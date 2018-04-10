@@ -1,0 +1,16 @@
+// Shukla default values
+{
+  name: "SHUKLA",
+  index: "config",
+  min_particles: -1,
+  max_particles: -1,
+  gen_neutrons: 1,
+  gen_protons: 1,
+  gen_gammas: 1,
+  gen_electrons: 1,
+  gen_muons: 1,
+  gen_pions: 1,
+  latitude: 0.0,
+  altitude: 0.0,
+  date: "1-1-2007",
+}

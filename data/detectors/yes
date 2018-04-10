@@ -1,0 +1,7 @@
+Debugger entered--Lisp error: (error "Kill ring is empty")
+  signal(error ("Kill ring is empty"))
+  error("Kill ring is empty")
+  current-kill(0)
+  yank(nil)
+  cua-paste(nil)
+  call-interactively(cua-paste nil nil)

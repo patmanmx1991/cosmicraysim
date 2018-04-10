@@ -1,0 +1,16 @@
+// CRY default values
+{
+  name: "CRY",
+  index: "config",
+  min_particles: 2.,
+  max_particles: -1.,
+  gen_neutrons: 0.,
+  gen_protons: 0.,
+  gen_gammas: 0.,
+  gen_electrons: 0.,
+  gen_muons: 0.,
+  gen_pions: 1.,
+  latitude: 0.0,
+  altitude: 0.0,
+  date: "1-1-2007",
+}

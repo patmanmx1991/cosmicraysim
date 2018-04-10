@@ -1,0 +1,7 @@
+{
+  name: "GLOBAL",
+  index: "config",
+  flux: "shukla",
+  physics: "default",
+  batchcommands: "",
+}
