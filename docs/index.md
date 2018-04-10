@@ -16,13 +16,6 @@ The purpose of this framework is to make it easy to perform muon tomography simu
 It includes options for different cosmic ray generators and physics lists which can be provided as strings at runtime, and a simple geometry loader through a JSON database format.
 
 
-
-## Installation Guide
-- [Prerequisites](installation/prerequisites)
-- [Building ROOT](installation/installingroot)
-- [Building GEANT4](installation/installinggeant4)
-- [Building CosmicRaySim](installation/buildingcosmic)
-
 ## Users Guide
 - [Getting Started](user-guide/gettingstarted.md)
 - [Editing DB Tables](user-guide/editingtables.md)

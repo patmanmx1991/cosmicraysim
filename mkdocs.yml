@@ -1,10 +1,6 @@
 site_name: Cosmic Ray Sim Documenation
 pages:
 - Home: index.md
-- Installation:
-  - Building ROOT: installation/installingroot
-  - Building GEANT4: installation/installinggeant4
-  - Building CosmicRaySim: installation/buildingcosmic
 - User Guide:
   - Getting Started: user-guide/gettingstarted.md
   - Editing Tables: user-guide/editingtables.md
