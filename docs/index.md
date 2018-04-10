@@ -21,6 +21,7 @@ It includes options for different cosmic ray generators and physics lists which 
 
 ## Users Guide
 - [Getting Started](users-guide/gettingstarted.md)
+- [Editing DB Tables](users-guide/editingtables.md)
 - [Making a Geometry](users-guide/makinggeometry.md)
 - [Choosing a Flux](users-guide/choosingflux.md)
 - [Choosing a Physics List](users-guide/choosingphysics.md)

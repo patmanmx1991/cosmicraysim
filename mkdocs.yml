@@ -2,11 +2,11 @@ site_name: Cosmic Ray Sim Documenation
 pages:
 - Home: index.md
 - User Guide:
-  - Getting Started: users-guide/gettingstarted.md
-  - Making Geometry: users-guide/makinggeometry.md
-  - Choosing a Flux: users-guide/choosingflux.md
-  - Choosing a Physics List: users-guide/choosingphysics.md
-  - Adding Detectors: users-guide/addingdetectors.md
+  - Getting Started: user-guide/gettingstarted.md
+  - Making Geometry: user-guide/makinggeometry.md
+  - Choosing a Flux: user-guide/choosingflux.md
+  - Choosing a Physics List: user-guide/choosingphysics.md
+  - Adding Detectors: user-guide/addingdetectors.md
 - Developer Guide:
   - Accessing DataBase: developers-guide/databaseaccess.md
 theme: readthedocs
