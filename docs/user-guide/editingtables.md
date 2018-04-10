@@ -13,7 +13,7 @@ The framework is setup so that flux/geometry objects are loaded from a given tab
 ```
 
 
-### Default Tables
+## Default Tables
 
 As soon as the framework starts it will first look inside $COSMICRAYSIM/data/ and load all tables that end in ".db",
 which are "default database" files defining some standard behaviour.
@@ -32,7 +32,7 @@ For example the "data/global.db" JSON table contains the default choice of physi
 ```
 
 
-### Loading Table Files
+## Loading Table Files
 
 Any extra JSON tables can be loaded at runtime, either by adding it to the "data" directory if it ends in ".db", or by loading it with the command line flag "-g" in the cosmicraysim application (the recommended way). 
 
@@ -52,7 +52,7 @@ cosmicraysim -g newtable.geo -g newtable2.geo ...
 ```
 
 
-### Table Type Formats
+## Table Type Formats
 The JSON reader can load many different data types, but gets a bit upset when the wrong datatype is loaded. If you see an exception caused when accessing the database but the entry is definitely in the table of interest then you should check the type is correct.
 
 
@@ -84,7 +84,7 @@ The JSON reader can load many different data types, but gets a bit upset when th
 ```
 
 
-### Comments
+## Comments
 Comments can be added anywhere in a table by including non-JSON format '//' characters.
 
 Example 1
@@ -105,7 +105,7 @@ Example 1
 ```
 
 
-### Cloning Tables
+## Cloning Tables
 
 To make loading geometries easier it is possible to clone an already existing table and edit some of its properties. If another table you want to clone already exists you can simply make a new table with a "clone" string field pointing to the other table.
 
