@@ -20,12 +20,12 @@ It includes options for different cosmic ray generators and physics lists which 
 ## Installation Guide
 
 ## Users Guide
-- [Getting Started](users-guide/gettingstarted.md)
-- [Editing DB Tables](users-guide/editingtables.md)
-- [Making a Geometry](users-guide/makinggeometry.md)
-- [Choosing a Flux](users-guide/choosingflux.md)
-- [Choosing a Physics List](users-guide/choosingphysics.md)
-- [Adding Detectors](users-guide/addingdetectors.md)
+- [Getting Started](user-guide/gettingstarted.md)
+- [Editing DB Tables](user-guide/editingtables.md)
+- [Making a Geometry](user-guide/makinggeometry.md)
+- [Choosing a Flux](user-guide/choosingflux.md)
+- [Choosing a Physics List](user-guide/choosingphysics.md)
+- [Adding Detectors](user-guide/addingdetectors.md)
 
 ## Developers Guide
 - [Accessing Database](developers-guide/databaseaccess.md)
