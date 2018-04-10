@@ -1,8 +1,14 @@
 site_name: Cosmic Ray Sim Documenation
 pages:
 - Home: index.md
+- Installation:
+  - Prerequisites: installation/prerequisites
+  - Building ROOT: installation/installingroot
+  - Building GEANT4: installation/installinggeant4
+  - Building CosmicRaySim: installation/buildingcosmic
 - User Guide:
   - Getting Started: user-guide/gettingstarted.md
+  - Editing Tables: user-guide/editingtables.md
   - Making Geometry: user-guide/makinggeometry.md
   - Choosing a Flux: user-guide/choosingflux.md
   - Choosing a Physics List: user-guide/choosingphysics.md
@@ -10,3 +16,6 @@ pages:
 - Developer Guide:
   - Accessing DataBase: developers-guide/databaseaccess.md
 theme: readthedocs
+
+
+

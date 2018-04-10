@@ -18,6 +18,10 @@ It includes options for different cosmic ray generators and physics lists which 
 
 
 ## Installation Guide
+- [Prerequisites](installation/prerequisites)
+- [Building ROOT](installation/installingroot)
+- [Building GEANT4](installation/installinggeant4)
+- [Building CosmicRaySim](installation/buildingcosmic)
 
 ## Users Guide
 - [Getting Started](user-guide/gettingstarted.md)
