@@ -109,7 +109,7 @@ Example 1
 
 To make loading geometries easier it is possible to clone an already existing table and edit some of its properties. If another table you want to clone already exists you can simply make a new table with a "clone" string field pointing to the other table.
 
- You must specify the fields name, clone, and index in the new table, where clone is the index of another table in with the same table name. Note, this only works across tables with the same TABLE_NAME, so you can't copy a "GEO" table to make a "FLUX" table. Then the DB reader will clone the other table, and use any entries to override the originals. 
+You must specify the fields name, clone, and index in the new table, where clone is the index of another table in with the same table name. Note, this only works across tables with the same TABLE_NAME, so you can't copy a "GEO" table to make a "FLUX" table. Then the DB reader will clone the other table, and use any entries to override the originals. 
 
 
 

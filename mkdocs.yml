@@ -2,7 +2,6 @@ site_name: Cosmic Ray Sim Documenation
 pages:
 - Home: index.md
 - Installation:
-  - Prerequisites: installation/prerequisites
   - Building ROOT: installation/installingroot
   - Building GEANT4: installation/installinggeant4
   - Building CosmicRaySim: installation/buildingcosmic
