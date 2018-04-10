@@ -1,10 +1,10 @@
 site_name: Sample Documentation
 pages:
 - Home: index.md
-- User Guide
+- User Guide:
   - Using the DataBase: user-guide/dbinputs.md
   - Using the Framework: user-guide/usingtheframework.md
-- Developer Guide
+- Developer Guide:
   - Accessing DataBase: developers-guide/databaseaccess.md
 theme: readthedocs
 
