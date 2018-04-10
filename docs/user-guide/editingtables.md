@@ -87,7 +87,6 @@ The JSON reader can load many different data types, but gets a bit upset when th
 ## Comments
 Comments can be added anywhere in a table by including non-JSON format '//' characters.
 
-Example 1
 ```
 // Geometry Definition
 {
