@@ -40,7 +40,9 @@ If loaded the generator itself will look for some further tables in the DB. Thes
 
 The commented out fields show the defaults which are loaded inside the generator. This table is usually kept in the database itself so the user doesn't have to provide it. If you want to edit any of these uncomment the line and change the value. Their descriptions are below.
 
-- **parameters**: Use a hard coded parameter set, each of the ones shown in the energy fit table in the Shukla paper are shown. Options are : "nottingham", "princealbert", "hamburg", "proton", "helium". It is also possible to load the parameter set, then change one parameter by including one of the other fields below. The default is the "nottingham" parameter set.
+- **parameters**: Use a hard coded parameter set, each of the ones shown in the energy fit table in the Shukla paper are shown. 
+Options are : "nottingham", "princealbert", "hamburg", "proton", "helium". 
+It is also possible to load the parameter set, then change one parameter by including one of the other fields below. The default is the "nottingham" parameter set.
 - **min_energy**: Minimum energy to generate muons at in GeV. Default is 5000. GeV. 
 - **max_energy**: Maximum energy to generate muons at in GeV. Default is 0.1 GeV. 
 - **I0**: Integrated Vertical Flux. Default is 88.5.
@@ -65,6 +67,7 @@ So that CosmicRaySim knows where to generate the particles in your custom geomet
 ```
 
 This table will be searched for at runtime by the Shukla generator and used to define where particles are produced. Its position and size are defined by a Geant4 box placed in the mother volume given the users specifications.
+
 - **size**: 3D size in meters of the source box. User should give x, y, and z lengths.
 - **position**: Position of the center of the source box in the WORLD volume co-ordinate system.
 
@@ -83,6 +86,7 @@ The Shukla generator also lets you skip over trajectories that are pointing away
 ```
 
 Again the user just has to specify the target box position and size
+
 - **size**: 3D size in meters of the source box. User should give x, y, and z lengths.
 - **position**: Position of the center of the source box in the WORLD volume co-ordinate system.
 
@@ -164,6 +168,7 @@ So that CosmicRaySim knows where to generate the particles in your custom geomet
 ```
 
 This table will be searched for at runtime by the Shukla generator and used to define where particles are produced. Its position and size are defined by a Geant4 box placed in the mother volume given the users specifications.
+
 - **size**: 3D size in meters of the source box. User should give x, y, and z lengths.
 - **position**: Position of the center of the source box in the WORLD volume co-ordinate system.
 
@@ -185,6 +190,7 @@ Since the CRY generator can produce multiple primaries (unlike the Shukla genera
 ```
 
 Again the user just has to specify the target box position and size
+
 - **size**: 3D size in meters of the source box. User should give x, y, and z lengths.
 - **position**: Position of the center of the source box in the WORLD volume co-ordinate system.
 
