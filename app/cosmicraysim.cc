@@ -60,6 +60,8 @@
 #include "G4THitsMap.hh"
 #include "G4SystemOfUnits.hh"
 
+#include <ctime>
+#include <iostream>
 
 #include "G4UserRunAction.hh"
 #include "globals.hh"
@@ -72,6 +74,7 @@ std::vector<std::string> gGeomtryFiles;
 std::string gNEvents = "-1";
 std::string gOutputFile = "";
 std::string gMacroFile = "";
+long gSeed = -1;
 bool gInteractive = false;
 
 int main(int argc, char** argv) {
@@ -104,6 +107,8 @@ int main(int argc, char** argv) {
       gMacroFile = std::string(argv[++i]);
     } else if (std::strcmp(argv[i], "-i") == 0) {
       gInteractive = true;
+    } else if (std::strcmp(argv[i], "-s") == 0){
+      gSeed = std::stol(argv[++i]);
     } else {
       std::cout << "Unknown COMMAND : " << argv[i] << std::endl;
       throw;
@@ -118,7 +123,17 @@ int main(int argc, char** argv) {
 
 
   // Choose the Random engine
-  G4Random::setTheEngine(new CLHEP::RanecuEngine);
+  CLHEP::RanecuEngine* rand = new CLHEP::RanecuEngine;
+  if (gSeed < 0){
+    long tl = std::time(0);
+    long pid = getpid();
+    std::cout << "PID = " << pid << " tl = " << tl << std::endl;
+    gSeed = pid + tl*100000;
+    std::cout << "SEED = " << gSeed << std::endl; 
+  }
+
+  rand->setSeed(gSeed);
+  G4Random::setTheEngine(rand);
 
   // Construct the default run manager. Pick the proper run
   // manager depending if the multi-threading option is
@@ -147,13 +162,6 @@ int main(int argc, char** argv) {
   // Get the pointer to the User Interface manager
   G4UImanager* UImanager = G4UImanager::GetUIpointer();
 
-  // Check valid output
-  if (gOutputFile.empty()) {
-    std::cout << "Need a valid output file : '-o outputfile.root' " << std::endl;
-    throw;
-  }
-
-  rdb->SetOutputFile(gOutputFile);
 
 
 
@@ -166,13 +174,21 @@ int main(int argc, char** argv) {
 
   // INTERACTIVE
   if (gInteractive) {
+
+    // Check valid output
+    if (gOutputFile.empty()) {
+      std::cout << "Need a valid output file : '-o outputfile.root' " << std::endl;
+      throw;
+    }
+    rdb->SetOutputFile(gOutputFile);
+
 #ifdef G4UI_USE
     G4UIExecutive* ui = new G4UIExecutive(argc, argv);
 
 #ifdef G4VIS_USE
-    UImanager->ApplyCommand("/control/execute init_vis.mac");
+    UImanager->ApplyCommand("/control/execute " + DB::GetDataPath() + "/init_vis.mac");
 #else
-    UImanager->ApplyCommand("/control/execute init.mac");
+    UImanager->ApplyCommand("/control/execute " + DB::GetDataPath() + "/init.mac");
 #endif
     // start the session here: make the Geant4 prompt Idle>
     // available to the user
@@ -187,12 +203,30 @@ int main(int argc, char** argv) {
     // MACRO
   } else if (!gMacroFile.empty()) { // batch mode
 
+
+    // Check valid output
+    if (gOutputFile.empty()) {
+      std::cout << "Need a valid output file : '-o outputfile.root' " << std::endl;
+      throw;
+    }
+
+    rdb->SetOutputFile(gOutputFile);
+
     G4String command = "/control/execute ";
     UImanager->ApplyCommand(command + gMacroFile);
 
 
     // BATCH
   } else {
+
+
+    // Check valid output
+    if (gOutputFile.empty()) {
+      std::cout << "Need a valid output file : '-o outputfile.root' " << std::endl;
+      throw;
+    }
+
+    rdb->SetOutputFile(gOutputFile);
 
     // Check N EVENTS
     if (std::stoi(gNEvents) < 1) {

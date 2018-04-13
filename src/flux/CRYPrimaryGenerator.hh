@@ -45,6 +45,9 @@
 #include "G4ParticleGun.hh"
 #include "globals.hh"
 #include <G4Box.hh>
+#include "analysis/Analysis.hh"
+#include "analysis/VFluxProcessor.hh"
+
 class G4Event;
 
 namespace COSMIC {
@@ -62,6 +65,7 @@ public:
         G4Box* GetSourceBox();
     std::vector<G4Box*> GetTargetBoxes();
     std::vector<G4ThreeVector> GetTargetBoxPositions();
+    G4double GetTime() {return fExposureTime;};
 
 private:
     std::vector<CRYParticle*> *vect; // vector of generated particles
@@ -97,8 +101,40 @@ private:
     
     std::string fSourceBoxIndex;
     bool fCheckTargetBoxes;
+    G4double fExposureTime;
+    int fNthrows;
 
     G4ThreeVector fSourceBoxPosition;
+};
+
+
+class CRYPrimaryFluxProcessor : public VFluxProcessor {
+public:
+  /// Processor can only be created with an associated
+  /// tracker object.
+  CRYPrimaryFluxProcessor(CRYPrimaryGenerator* gen, bool autosave=true);
+  /// Destructor
+  ~CRYPrimaryFluxProcessor(){};
+
+  /// Setup Ntuple entries
+  bool BeginOfRunAction(const G4Run* run);
+
+  /// Process the information the tracker recieved for this event
+  bool ProcessEvent(const G4Event* event);
+
+  /// Return an integrated exposure time in s. Used for
+  /// ending the run after so many seconds.
+  G4double GetExposureTime();
+
+protected:
+
+  CRYPrimaryGenerator* fGenerator; ///< Pointer to associated tracker SD
+
+  bool fSave; ///< Flag to save event info automatically
+
+  int fTimeIndex; ///< Time Ntuple Index
+
+
 };
 
 }

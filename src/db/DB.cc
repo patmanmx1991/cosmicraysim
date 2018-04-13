@@ -28,6 +28,10 @@ DB::DB()
 {
 }
 
+DB::DB(std::string filename){
+  this->LoadFile(DB::GetDataPath() + "/" + filename);
+}
+
 DB::~DB()
 {
 }
@@ -158,6 +162,31 @@ std::vector<DBLink*> DB::GetLinkGroup(std::string tablename){
   return tableset;
 }
 
+bool DB::HasTables(std::string name){
+  for (uint i = 0; i < fAllTables.size(); i++){
+    if (name.compare(fAllTables[i]->GetTableName()) == 0) return true;
+  }
+  return false;
+}
+
+DBLink* DB::CloneLink(std::string tablename, std::string ind1, std::string ind2){
+  DBTable* tbl = new DBTable(tablename, ind2);
+  
+  DBTable* cltbl = GetTable(tablename, ind1);
+  tbl->UpdateFields(cltbl);
+
+  fAllTables.push_back(tbl);
+
+  return new DBLink(this, tbl, tablename, ind2);
+}
+
+
+
+DBLink* DB::CreateLink(std::string tablename, std::string index){
+  DBTable* tbl = new DBTable(tablename, index);
+  fAllTables.push_back(tbl);
+  return new DBLink(this, tbl, tablename, index);
+}
 
 
 

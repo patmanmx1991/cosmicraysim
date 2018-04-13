@@ -20,10 +20,11 @@
 #include "G4PhysicalConstants.hh"
 #include "G4SystemOfUnits.hh"
 
-#include "GeoBox.hh"
-#include "GeoTubs.hh"
+#include "simple/GeoBox.hh"
+#include "simple/GeoTubs.hh"
+#include "dsc/DryStorageCask_VSC24.hh"
+#include "awemuontom/AWEMuonTomographyDetector.hh"
 
-///Task5d.1: Don't forget to include header file of your sensitive detector                                                                                                                                                                 
 #include "db/DB.hh"
 #include "db/DBTable.hh"
 #include <map>
@@ -34,10 +35,13 @@ namespace COSMIC{
 GeoObject* GeoObjectFactory::Construct(DBLink* table){
 
   std::string type = table->GetS("type");
+  std::cout << "Constructing Geometry : " << type << std::endl;
   if (type.compare("box")==0) return new GeoBox(table);
   else if (type.compare("tubs")==0) return new GeoTubs(table);
+  else if (type.compare("DSC_VSC24") == 0) return new DryStorageCask_VSC24(table);
+  else if (type.compare("awe_muontom") == 0) return new AWEMuonTomographyDetector(table);
 
-  std::cout << "Failed to Construct Geomtry" << std::endl;
+  std::cout << "Failed to Construct Geometry" << std::endl;
   return 0;
 }
 
@@ -45,7 +49,7 @@ GeoObject* GeoObjectFactory::Construct(DBLink* table){
 
 
 
-
+//----------------------------------------------------------
 GeoManager *GeoManager::fPrimary(0);
 
 GeoManager::GeoManager(){
@@ -115,13 +119,6 @@ int GeoManager::MotherStatus(DBLink* geo_tab){
 
 bool GeoManager::HasGeoObject(std::string name){
   return (fGeoObjects.find(name) != fGeoObjects.end());
-}
-
-
-void GeoManager::ConstructSensitive(){
-  for (int i = 0; i < fGeoIDs.size(); i++){
-    fGeoObjects[fGeoIDs[i]]->ConstructSensitive();
-  }
 }
 
 }

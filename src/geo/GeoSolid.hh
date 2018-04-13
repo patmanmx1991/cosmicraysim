@@ -18,25 +18,43 @@
 #include "G4SystemOfUnits.hh"
 #include "GeoObject.hh"
 #include "GeoUtils.hh"
+#include "db/DBLink.hh"
+#include "db/DB.hh"
 
 class G4LogicalVolume;
 class G4VPhysicalVolume;
 
 namespace COSMIC {
 
+/// Solid geometry object, building on the GeoObject template.
+/// Contains all functions to produce logical and physical volumes
+/// from a DBLink.
 class GeoSolid : public GeoObject {
 public:
-  inline GeoSolid(){};
-  inline GeoSolid(DBLink* table) {Construct(table);};
+
+  /// Empty Constructor
+  GeoSolid();
+
+  /// Function to actually create each volume from a table.
+  void Construct(DBLink* table);
+
+  /// Create the solid volume for this objet. Children must implement.
   virtual G4VSolid *ConstructSolidVolume(DBLink* table) = 0;
-  virtual G4LogicalVolume *ConstructLogicalVolume(DBLink* table, G4VSolid* solid);
-  virtual G4VPhysicalVolume* ConstructPhysicalVolume(DBLink* table, G4LogicalVolume* mother, G4LogicalVolume* logic);
-  virtual G4VSensitiveDetector* ConstructSensitiveDetector(DBLink* table, G4LogicalVolume* logic);
-  virtual void ConstructSensitive();
   
-  void Construct(DBLink* table);  
-  G4VSolid* fSolid;
-  G4VSensitiveDetector* fSensitive;
+  /// Construct logical volume given materials etc in a table
+  virtual G4LogicalVolume *ConstructLogicalVolume(DBLink* table, G4VSolid* solid);
+
+  /// Construct a physical volume placement given the settings in a table and the provided mother+logic
+  virtual G4VPhysicalVolume* ConstructPhysicalVolume(DBLink* table, G4LogicalVolume* mother, G4LogicalVolume* logic);
+
+  /// Construct a sensitive detector from the table and attach to the logic
+  virtual G4VSensitiveDetector* ConstructSensitiveDetector(DBLink* table, G4LogicalVolume* logic, G4VPhysicalVolume* vol);
+
+protected:
+
+  G4VSolid* fSolid; ///< Geant4 solid object for this geometry
+  G4VSensitiveDetector* fSensitive; ///< Pointer to sensitive detector object for this geometry
+
 };
 
 } // namespace COSMIC

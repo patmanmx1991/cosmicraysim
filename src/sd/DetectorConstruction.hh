@@ -60,7 +60,7 @@ class DetectorConstruction : public G4VUserDetectorConstruction
     /// Defines all the materials the detector is made of.
     void DefineMaterials();
 
-    G4bool  fCheckOverlaps;
+    // G4bool  fCheckOverlaps;
 };
 #endif
 

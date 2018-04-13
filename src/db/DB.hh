@@ -36,12 +36,14 @@ public:
 
   DB();
   virtual ~DB();
-
+  DB(std::string filename);
+  
   // Make a static way to access the DB
   static inline DB *Get()
     { return fPrimary == 0 ? fPrimary = new DB : fPrimary; };
   static std::string GetDataPath();
   static void PrintSplashScreen();
+  bool HasTables(std::string name);
   
   static DB *fPrimary;
 
@@ -59,6 +61,8 @@ public:
   DBLink* GetLink(std::string tablename, std::string index);
   std::vector<DBLink*> GetLinkGroup(std::string tablename);
   
+  DBLink* CreateLink(std::string tablename, std::string index);
+  DBLink* CloneLink(std::string tablename, std::string ind1, std::string ind2);
 
 protected:
   std::vector<DBTable*> fAllTables;

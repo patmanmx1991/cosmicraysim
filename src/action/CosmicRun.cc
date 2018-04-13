@@ -42,8 +42,8 @@
 #include "G4THitsMap.hh"
 #include "G4SystemOfUnits.hh"
 #include "sd/DetectorManager.hh"
-
-#include "action/CosmicAnalysis.hh"
+#include "trigger/TriggerManager.hh"
+#include "analysis/Analysis.hh"
 using namespace COSMIC;
 
 CosmicRun::CosmicRun()
@@ -57,29 +57,15 @@ CosmicRun::~CosmicRun()
 
 void CosmicRun::RecordEvent(const G4Event* event)
 {
-
-  // Get Analysis Manager
-  G4AnalysisManager* man = G4AnalysisManager::Instance();
-
-  int savecount = 0;
-  // Iterate through all the sensitive detectors and call the functions to read info
-  if (DetectorManager::Get()->GetNDetectors() > 0) {
-
-    // Get pointers to all detectors
-    bool saverow = DetectorManager::Get()->RecordEvent(event);
-    if (saverow) savecount++;
-  }
-
-  if (savecount > 0){
-    man->AddNtupleRow();
-  }
-
+  // Logging
   int eventid = event->GetEventID();
-  if (eventid % 10000 == 0){
-    std::cout << "### Processed Event " << eventid << std::endl;
+  if (eventid % 1000 == 0) {
+    std::cout << "### Processing Event : " << eventid
+              << "/" << numberOfEventToBeProcessed << std::endl;
   }
 
-  G4Run::RecordEvent(event);
+  Analysis::Get()->ProcessEvent(event);
+  Analysis::Get()->BeginOfEventAction();
 }
 
 

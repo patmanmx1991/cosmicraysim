@@ -22,11 +22,6 @@
 // * use  in  resulting  scientific  publications,  and indicate your *
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
-//
-// $Id: DefaultPhysics.cc 68058 2013-03-13 14:47:43Z gcosmo $
-//
-/// \file DefaultPhysics.cc
-/// \brief Implementation of the DefaultPhysics class
 
 #include "DefaultPhysics.hh"
 
@@ -34,7 +29,6 @@
 #include "G4RadioactiveDecayPhysics.hh"
 #include "G4EmStandardPhysics.hh"
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 DefaultPhysics::DefaultPhysics() 
 : G4VModularPhysicsList(){
@@ -54,17 +48,14 @@ DefaultPhysics::DefaultPhysics()
 
   // Standard EM Physics
   RegisterPhysics(new G4EmStandardPhysics());
-  // RegisterPhysics(new Shielding());
 
 }
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 DefaultPhysics::~DefaultPhysics()
 { 
 }
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void DefaultPhysics::SetCuts()
 {

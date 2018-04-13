@@ -42,10 +42,19 @@ public:
   double GetD(std::string name);
   std::string GetS(std::string name);
 
+  void Set(std::string name, int i);
+  void Set(std::string name, std::string s);
+  void Set(std::string name, std::vector<double> dv);
+  
   std::vector<int> GetVecI(std::string name);
   std::vector<float> GetVecF(std::string name);
   std::vector<double> GetVecD(std::string name);
   std::vector<std::string> GetVecS(std::string name);
+
+  inline void SetIndexName(std::string ind){ dbtable->SetIndexName(ind); };
+  inline void SetTableName(std::string ind){ dbtable->SetTableName(ind); };
+
+  void Prefix(std::string field, std::string pref);
 
   void Print();
 

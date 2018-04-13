@@ -45,6 +45,17 @@ bool DBLink::GetB(std::string name){
   return dbtable->GetI(name) > 0;
 }
 
+void DBLink::Set(std::string name, int i){
+  dbtable->Set(name, i);
+}
+
+void DBLink::Set(std::string name, std::string s){
+  dbtable->Set(name, s);
+}
+void DBLink::Set(std::string name, std::vector<double> dv){
+  dbtable->Set(name, dv);
+}
+
 int DBLink::GetI(std::string name){
   if (!dbtable) throw;
   return dbtable->GetI(name);
@@ -97,6 +108,10 @@ void DBLink::Lock(){
 void DBLink::Print(){
   std::cout << "DBLink : " << std::endl;
   dbtable->Print();
+}
+
+void DBLink::Prefix(std::string field, std::string pref){
+  dbtable->Prefix(field, pref);
 }
 
 

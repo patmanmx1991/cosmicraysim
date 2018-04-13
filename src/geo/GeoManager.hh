@@ -32,32 +32,32 @@
 //$$$$$$$$$$$$$$$$$$$$$$$$$$
 #include "GeoObject.hh"
 
-namespace COSMIC{
+namespace COSMIC {
 
 class GeoManager {
 public:
   GeoManager();
-  ~GeoManager(){};
+  ~GeoManager() {};
 
-G4LogicalVolume* GetMother(DBLink* geo_tab);
+  G4LogicalVolume* GetMother(DBLink* geo_tab);
 
   G4VPhysicalVolume* ConstructAll();
   std::vector<DBLink*> fGeoTables;
   std::map<std::string, GeoObject*> fGeoObjects;
-  int MotherStatus(DBLink* geo_tab);  
+  int MotherStatus(DBLink* geo_tab);
   bool HasGeoObject(std::string name);
 
-  void ConstructSensitive();
+  // void ConstructSensitive();
   std::vector<std::string> fGeoIDs;
   static inline GeoManager *Get()
-    { return fPrimary == 0 ? fPrimary = new GeoManager : fPrimary; };
+  { return fPrimary == 0 ? fPrimary = new GeoManager : fPrimary; };
   static GeoManager *fPrimary;
 
 };
 
 
 namespace GeoObjectFactory {
-  GeoObject* Construct(DBLink* table);
+GeoObject* Construct(DBLink* table);
 }
 
 }

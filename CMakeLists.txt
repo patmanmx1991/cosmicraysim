@@ -34,10 +34,10 @@ find_package(ROOT QUIET)
 if(ROOT_FOUND)
 add_definitions(-DG4ANALYSIS_USE_ROOT)
 include(${Geant4_USE_FILE})
-include_directories(${ROOT_INCLUDE_DIR} ${Geant4_INCLUDE_DIR} ${PROJECT_SOURCE_DIR}/src/RAT/ ${PROJECT_SOURCE_DIR}/src/)
+include_directories(${ROOT_INCLUDE_DIR} ${Geant4_INCLUDE_DIR} ${PROJECT_SOURCE_DIR}/src/RAT/ ${PROJECT_SOURCE_DIR}/src/ ${PROJECT_SOURCE_DIR}/src/geo/)
 else()
 include(${Geant4_USE_FILE})
-include_directories(${PROJECT_SOURCE_DIR}/src/ ${PROJECT_SOURCE_DIR}/src/)
+include_directories(${PROJECT_SOURCE_DIR}/src/ ${PROJECT_SOURCE_DIR}/src/ ${PROJECT_SOURCE_DIR}/src/geo/)
 endif()
 
 
@@ -45,8 +45,8 @@ endif()
 # Locate sources and headers for this project
 # NB: headers are included so they will show up in IDEs
 #
-file(GLOB sources ${PROJECT_SOURCE_DIR}/src/*/*.cc)
-file(GLOB headers ${PROJECT_SOURCE_DIR}/src/*/*.hh)
+file(GLOB sources ${PROJECT_SOURCE_DIR}/src/*/*.cc ${PROJECT_SOURCE_DIR}/src/geo/*/*.cc)
+file(GLOB headers ${PROJECT_SOURCE_DIR}/src/*/*.hh ${PROJECT_SOURCE_DIR}/src/geo/*/*.cc)
 
 #----------------------------------------------------------------------------
 # Add the executable, and link it to the Geant4 libraries

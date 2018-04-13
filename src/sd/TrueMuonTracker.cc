@@ -1,71 +1,43 @@
 #include "TrueMuonTracker.hh"
+#include "analysis/Analysis.hh"
+#include "db/DBLink.hh"
 
 namespace COSMIC {
 
-TrueMuonTracker::TrueMuonTracker(DBLink* tbl)
-  : DetectorObject(tbl)
+//------------------------------------------------------------------
+TrueMuonTracker::TrueMuonTracker(DBLink* tbl):
+  VDetector(tbl->GetIndexName(), "truemuon")
 {
-  std::cout << "Creating new muon tracker " << std::endl;
-  fTable   = tbl;
-  fType    = fTable->GetS("type");
-  fTableIndex    = fTable->GetIndexName() + "_" + fType;
-}
+  std::cout << "Creating new " << GetType()
+            << " detector : " << GetID() << std::endl;
 
-TrueMuonTracker::~TrueMuonTracker() {
-}
+  // Set initial state
+  ResetState();
 
-bool TrueMuonTracker::BeginOfRunAction(const G4Run* run) {
-  std::cout << "Registering TrueMuonTracker NTuples " << fTableIndex << std::endl;
-
-  G4AnalysisManager* man = G4AnalysisManager::Instance();
-
-  // Fill index energy
-  fMuonTimeIndex = man ->CreateNtupleDColumn(fTableIndex + "_t");
-  fMuonMomXIndex = man ->CreateNtupleDColumn(fTableIndex + "_px");
-  fMuonMomYIndex = man ->CreateNtupleDColumn(fTableIndex + "_py");
-  fMuonMomZIndex = man ->CreateNtupleDColumn(fTableIndex + "_pz");
-  fMuonPosXIndex = man ->CreateNtupleDColumn(fTableIndex + "_x");
-  fMuonPosYIndex = man ->CreateNtupleDColumn(fTableIndex + "_y");
-  fMuonPosZIndex = man ->CreateNtupleDColumn(fTableIndex + "_z");
-  fMuonPDGIndex  = man ->CreateNtupleIColumn(fTableIndex + "_pdg");
-
-  Reset();
-  return true;
-}
-
-bool TrueMuonTracker::RecordEvent(const G4Event* event) {
-
-  G4AnalysisManager* man = G4AnalysisManager::Instance();
-  man->FillNtupleDColumn(fMuonTimeIndex, -999.);
-  man->FillNtupleDColumn(fMuonMomXIndex, -999.);
-  man->FillNtupleDColumn(fMuonMomYIndex, -999.);
-  man->FillNtupleDColumn(fMuonMomZIndex, -999.);
-  man->FillNtupleDColumn(fMuonPosXIndex, -999.);
-  man->FillNtupleDColumn(fMuonPosYIndex, -999.);
-  man->FillNtupleDColumn(fMuonPosZIndex, -999.);
-  man->FillNtupleIColumn(fMuonPDGIndex, -999);
-
-
-
-  if (fTotEDep > 0.) {
-    // Fill muon vectors
-    man->FillNtupleDColumn(fMuonTimeIndex, fMuonTime);
-    man->FillNtupleDColumn(fMuonMomXIndex, fMuonMom.x() / MeV);
-    man->FillNtupleDColumn(fMuonMomYIndex, fMuonMom.y() / MeV);
-    man->FillNtupleDColumn(fMuonMomZIndex, fMuonMom.z() / MeV);
-    man->FillNtupleDColumn(fMuonPosXIndex, fMuonPos.x() / m);
-    man->FillNtupleDColumn(fMuonPosYIndex, fMuonPos.y() / m);
-    man->FillNtupleDColumn(fMuonPosZIndex, fMuonPos.z() / m);
-    man->FillNtupleIColumn(fMuonPDGIndex, fMuonPDG);
-    Reset();
-    return true;
-  } else {
-    Reset();
-    return false;
+  // By default also include the auto processor
+  // std::cout << "TRUE MUON PROCESSOR : " << tbl->GetI("processor") << std::endl;
+  if (!tbl->Has("processor") or tbl->GetI("processor") > 0) {
+    Analysis::Get()->RegisterProcessor(new TrueMuonProcessor(this));
   }
 }
 
-void TrueMuonTracker::Reset() {
+TrueMuonTracker::TrueMuonTracker(std::string name, std::string id, bool autoprocess, bool autosave):
+  VDetector(name, id)
+{
+  std::cout << "Creating new " << GetType()
+            << " detector : " << GetID() << std::endl;
+
+  // Set initial state
+  ResetState();
+
+  // By default also include the auto processor
+  if (autoprocess) {
+    Analysis::Get()->RegisterProcessor(new TrueMuonProcessor(this, autosave));
+  }
+}
+
+void TrueMuonTracker::ResetState() {
+  VDetector::ResetState();
   fMuonTime = 0.0;
   fMuonMom = G4ThreeVector();
   fMuonPos = G4ThreeVector();
@@ -74,8 +46,7 @@ void TrueMuonTracker::Reset() {
   fTotEDep = 0.0;
 }
 
-
-G4bool TrueMuonTracker::ProcessHits(G4Step* step, G4TouchableHistory* touch) {
+G4bool TrueMuonTracker::ProcessHits(G4Step* step, G4TouchableHistory* /*touch*/) {
 
   // Don't save tracks if no energy left in the detector
   G4double edep = step->GetTotalEnergyDeposit();
@@ -105,5 +76,65 @@ G4bool TrueMuonTracker::ProcessHits(G4Step* step, G4TouchableHistory* touch) {
 }
 
 
-
+//------------------------------------------------------------------
+TrueMuonProcessor::TrueMuonProcessor(TrueMuonTracker* trkr, bool autosave) :
+  VProcessor(trkr->GetID()), fSave(autosave)
+{
+  fTracker = trkr;
 }
+
+bool TrueMuonProcessor::BeginOfRunAction(const G4Run* /*run*/) {
+
+  std::string tableindex = GetID();
+  std::cout << "Registering TrueMuonProcessor NTuples " << tableindex << std::endl;
+
+  G4AnalysisManager* man = G4AnalysisManager::Instance();
+
+  // Fill index energy
+  fMuonTimeIndex = man ->CreateNtupleDColumn(tableindex + "_t");
+  fMuonMomXIndex = man ->CreateNtupleDColumn(tableindex + "_px");
+  fMuonMomYIndex = man ->CreateNtupleDColumn(tableindex + "_py");
+  fMuonMomZIndex = man ->CreateNtupleDColumn(tableindex + "_pz");
+  fMuonPosXIndex = man ->CreateNtupleDColumn(tableindex + "_x");
+  fMuonPosYIndex = man ->CreateNtupleDColumn(tableindex + "_y");
+  fMuonPosZIndex = man ->CreateNtupleDColumn(tableindex + "_z");
+  fMuonPDGIndex  = man ->CreateNtupleIColumn(tableindex + "_pdg");
+
+  return true;
+}
+
+bool TrueMuonProcessor::ProcessEvent(const G4Event* /*event*/) {
+  
+  // Register Trigger State
+  fHasInfo = fTracker->GetTotEDep() > 0.0;
+  fTime    = fTracker->GetMuonTime();
+  fEnergy  = fTracker->GetTotEDep();
+  
+  // Set Ntuple to defaults
+  G4AnalysisManager* man = G4AnalysisManager::Instance();
+  man->FillNtupleDColumn(fMuonTimeIndex, -999.);
+  man->FillNtupleDColumn(fMuonMomXIndex, -999.);
+  man->FillNtupleDColumn(fMuonMomYIndex, -999.);
+  man->FillNtupleDColumn(fMuonMomZIndex, -999.);
+  man->FillNtupleDColumn(fMuonPosXIndex, -999.);
+  man->FillNtupleDColumn(fMuonPosYIndex, -999.);
+  man->FillNtupleDColumn(fMuonPosZIndex, -999.);
+  man->FillNtupleIColumn(fMuonPDGIndex,  -999 );
+
+  if (fHasInfo) {
+    // Fill muon vectors
+    man->FillNtupleDColumn(fMuonTimeIndex, fTracker->GetMuonTime());
+    man->FillNtupleDColumn(fMuonMomXIndex, fTracker->GetMuonMom().x() / MeV);
+    man->FillNtupleDColumn(fMuonMomYIndex, fTracker->GetMuonMom().y() / MeV);
+    man->FillNtupleDColumn(fMuonMomZIndex, fTracker->GetMuonMom().z() / MeV);
+    man->FillNtupleDColumn(fMuonPosXIndex, fTracker->GetMuonPos().x() / m);
+    man->FillNtupleDColumn(fMuonPosYIndex, fTracker->GetMuonPos().y() / m);
+    man->FillNtupleDColumn(fMuonPosZIndex, fTracker->GetMuonPos().z() / m);
+    man->FillNtupleIColumn(fMuonPDGIndex , fTracker->GetMuonPDG());
+    return true;
+  } else {
+    return false;
+  }
+}
+
+} // - namespace COSMIC

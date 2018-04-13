@@ -33,8 +33,6 @@
 
 #include "G4Run.hh"
 #include "globals.hh"
-#include "sd/DetectorManager.hh"
-#include "geo/GeoManager.hh"
 
 class CosmicRun : public G4Run
 {
@@ -43,10 +41,7 @@ class CosmicRun : public G4Run
     virtual ~CosmicRun();
     virtual void RecordEvent(const G4Event*);
     virtual void Merge(const G4Run*);
-    
 };
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #endif
 

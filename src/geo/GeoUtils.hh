@@ -1,35 +1,28 @@
 #ifndef __GEOUTILS_HH__
 #define __GEOUTILS_HH__
 
+#include <iostream>
+#include "G4Box.hh"
 #include "G4SolidStore.hh"
 #include "G4LogicalVolumeStore.hh"
-
-#include "GeoSolid.hh"
-
-#include "G4NistManager.hh"
-#include "G4Box.hh"
-#include "G4Tubs.hh"
 #include "G4LogicalVolume.hh"
-#include "G4PVPlacement.hh"
-#include "G4RotationMatrix.hh"
-#include "G4Transform3D.hh"
-#include "G4SDManager.hh"
-#include "G4MultiFunctionalDetector.hh"
-#include "G4VPrimitiveScorer.hh"
-#include "G4PSEnergyDeposit.hh"
-#include "G4PSDoseDeposit.hh"
-#include "G4VisAttributes.hh"
-#include "G4PhysicalConstants.hh"
-#include "G4SystemOfUnits.hh"
+#include "db/DBLink.hh"
 
-namespace COSMIC{
-  namespace GEO{
-    G4VSolid* GetSolidFromStore(std::string name, bool verbose=true);
-    G4Box* GetBoxFromStore(std::string name, bool verbose=true);
-    G4LogicalVolume* GetLogicalFromStore(std::string name, bool verbose=true);
-    G4LogicalVolume* GetMotherLogicalFromStore(DBLink* tb, bool verbose=true);
+namespace COSMIC {
 
-  }
-}
+/// GEO Utils namespace
+namespace GEO {
+
+/// Get a solid from the Geant4 solid store via name
+G4VSolid* GetSolidFromStore(std::string name, bool verbose = true);
+/// Get a G4Box from the Geant4 solid store via name
+G4Box* GetBoxFromStore(std::string name, bool verbose = true);
+/// Get a logical volume from the Geant4 logical volume store via name
+G4LogicalVolume* GetLogicalFromStore(std::string name, bool verbose = true);
+/// Get a mother logical volume from the store via a table
+G4LogicalVolume* GetMotherLogicalFromStore(DBLink* tb, bool verbose = true);
+
+} // - namespace GEO
+} // - namespace COSMIC
 
 #endif

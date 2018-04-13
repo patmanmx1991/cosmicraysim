@@ -17,18 +17,22 @@
 #include "G4SystemOfUnits.hh"
 #include "G4GlobalMagFieldMessenger.hh"
 #include <map>
+#include "geo/GeoManager.hh"
+#include "G4VUserDetectorConstruction.hh"
+
 
 #include "db/DB.hh"
 #include "db/DBTable.hh"
 #include "geo/GeoManager.hh"
 #include "sd/DetectorManager.hh"
 #include "geo/GeoManager.hh"
+#include "trigger/TriggerManager.hh"
+
 
 using namespace COSMIC;
 
 DetectorConstruction::DetectorConstruction()
-  : G4VUserDetectorConstruction(),
-    fCheckOverlaps(true)
+  : G4VUserDetectorConstruction()
 {
   DefineMaterials();
 }
@@ -41,30 +45,14 @@ void DetectorConstruction::DefineMaterials()
 
 G4VPhysicalVolume* DetectorConstruction::Construct()
 {
-  // Delete the old detector if we are constructing a new one
-  // G4GeometryManager::GetInstance()->OpenGeometry();
-  // G4PhysicalVolumeStore::GetInstance()->Clean();
-  // G4LogicalVolumeStore::GetInstance()->Clean();
-  // G4SolidStore::GetInstance()->Clean();
-
-  // Load all possible sensitive detector objects first...
-  // DetectorManager::Get()->ConstructAll();
-
   // Build entire geometry
   G4VPhysicalVolume* world = GeoManager::Get()->ConstructAll();
-
   // Return pointer to physical world volume
   return world;
 }
 
 void DetectorConstruction::ConstructSDandField()
 {
-  G4SDManager::GetSDMpointer()->SetVerboseLevel(1);
-
-  // Geometry objects handle their own sensitivities...
-  GeoManager::Get()->ConstructSensitive();
-
-
-
+  // GeoManager::Get()->ConstructSensitive();
   return;
 }

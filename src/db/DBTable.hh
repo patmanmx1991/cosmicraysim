@@ -21,6 +21,8 @@ public:
   // Constructors
   DBTable();
   DBTable(json::Value v);
+  DBTable(std::string name, std::string ind);
+
   virtual ~DBTable();
 
   // Access Functions
@@ -31,6 +33,10 @@ public:
   std::vector<std::string> GetFields();
 
   bool Has(std::string name);
+
+  void Set(std::string name, int i);
+  void Set(std::string name, std::string s);
+  void Set(std::string name, std::vector<double> dv);
 
   int GetI(std::string name);
   float GetF(std::string name);
@@ -46,7 +52,9 @@ public:
   inline json::Value GetJSON(){return table;};
 
   void UpdateFields(DBTable* overrides);
-  inline void SetIndexName(std::string ind){ index = ind; };
+  inline void SetIndexName(std::string ind){ index = ind; Set("index",ind); };
+  inline void SetTableName(std::string ind){ tblname = ind; Set("name",ind); };
+  void Prefix(std::string name, std::string pref);
   
 protected:
   std::string tblname; 

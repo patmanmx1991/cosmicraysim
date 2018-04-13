@@ -6,10 +6,26 @@ DBTable::DBTable()
 {
 }
 
+
+
 DBTable::~DBTable()
 {
   tblname.clear();
   index.clear();
+}
+
+
+DBTable::DBTable(std::string name, std::string ind)
+{
+
+  table = json::Value();
+  std::string temp = "name";
+  table.setMember(temp, json::Value(name));
+  temp = "index";
+  table.setMember(temp, json::Value(ind));
+
+  tblname = GetS("name");
+  index   = GetS("index");
 }
 
 DBTable::DBTable(json::Value v)
@@ -22,6 +38,13 @@ DBTable::DBTable(json::Value v)
 std::vector<std::string> DBTable::GetFields() {
   return table.getMembers();
 }
+
+void DBTable::Prefix(std::string name, std::string pref){
+  std::string val = GetS(name);
+  Set(name, pref + val);
+  return;
+}
+
 
 void DBTable::Print() {
   std::cout << "----------------------" << std::endl;
@@ -89,10 +112,24 @@ std::vector<std::string> DBTable::GetVecS(std::string field) {
 }
 
 
+
+
+void DBTable::Set(std::string field, int i) {
+  table.setMember(field, json::Value(i));
+}
+
+void DBTable::Set(std::string field, std::string s){
+  table.setMember(field, json::Value(s));
+}
+void DBTable::Set(std::string field, std::vector<double> dv){
+  table.setMember(field, json::Value(dv));
+}
+
+
+
 bool DBTable::Has(std::string field) {
   return table.isMember(field);
 }
-
 
 void DBTable::UpdateFields(DBTable* tbl) {
   std::vector<std::string> updates = tbl->GetFields();

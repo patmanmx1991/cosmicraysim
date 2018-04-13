@@ -18,28 +18,37 @@
 #include "G4SystemOfUnits.hh"
 #include "GeoUtils.hh"
 #include "sd/DetectorManager.hh"
+#include "analysis/VDetector.hh"
+#include "analysis/Analysis.hh"
+#include "db/DB.hh"
+#include "db/DBLink.hh"
+
 
 namespace COSMIC {
 
+GeoSolid::GeoSolid() 
+{
+}
 
-void GeoSolid::Construct(DBLink* table) {
-  fTable  = table;
-  fName = fTable->GetIndexName();
+void GeoSolid::Construct(DBLink* table) 
+{
+  SetID(table->GetIndexName());
+  SetType(table->GetS("type"));
 
   // Get mother
-  fMotherLogical = GEO::GetMotherLogicalFromStore(fTable);
+  fMotherLogical = GEO::GetMotherLogicalFromStore(table);
 
   // Construct Solid
-  fSolid = ConstructSolidVolume(fTable);
+  fSolid = ConstructSolidVolume(table);
 
   // Construct Logical Volume
-  fLogical = ConstructLogicalVolume(fTable, fSolid);
+  fLogical = ConstructLogicalVolume(table, fSolid);
 
   // Construct Physical Volume
-  fPhysical = ConstructPhysicalVolume(fTable, fMotherLogical, fLogical);
+  fPhysical = ConstructPhysicalVolume(table, fMotherLogical, fLogical);
 
   // Construct Sensitive Detector
-  // fSensitive = ConstructSensitiveDetector(fTable, fLogical);
+  fSensitive = ConstructSensitiveDetector(table, fLogical, fPhysical);
 }
 
 
@@ -102,7 +111,7 @@ G4VPhysicalVolume* GeoSolid::ConstructPhysicalVolume(DBLink* table, G4LogicalVol
 
   // Setup orientation
   G4RotationMatrix *rotation = new G4RotationMatrix();
-  if (fTable->Has("orientation")) {
+  if (table->Has("orientation")) {
     const std::vector<double> &orientvector = table->GetVecD("orientation");
     G4ThreeVector soliddir;
     double angle_y = 0;
@@ -117,7 +126,7 @@ G4VPhysicalVolume* GeoSolid::ConstructPhysicalVolume(DBLink* table, G4LogicalVol
     rotation->rotateX(angle_x);
     rotation->rotateZ(angle_z);
   }
-  if (fTable->Has("rotation")) {
+  if (table->Has("rotation")) {
     const std::vector<double> &rotvector = table->GetVecD("rotation");
     rotation->rotateX(rotvector[0] * CLHEP::deg);
     rotation->rotateY(rotvector[1] * CLHEP::deg);
@@ -126,7 +135,7 @@ G4VPhysicalVolume* GeoSolid::ConstructPhysicalVolume(DBLink* table, G4LogicalVol
 
   // Setup positoin
   G4ThreeVector position(0.0, 0.0, 0.0);
-  if (fTable->Has("position")) {
+  if (table->Has("position")) {
     const std::vector<double> &posvector = table->GetVecD("position");
     position.setX(posvector[0] * CLHEP::m);
     position.setY(posvector[1] * CLHEP::m);
@@ -138,30 +147,26 @@ G4VPhysicalVolume* GeoSolid::ConstructPhysicalVolume(DBLink* table, G4LogicalVol
                            mother, false /*?*/, 0 /*?*/);
 }
 
-void GeoSolid::ConstructSensitive() {
-  fSensitive = ConstructSensitiveDetector(fTable, fLogical);
-}
-
-G4VSensitiveDetector* GeoSolid::ConstructSensitiveDetector(DBLink* table, G4LogicalVolume* logic) {
+G4VSensitiveDetector* GeoSolid::ConstructSensitiveDetector(DBLink* table, G4LogicalVolume* logic, G4VPhysicalVolume* vol) {
 
   // See if has sensitive detector
   if (!table->Has("sensitive")) return 0;
 
   // If it does then create a new SD object
-  std::string sensitive = table->GetS("sensitive");
-  G4VSensitiveDetector* sd = DetectorObjectFactory::CreateSD(sensitive);
+  std::string sensitive = table->GetS("sensitive");  
 
-  // Register the SD with the Geant4 SD Manager and our own
-  G4SDManager::GetSDMpointer()->AddNewDetector(sd);
-  DetectorManager::Get()->RegisterSensitiveDetector(table->GetS("index") + "_" + sensitive, sd);
-  logic->SetSensitiveDetector(sd);
+  // look up table 
+  DBLink* sdtbl = DB::Get()->CloneLink("DETECTOR",sensitive, table->GetIndexName() + "_" + sensitive);
+  VDetector* sd = DetectorObjectFactory::CreateSD(sdtbl);
+
+  // Assign the logical volume
+  sd->SetLogicalVolume(logic, vol);
+
+  // Register with analysis manager
+  Analysis::Get()->RegisterDetector(sd);
 
   // Return the sensitive detector for this volume
   return sd;
 }
-
-
-
-
 
 } // namespace COSMIC
