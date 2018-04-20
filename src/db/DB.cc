@@ -21,7 +21,7 @@ void DB::PrintSplashScreen(){
   std::cout << "\n CRESTA : Cosmic Rays for Environmental Science and Technology Applications" << std::endl;
   std::cout << "\n\n Authors: Chris Steer, Patrick Stowell, Lee Thompson" << std::endl;
   std::cout << " contact : p.stowell@sheffield.ac.uk" << std::endl;
-  std::cout << "\n =========================================" << std::endl;
+  std::cout << "\n=========================================" << std::endl;
 }
 
 DB::DB()
@@ -38,7 +38,7 @@ DB::~DB()
 
 int DB::Load(std::string filename)
 {
-    std::cout << "Trying to Load : " << filename << std::endl;
+  //    std::cout << "Trying to Load : " << filename << std::endl;
   // Try to get file info assuming the name is literal
   struct stat s;
   stat(filename.c_str(), &s);
@@ -50,7 +50,7 @@ int DB::Load(std::string filename)
   if (S_ISDIR(s.st_mode)){
     return LoadAll(filename);
   } else if (f.rfind(suf) == (f.size() - suf.size())){
-    std::cout << "Trying to LoadFile" << std::endl;
+    //    std::cout << "Trying to LoadFile" << std::endl;
     return LoadFile(filename);
   } else {
     return 1;
@@ -63,7 +63,7 @@ int DB::Load(std::string filename)
 
 int DB::LoadFile(std::string filename)
 {
-  std::cout << "DB: Loading '" << filename << "'' ... ";
+  std::cout << "DB : --> Loading '" << filename << "'' ... ";
   // Try to read and parse it as databse or JSON file.
   std::vector<DBTable *> contents;
   contents = ReadDBFile(filename);
@@ -80,7 +80,7 @@ int DB::LoadFile(std::string filename)
 
 int DB::LoadAll(std::string dirname, std::string pattern)
 {
-  std::cout << "DB: Loading all DB files from " << dirname << pattern << std::endl;
+  std::cout << "DB : Loading all DB files from " << dirname << pattern << std::endl;
   pattern = dirname + "/*"; //pattern;
   glob_t g;
 
@@ -158,7 +158,7 @@ std::vector<DBLink*> DB::GetLinkGroup(std::string tablename){
     std::string index = fAllTables[i]->GetIndexName();
     tableset.push_back(new DBLink(this, fAllTables[i], tablename, index));
   }
-  if (tableset.size() == 0) throw DBNotFoundError(tablename, "", "");  
+  // if (tableset.size() == 0) throw DBNotFoundError(tablename, "", "");  
   return tableset;
 }
 
@@ -189,6 +189,36 @@ DBLink* DB::CreateLink(std::string tablename, std::string index){
 }
 
 
+void DB::WriteDB(std::string s)
+{
+
+//   // Should actually dump all the information into entries in the TTree
+//   TFile* f = new TFile(s.c_str(),"RECREATE");
+//   TTree* t = new TTree("database","database");
+//   std::vector<DBROOTIO*> dbios;
+
+//   // Loop over Tables
+//   for (uint i = 0; i < fAllTables.size(); i++){
+    
+//     std::string name = fAllTables[i]->GetTableName() + "@" + fAllTables[i]->GetIndexName();
+//     DBROOTIO* rootio = fAllTables[i]->GetROOTIO();
+//     t->Branch(name.c_str(), rootio);
+//     dbios.push_back(dbio);
+
+//   }
+
+//   // Save Tree and Close
+//   t->Fill();
+//   t->Write();
+//   f->Close();
+
+//   // Delete IO Objects
+//   for (uint i = 0; i < dbios.size(); i++){
+//     delete (dbios[i]);
+//   }
+//   delete f;
+//   delete t;
+}
 
 
 

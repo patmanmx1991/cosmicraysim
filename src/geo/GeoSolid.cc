@@ -23,14 +23,15 @@
 #include "db/DB.hh"
 #include "db/DBLink.hh"
 
+#include "materials/MaterialManager.hh"
 
 namespace COSMIC {
 
-GeoSolid::GeoSolid() 
+GeoSolid::GeoSolid()
 {
 }
 
-void GeoSolid::Construct(DBLink* table) 
+void GeoSolid::Construct(DBLink* table)
 {
   SetID(table->GetIndexName());
   SetType(table->GetS("type"));
@@ -59,7 +60,7 @@ G4LogicalVolume* GeoSolid::ConstructLogicalVolume(DBLink* table, G4VSolid* solid
   G4Material* geo_material = NULL;
   if (table->Has("material")) {
     std::string geo_matname = table->GetS("material");
-    geo_material = nist->FindOrBuildMaterial(geo_matname);
+    geo_material = MaterialFactory::GetMaterial(geo_matname);
   }
   G4LogicalVolume* geo_logic = new G4LogicalVolume(solid, geo_material, name);
 
@@ -106,7 +107,8 @@ G4LogicalVolume* GeoSolid::ConstructLogicalVolume(DBLink* table, G4VSolid* solid
   return geo_logic;
 }
 
-G4VPhysicalVolume* GeoSolid::ConstructPhysicalVolume(DBLink* table, G4LogicalVolume* mother, G4LogicalVolume* logic) {
+G4VPhysicalVolume* GeoSolid::ConstructPhysicalPlacement(DBLink* table, G4LogicalVolume* mother, G4LogicalVolume* logic) {
+
   std::string name = table->GetIndexName();
 
   // Setup orientation
@@ -145,7 +147,93 @@ G4VPhysicalVolume* GeoSolid::ConstructPhysicalVolume(DBLink* table, G4LogicalVol
   // Create Physical
   return new G4PVPlacement(rotation, position, logic, name,
                            mother, false /*?*/, 0 /*?*/);
+
 }
+
+G4VPhysicalVolume* GeoSolid::ConstructPhysicalReplica(DBLink* table, G4LogicalVolume* mother, G4LogicalVolume* logic) {
+
+  std::string volume_name = table->GetIndexName();
+  G4VPhysicalVolume *pv;
+
+
+  // int replicas = table->GetI("replicas");
+  // string axis_str = table->GetS("replica_axis");
+  // EAxis axis = kXAxis;
+
+  // if (axis_str == "x")
+  //   axis = kXAxis;
+  // else if (axis_str == "y")
+  //   axis = kYAxis;
+  // else if (axis_str == "z")
+  //   axis = kZAxis;
+  // else if (axis_str == "rho")
+  //   axis = kRho;
+  // else if (axis_str == "phi")
+  //   axis = kPhi;
+
+  // G4double replica_spacing = table->GetD("replica_spacing") * CLHEP::mm;
+  // pv = new G4PVReplica(volume_name, logic, mother, axis, replicas, replica_spacing);
+
+  return pv;
+}
+
+
+G4VPhysicalVolume* GeoSolid::ConstructPhysicalParametrisation(DBLink* table, G4LogicalVolume* mother, G4LogicalVolume* logic) {
+
+  std::string volume_name = table->GetIndexName();
+  G4VPhysicalVolume *pv;
+
+  // This is a bit harder to do nested parametrisation.
+  // Could do it in composite but would be hard to assign sensitive detectors.
+  // Maybe thats fine? Need to make sensitive detectors record copyNo so that they account for a layer.
+  // Also need to make the Drift Chamber positions do the same really....
+
+  // 
+
+  // // std::string parametrisation = table->GetS("parametrisation");
+  // // G4VPVParametrised* pr = GeoManager::GetParametrisation(parametrisation);
+
+  // // new G4VPVParametrised(volume_name, logic, mother, axis, nch, )
+
+
+  return pv;
+}
+
+
+
+G4VPhysicalVolume* GeoSolid::ConstructPhysicalVolume(DBLink* table, G4LogicalVolume* mother, G4LogicalVolume* logic) {
+  std::string name = table->GetIndexName();
+
+  int replicas = 0;
+  if (table->Has("replicas")) replicas = table->GetI("replicas");
+
+  std::string parametrisation = "";
+  if (table->Has("parametrisation"))  parametrisation = table->GetS("parametrisation");
+
+  // Check if its placement/replica/parametrised
+  if (replicas > 0) {
+
+    // Check not dodgy inputs
+    if (!parametrisation.empty()) {
+      std::cout << "Can't give parametrisation and replaces in volume!" << std::endl;
+      throw;
+    }
+    return ConstructPhysicalReplica(table, mother, logic);
+
+    // Parametrisation
+  } else if (!parametrisation.empty()) {
+    return ConstructPhysicalParametrisation(table, mother, logic);
+
+    // Placement
+  } else {
+    return ConstructPhysicalPlacement(table, mother, logic);
+  }
+
+  return 0;
+}
+
+
+
 
 G4VSensitiveDetector* GeoSolid::ConstructSensitiveDetector(DBLink* table, G4LogicalVolume* logic, G4VPhysicalVolume* vol) {
 
@@ -153,10 +241,10 @@ G4VSensitiveDetector* GeoSolid::ConstructSensitiveDetector(DBLink* table, G4Logi
   if (!table->Has("sensitive")) return 0;
 
   // If it does then create a new SD object
-  std::string sensitive = table->GetS("sensitive");  
+  std::string sensitive = table->GetS("sensitive");
 
-  // look up table 
-  DBLink* sdtbl = DB::Get()->CloneLink("DETECTOR",sensitive, table->GetIndexName() + "_" + sensitive);
+  // look up table
+  DBLink* sdtbl = DB::Get()->CloneLink("DETECTOR", sensitive, table->GetIndexName() + "_" + sensitive);
   VDetector* sd = DetectorObjectFactory::CreateSD(sdtbl);
 
   // Assign the logical volume

@@ -1,0 +1,8 @@
+{
+  name: "MATERIAL",
+  index: "COSMIC_STEEL",
+  element_names:  ["Fe","C"]
+  element_counts: [98, 2],
+  density: 8.05, //g/cm3
+}
+

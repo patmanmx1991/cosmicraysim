@@ -35,7 +35,8 @@ namespace COSMIC{
 GeoObject* GeoObjectFactory::Construct(DBLink* table){
 
   std::string type = table->GetS("type");
-  std::cout << "Constructing Geometry : " << type << std::endl;
+  
+  std::cout << "GEO: Constructing " << type << " : " << table->GetIndexName() <<  std::endl;
   if (type.compare("box")==0) return new GeoBox(table);
   else if (type.compare("tubs")==0) return new GeoTubs(table);
   else if (type.compare("DSC_VSC24") == 0) return new DryStorageCask_VSC24(table);
@@ -57,6 +58,8 @@ GeoManager::GeoManager(){
 }
 
 G4VPhysicalVolume* GeoManager::ConstructAll(){
+  std::cout << "===============================" << std::endl;
+  std::cout << "GEO: Building Geometry " << std::endl;
   std::vector<DBLink*> tables_clone = fGeoTables;
   std::vector<DBLink*>::iterator geo_iter = tables_clone.begin();
 
@@ -78,7 +81,6 @@ G4VPhysicalVolume* GeoManager::ConstructAll(){
         
       // Check if mother already created
       int mother_status = MotherStatus(geo_tab);
-      std::cout << " : --> " << mother_status << std::endl;
       if (mother_status == 2){
         ++geo_iter;
         continue; // If it hasn't skip for now
@@ -106,8 +108,6 @@ G4VPhysicalVolume* GeoManager::ConstructAll(){
 int GeoManager::MotherStatus(DBLink* geo_tab){
   if (geo_tab->Has("mother")){
     std::string mother = (geo_tab)->GetS("mother");
-    std::cout << "Mother Status : " << geo_tab->GetIndexName() << " : " << mother << std::endl;
-
     if (this->HasGeoObject(mother)){
       return 1;
     } else{

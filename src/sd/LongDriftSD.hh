@@ -59,13 +59,12 @@ public:
   /// Draw the hits
   void DrawAll();
 
-
 protected:
 
   DriftChamberHitsCollection* fHitsCollection;
   G4int fHCID;
-G4LogicalVolume* fLogical;
-G4VPhysicalVolume* fPhysical;
+  G4LogicalVolume* fLogical;
+  G4VPhysicalVolume* fPhysical;
   int fDriftChamberType;
   int fLongDim0;
   int fLongDim1;
@@ -110,6 +109,9 @@ public:
   inline G4double       GetPosX() { return fPosX;  };
   inline G4double       GetPosY() { return fPosY;  };
   inline G4double       GetPosZ() { return fPosZ;  };
+  inline G4double       GetErrX() { return fErrX;  };
+  inline G4double       GetErrY() { return fErrY;  };
+  inline G4double       GetErrZ() { return fErrZ;  };
   inline G4double       GetEDep() { return fEdep;  };
 
   // Enums for determining what variables to save in GLOBAL
@@ -143,7 +145,7 @@ protected:
   G4double fErrX;
   G4double fErrY;
   G4double fErrZ;
-  
+
   int fEdepIndex;
   int fTimeIndex;
   int fPosXIndex;

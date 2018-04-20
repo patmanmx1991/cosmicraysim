@@ -13,6 +13,9 @@ namespace TriggerFactory {
 /// Function to create trigger objects from tables
 VTrigger* Construct(DBLink* table);
 
+/// Function to generate all possible triggers loaded by the user tables
+void ConstructTriggers();
+
 } // - namespace TriggerFactory
 } // - namespace COSMIC
 #endif

@@ -44,6 +44,41 @@ protected:
 };
 
 
+//! Wrapper for JointFCN to make ROOT minimization behave sensibly.
+class TrackFitter{
+ public:
+
+  // Empty Construction
+  TrackFitter(){}
+  ~TrackFitter(){};
+
+  // Set Functions
+  void SetTimes(std::vector<double>* t){ fTimes = t; };
+  void SetPositions(std::vector<G4ThreeVector>* v){ fHitPositions= v; };
+  void SetErrors(std::vector<G4ThreeVector>* e){ fHitErrors = e;};
+
+  // Actual Fitter
+  double DoEval(const double *x) const;
+
+  // Func Operator for arrays
+  inline double operator() (const double *x) const
+  {
+    return this->DoEval(x);
+  };
+  
+ private:
+  
+  std::vector<double>* fTimes;
+  std::vector<G4ThreeVector>* fHitPositions;
+  std::vector<G4ThreeVector>* fHitErrors;
+
+};
+
+
+
+
+
+
 /// True Muon Processor Object :
 /// By default this is created alongside the true muon
 /// tracker object, so the info is automatically added
@@ -66,6 +101,7 @@ public:
 protected:
 
   AWEMuonTomographyDetector* fAWEDetector; ///< Pointer to associated detector medium
+  std::vector<LongDriftProcessors*> fDriftChamberProcs;
 
   int fMuonTimeIndex; ///< Time Ntuple Index
   int fMuonMomXIndex; ///< MomX Ntuple Index
@@ -76,7 +112,19 @@ protected:
   int fMuonPosZIndex; ///< PosZ Ntuple Index
   int fMuonPDGIndex;  ///< MPDG Ntuple Index
 
+   // Create Fit Machinery
+  TrackFitter* fFitterFCN;
+  ROOT::Math::Functor* fCallFunctor;
+  ROOT::Math::Minimizer* fMinimizer;
+  G4ThreeVector* fMuonMom;
+  G4ThreeVector* fMuonErr;
+  G4ThreeVector* fMuonPos;
+  G4ThreeVector* fMuonPosErr;
+
 };
+
+
+
 
 
 

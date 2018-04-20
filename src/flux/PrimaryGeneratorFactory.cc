@@ -15,7 +15,7 @@ G4VUserPrimaryGeneratorAction* PrimaryGeneratorFactory::LoadGenerator(DBLink* ta
 
   // Read Flux Table using horrible ugly string comparisons!
   std::string type = table->GetS("flux");
-  std::cout << "Loading Primary Generator : " << type << std::endl;
+  std::cout << "FLX: Loading Primary Generator : " << type << std::endl;
   if (type.compare("shukla")==0) return new ShuklaPrimaryGenerator();
   if (type.compare("cry")==0) return new CRYPrimaryGenerator();
 

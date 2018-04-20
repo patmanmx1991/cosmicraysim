@@ -64,6 +64,10 @@ public:
   DBLink* CreateLink(std::string tablename, std::string index);
   DBLink* CloneLink(std::string tablename, std::string ind1, std::string ind2);
 
+
+  void WriteDB(std::string s);
+
+
 protected:
   std::vector<DBTable*> fAllTables;
   std::string fOutputFile;

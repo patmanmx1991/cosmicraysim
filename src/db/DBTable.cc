@@ -49,10 +49,10 @@ void DBTable::Prefix(std::string name, std::string pref){
 void DBTable::Print() {
   std::cout << "----------------------" << std::endl;
   std::vector<std::string> fields = GetFields();
-  for (std::vector<std::string>::iterator iter = fields.begin();
-       iter != fields.end(); iter++) {
-    std::cout << (*iter) << " ---> " << "NOT YET IMPLEMENTED" << std::endl;
-  }
+  // for (std::vector<std::string>::iterator iter = fields.begin();
+       // iter != fields.end(); iter++) {
+    // std::cout << (*iter) << " ---> " << table[(*iter)].getValue() << std::endl;
+  // }
   std::cout << "----------------------" << std::endl;
 }
 
@@ -70,7 +70,7 @@ float DBTable::GetF(std::string field) {
 
 
 double DBTable::GetD(std::string field) {
-  std::cout << "Getting field : " << field << std::endl;
+  //  std::cout << "Getting field : " << field << std::endl;
   if (not table.isMember(field)) throw DBNotFoundError(tblname, index, field);
   return double(table[field].getReal());
 }
@@ -175,4 +175,8 @@ DBTable *DBJSONParser::convertTable(json::Value &jsonDoc)
 }
 
 
+
+
 }
+
+// ClassImp (DBROOTIO);

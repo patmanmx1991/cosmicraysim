@@ -9,7 +9,7 @@ namespace COSMIC {
 LongDriftSD::LongDriftSD(DBLink* tbl):
     VDetector(tbl->GetIndexName(), "longdrift")
 {
-    std::cout << "Creating new " << GetType()
+    std::cout << "DET: Creating new " << GetType()
               << " detector : " << GetID() << std::endl;
 
     // Set initial state
@@ -40,7 +40,7 @@ LongDriftSD::LongDriftSD(std::string name, std::string id,
                          bool autoprocess, bool autosave):
     VDetector(name, id)
 {
-    std::cout << "Creating new " << GetType()
+    std::cout << "DET: Creating new " << GetType()
               << " detector : " << GetID() << std::endl;
 
     // Set initial state
@@ -152,7 +152,7 @@ G4bool LongDriftSD::ProcessHits(G4Step* step, G4TouchableHistory* /*touch*/)
 
 void LongDriftSD::DrawAll() {
 
-    std::cout << "Drawing all in Sensitive Detector" << std::endl;
+    std::cout << "DET: Drawing all in Sensitive Detector" << std::endl;
     int nhits = (int) fHitsCollection->GetSize();
     for (int ihit = 0; ihit < nhits; ihit++) {
         ( *(fHitsCollection) )[ihit]->Draw();
@@ -263,7 +263,7 @@ bool LongDriftProcessor::ProcessEvent(const G4Event* event) {
     fEnergy  = 0.0;
 
     // If Triggered then fill
-    if (fHasInfo) {
+    if (fHasInfo and fSave) {
 
         // Fill muon vectors
         man->FillNtupleDColumn(fTimeIndex, fTime);

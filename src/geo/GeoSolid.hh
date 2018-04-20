@@ -20,6 +20,7 @@
 #include "GeoUtils.hh"
 #include "db/DBLink.hh"
 #include "db/DB.hh"
+#include "materials/MaterialManager.hh"
 
 class G4LogicalVolume;
 class G4VPhysicalVolume;
@@ -49,6 +50,16 @@ public:
 
   /// Construct a sensitive detector from the table and attach to the logic
   virtual G4VSensitiveDetector* ConstructSensitiveDetector(DBLink* table, G4LogicalVolume* logic, G4VPhysicalVolume* vol);
+
+  /// Construct a physical volume placement given the settings in a table and the provided mother+logic
+  virtual G4VPhysicalVolume* ConstructPhysicalReplica(DBLink* table, G4LogicalVolume* mother, G4LogicalVolume* logic);
+ 
+  /// Construct a physical volume placement given the settings in a table and the provided mother+logic
+  virtual G4VPhysicalVolume* ConstructPhysicalPlacement(DBLink* table, G4LogicalVolume* mother, G4LogicalVolume* logic);
+
+  /// Construct a physical volume placement given the settings in a table and the provided mother+logic
+  virtual G4VPhysicalVolume* ConstructPhysicalParametrisation(DBLink* table, G4LogicalVolume* mother, G4LogicalVolume* logic);
+
 
 protected:
 

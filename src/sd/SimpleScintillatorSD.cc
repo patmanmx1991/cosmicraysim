@@ -43,6 +43,7 @@ SimpleScintillatorSD::SimpleScintillatorSD(std::string name, std::string id,
 
 void SimpleScintillatorSD::Initialize(G4HCofThisEvent* hce)
 {
+    std::cout << "Initialising Hit Collection" << std::endl;
     fHitsCollection = new ScintillatorHitsCollection(SensitiveDetectorName, collectionName[0]);
     if (fHCID < 0) fHCID = G4SDManager::GetSDMpointer()->GetCollectionID(fHitsCollection);
     hce->AddHitsCollection(fHCID, fHitsCollection);

@@ -18,7 +18,7 @@
         size_z: 2.40,
         position: [0.0,0.0,0.0],
         rotation: [0.0,0.0,0.0],
-        material: "G4_C",
+        material: "G4_CONCRETE",
         drawstyle: "solid",
         color: [0.3,0.3,0.3,0.4],
 }
@@ -31,7 +31,7 @@
         size_z: 0.05,
         position: [0.0,0.0,-2.35],
         rotation: [0.0,0.0,0.0],
-        material: "G4_C",
+        material: "G4_CONCRETE",
         drawstyle: "solid",
         color: [0.3,0.3,0.3,0.4],
 }
@@ -45,7 +45,7 @@
         size_z: 2.30,
         position: [0.0,0.0,0.0],
         rotation: [0.0,0.0,0.0],
-        material: "G4_Fe",
+        material: "COSMIC_STEEL",
         drawstyle: "solid",
         color: [0.3,0.3,0.3,0.8],
 }
@@ -59,7 +59,7 @@
         size_z: 0.0254,
         position: [0.0,0.0,-2.3127],
         rotation: [0.0,0.0,0.0],
-        material: "G4_Fe",
+        material: "COSMIC_STEEL",
         drawstyle: "solid",
         color: [0.3,0.3,0.3,0.8],
 }
@@ -73,7 +73,7 @@
         size_z: 0.0254,
         position: [0.0,0.0,2.3127],
         rotation: [0.0,0.0,0.0],
-        material: "G4_Fe",
+        material: "COSMIC_STEEL",
         drawstyle: "solid",
         color: [0.3,0.3,0.3,0.8],
 }

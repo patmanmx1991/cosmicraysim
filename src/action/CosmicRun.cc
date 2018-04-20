@@ -59,8 +59,8 @@ void CosmicRun::RecordEvent(const G4Event* event)
 {
   // Logging
   int eventid = event->GetEventID();
-  if (eventid % 1000 == 0) {
-    std::cout << "### Processing Event : " << eventid
+  if (eventid % 10000 == 0) {
+    std::cout << "RUN: --> Processing Event : " << eventid
               << "/" << numberOfEventToBeProcessed << std::endl;
   }
 

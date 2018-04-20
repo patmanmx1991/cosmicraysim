@@ -16,7 +16,7 @@ namespace COSMIC {
 //----------------------------------------------------------------------------//
 CRYPrimaryGenerator::CRYPrimaryGenerator()
 {
-  std::cout << "Building CRY Generator" << std::endl;
+  std::cout << "FLX: Building CRY Generator" << std::endl;
   fTable = DB::Get()->GetLink("CRY", "config");
 
   // Setup Defaults
@@ -70,16 +70,20 @@ CRYPrimaryGenerator::CRYPrimaryGenerator()
   // define a particle gun
   particleGun = new G4ParticleGun();
 
-    fExposureTime = 0.0;
-    fNthrows = 0;
+  fExposureTime = 0.0;
+  fNthrows = 0;
 
-    // Make a new processor
-    Analysis::Get()->SetFluxProcessor(new CRYPrimaryFluxProcessor(this));
+  // Make a new processor
+  Analysis::Get()->SetFluxProcessor(new CRYPrimaryFluxProcessor(this));
 }
 
 //----------------------------------------------------------------------------//
 CRYPrimaryGenerator::~CRYPrimaryGenerator()
 {
+  delete fSourceBox;
+  delete gen;
+  vect->clear();
+  delete vect;
 }
 
 //----------------------------------------------------------------------------//
@@ -101,7 +105,7 @@ void CRYPrimaryGenerator::UpdateCRY()
 
   // Fill truncation if provided
   // if (fNParticlesMin > 0) {
-    cryconfigs << " nParticlesMin " << fNParticlesMin;
+  cryconfigs << " nParticlesMin " << fNParticlesMin;
   // }
   if (fNParticlesMax > 0) {
     cryconfigs << " nParticlesMax " << fNParticlesMax;
@@ -153,7 +157,7 @@ G4Box* CRYPrimaryGenerator::GetSourceBox() {
       throw;
     }
 
-    // Set our lateral box size for the CRY Engine 
+    // Set our lateral box size for the CRY Engine
     fLateralBoxSize = size[0];
 
     // Create the box
@@ -281,7 +285,15 @@ void CRYPrimaryGenerator::GeneratePrimaries(G4Event* anEvent)
       }
 
       // If one good trajectory then event is good.
-      if (good_traj) { stacksize++; }
+      if (good_traj) {
+        stacksize++;
+      }
+    }
+
+    if (stacksize == 0) {
+      for (unsigned j = 0; j < vect->size(); j++) {
+        delete (*vect)[j];
+      }
     }
 
   } while (stacksize < 1 and throws < 1E8);
@@ -296,8 +308,8 @@ void CRYPrimaryGenerator::GeneratePrimaries(G4Event* anEvent)
 
   //....debug output
   // G4cout << "\nEvent=" << anEvent->GetEventID() << " "
-         // << "CRY generated nparticles=" << vect->size()
-         // << G4endl;
+  // << "CRY generated nparticles=" << vect->size()
+  // << G4endl;
 
   for ( unsigned j = 0; j < vect->size(); j++) {
 
@@ -335,46 +347,46 @@ void CRYPrimaryGenerator::GeneratePrimaries(G4Event* anEvent)
 
 //------------------------------------------------------------------
 CRYPrimaryFluxProcessor::CRYPrimaryFluxProcessor(CRYPrimaryGenerator* gen, bool autosave) :
-    VFluxProcessor("cry"), fSave(autosave)
+  VFluxProcessor("cry"), fSave(autosave)
 {
-    fGenerator = gen;
+  fGenerator = gen;
 }
 
 bool CRYPrimaryFluxProcessor::BeginOfRunAction(const G4Run* /*run*/) {
 
-    std::string tableindex = "cry";
-    std::cout << "Registering CRYPrimaryFluxProcessor NTuples " << tableindex << std::endl;
+  std::string tableindex = "cry";
+  std::cout << "FLX: Registering CRYPrimaryFluxProcessor NTuples " << tableindex << std::endl;
 
-    G4AnalysisManager* man = G4AnalysisManager::Instance();
+  G4AnalysisManager* man = G4AnalysisManager::Instance();
 
-    // Fill index energy
-    fTimeIndex = man ->CreateNtupleDColumn(tableindex + "_t");
+  // Fill index energy
+  fTimeIndex = man ->CreateNtupleDColumn(tableindex + "_t");
 
-    return true;
+  return true;
 }
 
 bool CRYPrimaryFluxProcessor::ProcessEvent(const G4Event* /*event*/) {
 
-    // Register Trigger State
-    fHasInfo = true;
-    fTime    = fGenerator->GetTime();
+  // Register Trigger State
+  fHasInfo = true;
+  fTime    = fGenerator->GetTime();
 
-    // Set Ntuple to defaults
-    G4AnalysisManager* man = G4AnalysisManager::Instance();
-    man->FillNtupleDColumn(fTimeIndex, -999.);
+  // Set Ntuple to defaults
+  G4AnalysisManager* man = G4AnalysisManager::Instance();
+  man->FillNtupleDColumn(fTimeIndex, -999.);
 
-    if (fHasInfo) {
-        // Fill muon vectors
-        man->FillNtupleDColumn(fTimeIndex,   fGenerator->GetTime());
-        return true;
-    } else {
-        return false;
-    }
+  if (fHasInfo) {
+    // Fill muon vectors
+    man->FillNtupleDColumn(fTimeIndex,   fGenerator->GetTime());
     return true;
+  } else {
+    return false;
+  }
+  return true;
 }
 
 G4double CRYPrimaryFluxProcessor::GetExposureTime() {
-    return fGenerator->GetTime();
+  return fGenerator->GetTime();
 }
 
 

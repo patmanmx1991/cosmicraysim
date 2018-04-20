@@ -13,15 +13,19 @@ namespace COSMIC {
 SimpleTrigger::SimpleTrigger(DBLink* tbl)
   : VTrigger(tbl->GetIndexName())
 {
+  std::cout << "TRG: Loading Simple Trigger : " << tbl->GetIndexName() << std::endl;
 
   // Get list of detector objects
-  SetupProcessors(tbl->GetVecS("processors"));
+  if (tbl->Has("processors")){
+    SetupProcessors(tbl->GetVecS("processors"));
+  }
 
   // Get thresholds
   fEnergyThreshold = -1.0;
   fTimeThreshold = -1.0;
   if (tbl->Has("energy_threshold")) fEnergyThreshold = tbl->GetD("energy_threshold") * MeV;
   if (tbl->Has("time_threshold"))   fEnergyThreshold = tbl->GetD("time_threshold") * ns;
+
 }
 
 SimpleTrigger::SimpleTrigger(std::string name,
@@ -38,6 +42,7 @@ void SimpleTrigger::SetupProcessors(std::vector<std::string> det) {
   for (uint i = 0; i < det.size(); i++) {
     VProcessor* detobj = Analysis::Get()->GetProcessor(det[i]);
     fProcessors.push_back(detobj);
+    std::cout << " --> Processor Input " << i << " : " << det[i] << std::endl;
   }
 }
 
@@ -58,7 +63,9 @@ bool SimpleTrigger::ProcessTrigger(const G4Event* /*event*/) {
       complete_trig = false;
     }
   }
-
+  
+  // std::cout << "Returning True Trigger : " << complete_trig << std::endl;
+  fTriggered = complete_trig;
   return complete_trig;
 }
 

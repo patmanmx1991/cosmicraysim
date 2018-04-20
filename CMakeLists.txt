@@ -27,6 +27,17 @@ endif()
 find_package(ROOT QUIET)
 
 
+
+#---Set Link and include directories--------------------------------------------------------------
+#include_directories(${ROOT_INCLUDE_DIRS})
+#link_directories(${ROOT_LIBRARY_DIR})
+
+#---Set Flags-------------------------------------------------------------------------------------
+#add_definitions(${ROOT_DEFINITIONS})
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ROOT_CXX_FLAGS}")
+#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${ROOT_C_FLAGS}")
+#set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} ${ROOT_fortran_FLAGS}")
+
 #----------------------------------------------------------------------------
 # Setup Geant4 include directories and compile definitions
 # Setup include directory for this project
@@ -47,6 +58,16 @@ endif()
 #
 file(GLOB sources ${PROJECT_SOURCE_DIR}/src/*/*.cc ${PROJECT_SOURCE_DIR}/src/geo/*/*.cc)
 file(GLOB headers ${PROJECT_SOURCE_DIR}/src/*/*.hh ${PROJECT_SOURCE_DIR}/src/geo/*/*.cc)
+
+#----------------------------------------------------------------------------
+# Create the DB Library
+
+
+#ROOT_GENERATE_DICTIONARY(DBlib ${PROJECT_SOURCE_DIR}/src/db/DBTable.h LINKDEF ${PROJECT_SOURCE_DIR}/src/db/DBTable_LinkDef.h)
+#add_library(myDBlib SHARED ${PROJECT_SOURCE_DIR}/src/db/DBTable.cc DBlib.cxx)
+#target_link_libraries(myDBlib ${ROOT_LIBRARIES})
+
+#----------------------------------------------------------------------------
 
 #----------------------------------------------------------------------------
 # Add the executable, and link it to the Geant4 libraries

@@ -6,7 +6,7 @@
 #include <iostream>
 #include <db/json.hh>
 #include <db/ReadFile.hh>
-
+#include "TObject.h"
 
 namespace COSMIC
 {
@@ -78,6 +78,7 @@ public:
 
 
 
+
 /** Exception: Field not found in DB */
 class DBNotFoundError {
 public:
@@ -107,5 +108,17 @@ public:
 
 
 }
+
+class DBROOTIO {
+public:
+  DBROOTIO(){};
+  ~DBROOTIO(){};
+  std::vector<std::string> fIndex;
+  std::vector<std::string> fFields;
+  std::vector<std::string> fValues;
+  std::vector<std::string> fTypes;
+  // ClassDef (DBROOTIO, 1);
+};
+
 
 #endif

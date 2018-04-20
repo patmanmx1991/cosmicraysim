@@ -29,7 +29,7 @@ DryStorageCask_VSC24::DryStorageCask_VSC24(DBLink* table){
 
 void DryStorageCask_VSC24::Construct(DBLink* table)
 {
-  std::cout << "Constructing Dry Storage Cask" << std::endl;
+
   SetID(table->GetIndexName());
   SetType(table->GetS("type"));
 

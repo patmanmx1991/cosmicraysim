@@ -9,14 +9,14 @@
 #include "G4Event.hh"
 #include "globals.hh"
 // COSMIC Headers
-
+#include "VFluxProcessor.hh"
 
 namespace COSMIC {
 
 // Forward Declarations
 class VProcessor;
 class VTrigger;
-class VFluxProcessor;
+
 class VDetector;
 
 /// Singleton Analysis Manager that handles all cosmic run processing
@@ -99,7 +99,15 @@ public:
   /// Set the exposure time
   void SetExposureTimeLimit(G4double d){ fExposureTimeLimit = d; };
 
+  G4double GetExposureTime(){ return fFluxProcessor->GetExposureTime(); };
 
+  void SetOutputTag(std::string s){ fOutputTag = s; };
+  void SetOutputRun(int i){ fRunID = i; };
+  void SetOutputSubRun(int i){ fSubRunID = i; };
+  void IncrementSubRun() { fSubRunID++; };
+
+  int GetNSavedEvents(){ return fSavedEvents; };
+  
 protected:
 
   static Analysis *fPrimary; ///< Singleton Object
@@ -119,6 +127,13 @@ protected:
   int fGeneratedEventsLimit;  ///< Max limit on gen. events
 
   G4double fExposureTimeLimit; ///< Exposure Time max in s
+
+  bool fNTuplesSetup; ///< Check Ntuples OKAY
+
+  std::string fOutputTag;
+  int fRunID;
+  int fSubRunID;
+
 };
 
 } // - namespace COSMIC

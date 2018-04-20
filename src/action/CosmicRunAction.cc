@@ -51,8 +51,8 @@
 using namespace COSMIC;
 
 CosmicRunAction::CosmicRunAction()
- : G4UserRunAction()
-{       
+  : G4UserRunAction(), fCurrentRun(0)
+{
 }
 
 CosmicRunAction::~CosmicRunAction()
@@ -64,12 +64,18 @@ G4Run* CosmicRunAction::GenerateRun()
 { return new CosmicRun; }
 
 void CosmicRunAction::BeginOfRunAction(const G4Run* run)
-{ 
+{
+  std::cout << "=========================================" << std::endl;
+  std::cout << "ACT: Beginning Run : " << fCurrentRun << std::endl;
   Analysis::Get()->BeginOfRunAction(run);
 }
 
 void CosmicRunAction::EndOfRunAction(const G4Run* run)
 {
   Analysis::Get()->EndOfRunAction(run);
+  fCurrentRun++;
+  Analysis::Get()->IncrementSubRun();
+  std::cout << "ACT: Finished Run. Triggered : " << Analysis::Get()->GetNSavedEvents()
+            << ", Exposure : " << Analysis::Get()->GetExposureTime() << " s" << std::endl;
 }
 

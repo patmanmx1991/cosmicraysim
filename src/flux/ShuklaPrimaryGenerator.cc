@@ -9,7 +9,7 @@ ShuklaPrimaryGenerator::ShuklaPrimaryGenerator()
       fNThrows(0)
 {
     G4AutoLock lock(&myMutex);
-    std::cout << "Building Shukla Generator" << std::endl;
+    std::cout << "FLX: Building Shukla Generator" << std::endl;
 
     // Setup Table
     fTable = DB::Get()->GetLink("SHUKLA", "config");
@@ -30,35 +30,35 @@ ShuklaPrimaryGenerator::ShuklaPrimaryGenerator()
         std::string parset = fTable->GetS("parameters");
 
         if (parset.compare("nottingham") == 0) {
-            std::cout << " --> Using Nottingham parset." << std::endl;
+            std::cout << "FLX: --> Using Nottingham parset." << std::endl;
 
         } else if (parset.compare("princealbert")) {
-            std::cout << " --> Using Nottingham parset." << std::endl;
+            std::cout << "FLX: --> Using Nottingham parset." << std::endl;
             fPar_I0 = 110.0;
             fPar_E0 = 3.6;
 
         } else if (parset.compare("hamburg") == 0) {
-            std::cout << " --> Using Hamburg parset." << std::endl;
+            std::cout << "FLX: --> Using Hamburg parset." << std::endl;
             fPar_I0  = 71.0;
             fPar_E0  = 23.78;
             fPar_eps = 2000.0;
 
         } else if (parset.compare("proton") == 0) {
-            std::cout << " --> Using Proton parset." << std::endl;
+            std::cout << "FLX: --> Using Proton parset." << std::endl;
             fPar_I0 = 8952.0;
             fPar_n = 2.93;
             fPar_E0 = 1.42;
             fPar_eps = 0.0;
 
         } else if (parset.compare("helium") == 0) {
-            std::cout << " --> Using Helium parset." << std::endl;
+            std::cout << "FLX: --> Using Helium parset." << std::endl;
             fPar_I0 = 5200.0;
             fPar_n = 2.75;
             fPar_E0 = 0.28;
             fPar_eps = 0.0;
         }
     } else {
-        std::cout << " --> Using Nottingham parset." << std::endl;
+        std::cout << "FLX: --> Using Nottingham parset." << std::endl;
     }
 
     // Now look for manual overrides
@@ -73,15 +73,15 @@ ShuklaPrimaryGenerator::ShuklaPrimaryGenerator()
     if (fTable->Has("distance")) fPar_dis = fTable->GetD("distance");
 
     // Print Setup
-    std::cout << " --> Min Energy : " << fMinEnergy << " GeV" << std::endl;
-    std::cout << " --> Max Energy : " << fMaxEnergy << " GeV" << std::endl;
-    std::cout << " --> I0         : " << fPar_I0 << " m-2 s-1 sr -1" << std::endl;
-    std::cout << " --> n          : " << fPar_n << std::endl;
-    std::cout << " --> E0         : " << fPar_E0  << " GeV" << std::endl;
-    std::cout << " --> epsilon    : " << fPar_eps << " GeV" << std::endl;
-    std::cout << " --> radius     : " << fPar_rad << " km"  << std::endl;
-    std::cout << " --> distance   : " << fPar_dis << " km"  << std::endl;
-    std::cout << " --> R/d        : " << fPar_rad / fPar_dis << std::endl;
+    std::cout << "FLX: --> Min Energy : " << fMinEnergy << " GeV" << std::endl;
+    std::cout << "FLX: --> Max Energy : " << fMaxEnergy << " GeV" << std::endl;
+    std::cout << "FLX: --> I0         : " << fPar_I0 << " m-2 s-1 sr -1" << std::endl;
+    std::cout << "FLX: --> n          : " << fPar_n << std::endl;
+    std::cout << "FLX: --> E0         : " << fPar_E0  << " GeV" << std::endl;
+    std::cout << "FLX: --> epsilon    : " << fPar_eps << " GeV" << std::endl;
+    std::cout << "FLX: --> radius     : " << fPar_rad << " km"  << std::endl;
+    std::cout << "FLX: --> distance   : " << fPar_dis << " km"  << std::endl;
+    std::cout << "FLX: --> R/d        : " << fPar_rad / fPar_dis << std::endl;
 
     // Check limits
     if (fMinEnergy < 0.1) {
@@ -94,7 +94,7 @@ ShuklaPrimaryGenerator::ShuklaPrimaryGenerator()
     }
 
     // // Setup the energy PDF
-    std::cout << " --> Setting up PDFs." << std::endl;
+    std::cout << "FLX: --> Setting up PDFs." << std::endl;
     fEnergyPDF = new TF1("energy_pdf",
                          "[3]*((x+[0])**(-[2]))*([1]/([1]+x))", fMinEnergy * GeV, fMaxEnergy * GeV);
 
@@ -110,7 +110,7 @@ ShuklaPrimaryGenerator::ShuklaPrimaryGenerator()
 
     // From dataset fit in Shukla paper
     G4double vertical_flux_rate = fPar_I0;// m-2 s-1 sr-1
-    std::cout << " --> VerticalFlux : " << vertical_flux_rate << " m-2 s-1 sr-1" << std::endl;
+    std::cout << "FLX: --> VerticalFlux : " << vertical_flux_rate << " m-2 s-1 sr-1" << std::endl;
 
     // Parameters : [0] = r, x = cos_theta
     fZenithPDF = new TF1("fZenithPDF",
@@ -124,11 +124,11 @@ ShuklaPrimaryGenerator::ShuklaPrimaryGenerator()
                        * fEnergyPDF->Integral(fMinEnergy * GeV, fMaxEnergy * GeV));
 
     // The muon rate
-    std::cout << " --> Integrated Flux : " << fFluxIntegrated << " m-2 s-1" << std::endl;
-    std::cout << " --> Integrated Flux : " << 60.0 * fFluxIntegrated*cm*cm/m/m  << " cm-2 min-1" << std::endl;
+    std::cout << "FLX: --> Integrated Flux : " << fFluxIntegrated << " m-2 s-1" << std::endl;
+    std::cout << "FLX: --> Integrated Flux : " << 60.0 * fFluxIntegrated*cm*cm/m/m  << " cm-2 min-1" << std::endl;
 
     // Setup Particle Gun
-    std::cout << " --> Creating Particle Gun." << std::endl;
+    std::cout << "FLX: --> Creating Particle Gun." << std::endl;
     G4int nofParticles = 1;
     fParticleGun  = new G4ParticleGun(nofParticles);
     G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
@@ -142,7 +142,7 @@ ShuklaPrimaryGenerator::ShuklaPrimaryGenerator()
     fSourceBox = false;
     GetSourceBox();
     GetTargetBoxes();
-    std::cout << " --> Complete." << std::endl;
+    std::cout << "FLX: --> Complete." << std::endl;
 
     // Make a new processor
     Analysis::Get()->SetFluxProcessor(new ShuklaPrimaryFluxProcessor(this));
@@ -369,7 +369,7 @@ ShuklaPrimaryFluxProcessor::ShuklaPrimaryFluxProcessor(ShuklaPrimaryGenerator* g
 bool ShuklaPrimaryFluxProcessor::BeginOfRunAction(const G4Run* /*run*/) {
 
     std::string tableindex = "shukla";
-    std::cout << "Registering ShuklaPrimaryFluxProcessor NTuples " << tableindex << std::endl;
+    std::cout << "FLX: Registering ShuklaPrimaryFluxProcessor NTuples " << tableindex << std::endl;
 
     G4AnalysisManager* man = G4AnalysisManager::Instance();
 

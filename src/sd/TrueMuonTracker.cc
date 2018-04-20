@@ -8,7 +8,7 @@ namespace COSMIC {
 TrueMuonTracker::TrueMuonTracker(DBLink* tbl):
   VDetector(tbl->GetIndexName(), "truemuon")
 {
-  std::cout << "Creating new " << GetType()
+  std::cout << "DET: Creating new " << GetType()
             << " detector : " << GetID() << std::endl;
 
   // Set initial state
@@ -24,7 +24,7 @@ TrueMuonTracker::TrueMuonTracker(DBLink* tbl):
 TrueMuonTracker::TrueMuonTracker(std::string name, std::string id, bool autoprocess, bool autosave):
   VDetector(name, id)
 {
-  std::cout << "Creating new " << GetType()
+  std::cout << "DET: Creating new " << GetType()
             << " detector : " << GetID() << std::endl;
 
   // Set initial state
@@ -86,7 +86,7 @@ TrueMuonProcessor::TrueMuonProcessor(TrueMuonTracker* trkr, bool autosave) :
 bool TrueMuonProcessor::BeginOfRunAction(const G4Run* /*run*/) {
 
   std::string tableindex = GetID();
-  std::cout << "Registering TrueMuonProcessor NTuples " << tableindex << std::endl;
+  std::cout << "DET: Registering TrueMuonProcessor NTuples " << tableindex << std::endl;
 
   G4AnalysisManager* man = G4AnalysisManager::Instance();
 

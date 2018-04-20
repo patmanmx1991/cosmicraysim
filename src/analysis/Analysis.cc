@@ -18,7 +18,10 @@ Analysis::Analysis() :
   fGeneratedEventsLimit(-1),
   fSavedEventsLimit(-1),
   fExposureTimeLimit(-1.0),
-  fFluxProcessor(0)
+  fFluxProcessor(0),
+  fNTuplesSetup(0),
+  fSavedEvents(0),
+  fGeneratedEvents(0)
 {
 }
 
@@ -30,31 +33,46 @@ Analysis *Analysis::fPrimary(0);
 
 void Analysis::BeginOfRunAction(const G4Run* run) {
 
-  std::cout << "Setting up G4Manager" << std::endl;
-  // Initialise G4 ROOT Manager
-  fG4Manager = G4AnalysisManager::Instance();
-  fG4Manager->SetVerboseLevel(1);
-  fG4Manager->SetFirstNtupleId(0);
-  fG4Manager->SetFirstHistoId(0);
-  fG4Manager->CreateNtuple("detectorevents", "Dynamic Detector Saved Information");
 
-  // Run event processors begin run action
-  std::vector<VProcessor*>::iterator iter;
-  for (iter = fProcessors.begin(); iter != fProcessors.end(); iter++) {
-    (*iter)->BeginOfRunAction(run);
+  if (!fNTuplesSetup) {
+    std::cout << "ANL: Setting up G4Manager" << std::endl;
+    // Initialise G4 ROOT Manager
+    fG4Manager = G4AnalysisManager::Instance();
+    fG4Manager->SetVerboseLevel(1);
+    fG4Manager->SetFirstNtupleId(0);
+    fG4Manager->SetFirstHistoId(0);
+    fG4Manager->CreateNtuple("detectorevents", "Dynamic Detector Saved Information");
+
+
+    // Run event processors begin run action
+    std::vector<VProcessor*>::iterator iter;
+    for (iter = fProcessors.begin(); iter != fProcessors.end(); iter++) {
+      (*iter)->BeginOfRunAction(run);
+    }
+
+    // Run Flux Processor begin run action
+    if (fFluxProcessor) fFluxProcessor->BeginOfRunAction(run);
+
+    // Finish Ntuple and open output
+    fG4Manager->FinishNtuple();
   }
-  
-  // Run Flux Processor begin run action
-  if (fFluxProcessor) fFluxProcessor->BeginOfRunAction(run);
 
-  // Finish Ntuple and open output
-  fG4Manager->FinishNtuple();
-  fG4Manager->OpenFile(DB::Get()->GetOutputFile());
+  // Make new output file
+  std::string outputname = "";
+  outputname += fOutputTag + ".";
+  outputname += std::to_string(fRunID) + ".";
+  outputname += std::to_string(fSubRunID) + ".root";
+
+  // Open new output
+  fG4Manager->OpenFile(outputname);
+  fNTuplesSetup = true;
 }
 
 void Analysis::EndOfRunAction(const G4Run* run) {
+  std::cout << "Writing" << std::endl;
   fG4Manager->Write();
   fG4Manager->CloseFile();
+  // delete  G4AnalysisManager::Instance();
 }
 
 void Analysis::BeginOfEventAction() {
@@ -84,19 +102,6 @@ void Analysis::ProcessEvent(const G4Event* event) {
   // If we have at least one trigger record the event
   if (IsTriggered()) RecordEvent();
 
-  // If events above limits abort the run
-  if (fGeneratedEventsLimit > 0 and
-      fGeneratedEvents > fGeneratedEventsLimit) {
-    std::cout << "WE SHOULD ABORT THE RUN!" << std::endl;
-  }
-
-  // If exposure time from flux processor too high
-  if (fExposureTimeLimit > 0) {
-    if (fFluxProcessor->GetExposureTime() > fExposureTimeLimit) {
-      std::cout << "WE SHOULD ABORT THE RUN!" << std::endl;
-    }
-  }
-
 }
 
 void Analysis::RecordEvent() {
@@ -119,10 +124,14 @@ bool Analysis::IsTriggered() {
   // If no valid triggers loaded, save everything
   if (fTriggers.size() < 1) return true;
 
+  // std::cout << "Checking for at least one trigger" << std::endl;
+
   // For now just find at least one true trigger
   std::vector<VTrigger*>::iterator iter;
   for (iter = fTriggers.begin(); iter != fTriggers.end(); iter++) {
-    if ((*iter)->GetTrigger()) return true;
+    if ((*iter)->GetTrigger()) {
+      return true;
+    }
   }
 
   return false;
@@ -191,7 +200,7 @@ VDetector* Analysis::GetDetector(std::string id) {
   return 0;
 }
 
-void Analysis::SetFluxProcessor(VFluxProcessor* p){
+void Analysis::SetFluxProcessor(VFluxProcessor* p) {
   fFluxProcessor = p;
 }
 

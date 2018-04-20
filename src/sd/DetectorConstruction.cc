@@ -27,7 +27,7 @@
 #include "sd/DetectorManager.hh"
 #include "geo/GeoManager.hh"
 #include "trigger/TriggerManager.hh"
-
+#include "processors/ProcessorFactory.hh"
 
 using namespace COSMIC;
 
@@ -47,12 +47,14 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 {
   // Build entire geometry
   G4VPhysicalVolume* world = GeoManager::Get()->ConstructAll();
+  
   // Return pointer to physical world volume
   return world;
 }
 
 void DetectorConstruction::ConstructSDandField()
 {
-  // GeoManager::Get()->ConstructSensitive();
+  TriggerFactory::ConstructTriggers();
+  ProcessorFactory::ConstructProcessors();
   return;
 }

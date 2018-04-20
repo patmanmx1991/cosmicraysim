@@ -26,7 +26,6 @@ namespace COSMIC {
 void AWEMuonTomographyDetector::Construct(DBLink* table) {
   SetID(table->GetIndexName());
   SetType(table->GetS("type"));
-  std::cout << "Constructing AWEMuonTomography Detector" << std::endl;
   std::string fName = table->GetIndexName();
   std::string fMotherName = table->GetS("mother");
 
@@ -71,13 +70,19 @@ void AWEMuonTomographyDetector::Construct(DBLink* table) {
     std::vector<double> position = {posrot[0], posrot[1], posrot[2]};
     std::vector<double> rotation = {posrot[3], posrot[4], posrot[5]};
 
-    // Create the target rod by overloading table
+    // Create the target by overloading table
     DBLink* chtemplate = tdb->CloneLink("GEO", "drift_chamber", fName + "_" + chname);
     chtemplate->Set("position", position);
     chtemplate->Set("rotation", rotation);
     GeoBox* obj = new GeoBox(chtemplate);
     fSubObjects.push_back(obj);
     fDriftObjects.push_back(obj);
+
+    // Create the sensitive detectors
+    DBLink* sdtemplate = tdb->CloneLink("GEO", "drift_sd", fName + "_" + chname + "_sd");
+    LongDriftSD* det = new LongDriftSD(sdtemplate);
+    det->SetLogicalVolume(obj->GetLogical(), obj->GetPhysical());
+    Analysis::Get()->RegisterDetector(sd);
   }
 
   // Register an AWEMuonTomographyProcessor to combine hits and return trigger
@@ -93,6 +98,28 @@ AWEMuonTomographyProcessor::AWEMuonTomographyProcessor(AWEMuonTomographyDetector
   VProcessor(det->GetID())
 {
   fAWEDetector = det;
+  // Get drift Geo Objects
+  std::vector<GeoObject*> drifts = fAWEDetector->GetDriftObjects();
+
+  // From each one get the sensitive and manually create a processor.
+  // This is super awkward. May need to rethink.
+  for (uint i = 0; i < drifts.size(); i++) {
+    LongDriftSD* sd = static_cast<LongDriftSD*>(drifts->GetSensitive());
+    fDriftChamberProcs.push_back( new LongDriftProcessor(sd, true) );
+  }
+
+
+  // Create Fit Machinery
+  fFitterFCN   = new TrackFitter();
+  fCallFunctor = new ROOT::Math::Functor(*fFitterFCN, 6);
+  fMinimizer   = ROOT::Math::Factory::CreateMinimizer("Minuit2", "Migrad");
+  fMinimizer->SetVariable(0, "posx", 0.0, 1.0);
+  fMinimizer->SetVariable(1, "posy", 0.0, 1.0);
+  fMinimizer->SetVariable(2, "posz", 0.0, 1.0);
+  fMinimizer->SetVariable(3, "momx", 0.0, 1.0);
+  fMinimizer->SetVariable(4, "momy", 0.0, 1.0);
+  fMinimizer->SetVariable(5, "momz", 0.0, 1.0);
+  fMinimizer->SetFunction(*fCallFunctor);
 }
 
 bool AWEMuonTomographyProcessor::BeginOfRunAction(const G4Run* /*run*/) {
@@ -103,34 +130,116 @@ bool AWEMuonTomographyProcessor::BeginOfRunAction(const G4Run* /*run*/) {
 
   // Fill index energy
   fMuonTimeIndex = man ->CreateNtupleDColumn(tableindex + "_t");
-  fMuonMomXIndex = man ->CreateNtupleDColumn(tableindex + "_px");
-  fMuonMomYIndex = man ->CreateNtupleDColumn(tableindex + "_py");
-  fMuonMomZIndex = man ->CreateNtupleDColumn(tableindex + "_pz");
+
   fMuonPosXIndex = man ->CreateNtupleDColumn(tableindex + "_x");
   fMuonPosYIndex = man ->CreateNtupleDColumn(tableindex + "_y");
   fMuonPosZIndex = man ->CreateNtupleDColumn(tableindex + "_z");
 
+  fMuonPosXIndex = man ->CreateNtupleDColumn(tableindex + "_ex");
+  fMuonPosYIndex = man ->CreateNtupleDColumn(tableindex + "_ey");
+  fMuonPosZIndex = man ->CreateNtupleDColumn(tableindex + "_ez");
+
   return true;
 }
 
-bool AWEMuonTomographyProcessor::ProcessEvent(const G4Event* /*event*/) {
+bool AWEMuonTomographyProcessor::ProcessEvent(const G4Event* event) {
 
-  // No processors have been created for the drift chamber objects
+
+  // No processors have been automatically handled for the drift chamber objects
   // We have to manually get the HitPosition from each
+  std::vector<double> time;
+  std::vector<G4ThreeVector> pos;
+  std::vector<G4ThreeVector> err;
+  for (uint i = 0; i < fDriftChambers.size(); i++) {
 
+    // Run our processing
+    fDriftChambers[i]->ProcessEvent(event);
 
-  // Also get the energy deposited and the hit time 
+    // Check if chamber had info
+    if (!fDriftChamberProcs[i]->HasInfo()) continue;
 
+    G4double x  = fDriftChamberProcs[i]->GetPosX();
+    G4double y  = fDriftChamberProcs[i]->GetPosY();
+    G4double z  = fDriftChamberProcs[i]->GetPosZ();
 
+    // Get inverse errors for later residual calculation
+    G4double ex = 1.0 / fDriftChamberProcs[i]->GetErrX();
+    G4double ey = 1.0 / fDriftChamberProcs[i]->GetErrY();
+    G4double ez = 1.0 / fDriftChamberProcs[i]->GetErrZ();
 
-  // Need to manually get hits from all of the drift chambers sensitive volumes.
+    G4double t  = fDriftChamberProcs[i]->GetTime();
 
-  // Then perform a likelihood fit 
+    std::cout << " adding processed muon track " << std::endl;
+    time.push_back(t);
+    pos.push_back(G4ThreeVector(x, y, z));
+    err.push_back(G4ThreeVector(x, y, z));
+  }
 
+  // Now perform a simple track fit to return a muon vector and error
+  // Reset Minuit Instance
+  fMinimizer->SetVariableValue(0, 0.0);
+  fMinimizer->SetVariableValue(1, 0.0);
+  fMinimizer->SetVariableValue(2, 0.0);
+  fMinimizer->SetVariableValue(3, 0.0);
+  fMinimizer->SetVariableValue(4, 0.0);
+  fMinimizer->SetVariableValue(5, 0.0);
 
+  // Update Functor Object with hit information
+  fFitterFCN->SetTimes(&time);
+  fFitterFCN->SetPositions(&pos);
+  fFitterFCN->SetErrors(&err);
+
+  // Run the Fit
+  fMinimizer->Minimize();
+
+  // Extract the fit parameters
+  // Get X and Err
+  const double* values = fMinimizer->X();
+  const double* errors = fMinimizer->Errors();
+
+  fMuonPos    = G4ThreeVector(values[0], values[1], values[2]);
+  fMuonPosErr = G4ThreeVector(errors[0], errors[1], errors[2]);
+  fMuonMom    = G4ThreeVector(values[3], values[4], values[5]);
+  fMuonMomErr = G4ThreeVector(errors[3], errors[4], errors[5]);
+  
   return true;
 }
 
+
+double TrackFitter::DoEval(const double *x) const {
+
+  G4double posx = x[0];
+  G4double posy = x[1];
+  G4double posz = x[2];
+  G4double momx = x[3];
+  G4double momy = x[4];
+  G4double momz = x[5];
+
+  G4ThreeVector pos = G4ThreeVector(x[0], x[1], x[2]);
+  G4ThreeVector mom = G4ThreeVector(x[2], x[3], x[4]);
+  G4ThreeVector dir = mom.unit();
+
+  // Iterate over hits and get residual of each one
+  // based on its distance away from the track and its
+  // associated errors.
+
+  // Find the closest point on the line to a given point.
+
+  // Then use point errors to calculate a residual.
+
+  G4double totalres = 0.0;
+  for (uint i = 0; i < fHitPositions->size(); i++) {
+
+    G4ThreeVector P = (*fHitPositions)[i];
+    G4ThreeVector closest = V * P.dot(V);
+
+    G4ThreeVector resvect = (closest - P).dot(E);
+    G4double res = resvect.dot(resvect);
+    totalres += res;
+  }
+
+  return totalres;
+}
 
 
 
