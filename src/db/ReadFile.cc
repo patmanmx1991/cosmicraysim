@@ -1,8 +1,9 @@
 #include <db/ReadFile.hh>
 
-
 namespace COSMIC {
+
 namespace DBUtils {
+
 int ReadFile(const std::string &filename, std::string &filecontents)
 {
   bool bzip2 = true;

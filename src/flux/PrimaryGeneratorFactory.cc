@@ -2,7 +2,6 @@
 
 #include "db/DB.hh"
 #include "db/DBLink.hh"
-
 #include "flux/ShuklaPrimaryGenerator.hh"
 #include "flux/CRYPrimaryGenerator.hh"
 
@@ -17,7 +16,7 @@ G4VUserPrimaryGeneratorAction* PrimaryGeneratorFactory::LoadGenerator(DBLink* ta
   std::string type = table->GetS("flux");
   std::cout << "FLX: Loading Primary Generator : " << type << std::endl;
   if (type.compare("shukla")==0) return new ShuklaPrimaryGenerator();
-  if (type.compare("cry")==0) return new CRYPrimaryGenerator();
+  if (type.compare("cry")==0)    return new CRYPrimaryGenerator();
 
   // Check if onle made
   std::cout << "Generator Creation Failed!" << std::endl;

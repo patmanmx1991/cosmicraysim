@@ -21,6 +21,34 @@
 #include "analysis/VProcessor.hh"
 #include "analysis/Analysis.hh"
 
+
+#include "TH1.h"
+#include "TF1.h"
+#include "TMatrixD.h"
+#include "TVectorD.h"
+#include "Minuit2/FCNBase.h"
+#include "TFitterMinuit.h"
+#include "TSystem.h"
+#include "TFile.h"
+#include "TProfile.h"
+
+
+#include <vector>
+#include <string>
+#include <iostream>
+#include <sstream>
+#include <cstring>
+
+
+
+#include "Math/Minimizer.h"
+#include "Math/Factory.h"
+#include "Math/Functor.h"
+#include "sd/LongDriftSD.hh"
+
+
+
+
 class G4LogicalVolume;
 class G4VPhysicalVolume;
 
@@ -101,7 +129,7 @@ public:
 protected:
 
   AWEMuonTomographyDetector* fAWEDetector; ///< Pointer to associated detector medium
-  std::vector<LongDriftProcessors*> fDriftChamberProcs;
+  std::vector<LongDriftProcessor*> fDriftChamberProcs;
 
   int fMuonTimeIndex; ///< Time Ntuple Index
   int fMuonMomXIndex; ///< MomX Ntuple Index
@@ -116,10 +144,10 @@ protected:
   TrackFitter* fFitterFCN;
   ROOT::Math::Functor* fCallFunctor;
   ROOT::Math::Minimizer* fMinimizer;
-  G4ThreeVector* fMuonMom;
-  G4ThreeVector* fMuonErr;
-  G4ThreeVector* fMuonPos;
-  G4ThreeVector* fMuonPosErr;
+  G4ThreeVector fMuonMom;
+  G4ThreeVector fMuonMomErr;
+  G4ThreeVector fMuonPos;
+  G4ThreeVector fMuonPosErr;
 
 };
 

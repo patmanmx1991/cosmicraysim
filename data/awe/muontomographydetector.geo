@@ -5,11 +5,12 @@
 	size: [2.0,2.0,1.0],
 	position: [0.0,0.0,0.0],
 	material: "G4_AIR",
+	sensitive: "truemuon",
 }
 {
   name: "DETECTOR",
   index: "scintillator",
-  type:  "truemuon"
+  type:  "scintillator"
   	processor: 0, // Register to processing loop
 	save: 0, // Don't automatically save
 }
@@ -28,10 +29,8 @@
 
 {
   name: "DETECTOR",
-  index: "longitudinal_drift",
-  type:  "truemuon"
-	processor: 0, // Register to processing loop
-	save: 0, // Don't automatically save
+  index: "longdrift",
+  type:  "longdrift"
 }
 {
 	name: "GEO",
@@ -43,7 +42,7 @@
 	color: [1.,0.,0.,0.3],
 	drawstyle: "wireframe"
 	mother: "volume"
-	sensitive: "longitudinal_drift",
+	sensitive: "longdrift"
 }
 
 

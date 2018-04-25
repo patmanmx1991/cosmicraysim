@@ -20,6 +20,7 @@
 #include "sd/DetectorManager.hh"
 #include "simple/GeoBox.hh"
 #include "simple/GeoTubs.hh"
+#include "sd/LongDriftSD.hh"
 namespace COSMIC {
 
 
@@ -51,6 +52,9 @@ void AWEMuonTomographyDetector::Construct(DBLink* table) {
   GeoBox* fScintObject = new GeoBox(tbl);
   fSubObjects.push_back(fScintObject);
 
+  // DBLink* sctemplate = tdb->CloneLink("DETECTOR", "scintillator", fName + "_scintillator_panel" + "_sd");
+  // ScintillatorSD* det = new ScintillatorSD(sdtemplate);
+
   // Make the drift chamber array
   DBLink* postable = tdb->GetLink("GEO", "chamber_positions");
   std::vector<std::string> fields = postable->GetFields();
@@ -78,17 +82,15 @@ void AWEMuonTomographyDetector::Construct(DBLink* table) {
     fSubObjects.push_back(obj);
     fDriftObjects.push_back(obj);
 
-    // Create the sensitive detectors
-    DBLink* sdtemplate = tdb->CloneLink("GEO", "drift_sd", fName + "_" + chname + "_sd");
-    LongDriftSD* det = new LongDriftSD(sdtemplate);
-    det->SetLogicalVolume(obj->GetLogical(), obj->GetPhysical());
-    Analysis::Get()->RegisterDetector(sd);
+    // Create the sensitive detectors manually for each one
+    // DBLink* sdtemplate = tdb->CloneLink("DETECTOR", "longdrift", fName + "_" + chname + "_sd");
+    // LongDriftSD* det = new LongDriftSD(sdtemplate);
   }
 
-  // Register an AWEMuonTomographyProcessor to combine hits and return trigger
-  if (!table->Has("processor") or table->GetB("processor")) {
-    Analysis::Get()->RegisterProcessor(new AWEMuonTomographyProcessor(this));
-  }
+  // // Register an AWEMuonTomographyProcessor to combine hits and return trigger
+  // if (!table->Has("processor") or table->GetB("processor")) {
+  //   Analysis::Get()->RegisterProcessor(new AWEMuonTomographyProcessor(this));
+  // }
 
   // Remove the temporary database.
   delete tdb;
@@ -104,7 +106,7 @@ AWEMuonTomographyProcessor::AWEMuonTomographyProcessor(AWEMuonTomographyDetector
   // From each one get the sensitive and manually create a processor.
   // This is super awkward. May need to rethink.
   for (uint i = 0; i < drifts.size(); i++) {
-    LongDriftSD* sd = static_cast<LongDriftSD*>(drifts->GetSensitive());
+    LongDriftSD* sd = static_cast<LongDriftSD*>(drifts[i]->GetSensitive());
     fDriftChamberProcs.push_back( new LongDriftProcessor(sd, true) );
   }
 
@@ -150,10 +152,11 @@ bool AWEMuonTomographyProcessor::ProcessEvent(const G4Event* event) {
   std::vector<double> time;
   std::vector<G4ThreeVector> pos;
   std::vector<G4ThreeVector> err;
-  for (uint i = 0; i < fDriftChambers.size(); i++) {
+  for (uint i = 0; i < fDriftChamberProcs.size(); i++) {
 
     // Run our processing
-    fDriftChambers[i]->ProcessEvent(event);
+    std::cout << "Processing drift chambre : " << i << std::endl;
+    fDriftChamberProcs[i]->ProcessEvent(event);
 
     // Check if chamber had info
     if (!fDriftChamberProcs[i]->HasInfo()) continue;
@@ -174,6 +177,18 @@ bool AWEMuonTomographyProcessor::ProcessEvent(const G4Event* event) {
     pos.push_back(G4ThreeVector(x, y, z));
     err.push_back(G4ThreeVector(x, y, z));
   }
+
+  // Perform a 2D line fit in X-Y plane
+
+  // Perform a 2D line fit in Y-Z plane 
+
+  // Combine projection vectors to get a track
+
+  // Require at least 3 points, with at least one alternated plane....
+
+  
+
+  
 
   // Now perform a simple track fit to return a muon vector and error
   // Reset Minuit Instance
@@ -231,13 +246,14 @@ double TrackFitter::DoEval(const double *x) const {
   for (uint i = 0; i < fHitPositions->size(); i++) {
 
     G4ThreeVector P = (*fHitPositions)[i];
-    G4ThreeVector closest = V * P.dot(V);
+    G4ThreeVector E = (*fHitErrors)[i];
+    G4ThreeVector closest = pos + ((P-pos).dot(dir))/(dir.dot(dir)) * dir;
 
-    G4ThreeVector resvect = (closest - P).dot(E);
-    G4double res = resvect.dot(resvect);
-    totalres += res;
+    // G4ThreeVector resvect = (closest - P).dot(E);
+    G4double res = (closest - P).dot(E);
+    totalres += res * res;
   }
-
+  std::cout << "Total res = " << totalres << std::endl;
   return totalres;
 }
 

@@ -4,19 +4,20 @@
 #include <string>
 #include <vector>
 #include <iostream>
-#include <db/json.hh>
-#include <db/ReadFile.hh>
+
 #include "TObject.h"
 
-namespace COSMIC
-{
+#include <db/json.hh>
+#include <db/ReadFile.hh>
 
 // Forward Declarations
-class DBTable;
-class DBJSONParser;
+class COSMIC::DBTable;
+class COSMIC::DBJSONParser;
 
-// Database Table Class 
-class DBTable{
+namespace COSMIC {
+
+// Database Table Class
+class DBTable {
 public:
   // Constructors
   DBTable();
@@ -26,8 +27,8 @@ public:
   virtual ~DBTable();
 
   // Access Functions
-  inline std::string GetTableName(){return tblname;};
-  inline std::string GetIndexName(){return index;};
+  inline std::string GetTableName() {return tblname;};
+  inline std::string GetIndexName() {return index;};
 
   void Print();
   std::vector<std::string> GetFields();
@@ -43,22 +44,22 @@ public:
   double GetD(std::string name);
   std::string GetS(std::string name);
   DBTable* GetT(std::string name);
-  
-  std::vector<int> GetVecI(std::string name);
-  std::vector<float> GetVecF(std::string name);
-  std::vector<double> GetVecD(std::string name);
+
+  std::vector<int>         GetVecI(std::string name);
+  std::vector<float>       GetVecF(std::string name);
+  std::vector<double>      GetVecD(std::string name);
   std::vector<std::string> GetVecS(std::string name);
 
-  inline json::Value GetJSON(){return table;};
+  inline json::Value GetJSON() {return table;};
 
   void UpdateFields(DBTable* overrides);
-  inline void SetIndexName(std::string ind){ index = ind; Set("index",ind); };
-  inline void SetTableName(std::string ind){ tblname = ind; Set("name",ind); };
+  inline void SetIndexName(std::string ind) { index = ind; Set("index", ind); };
+  inline void SetTableName(std::string ind) { tblname = ind; Set("name", ind); };
   void Prefix(std::string name, std::string pref);
-  
+
 protected:
-  std::string tblname; 
-  std::string index;   
+  std::string tblname;
+  std::string index;
   json::Value table;
 };
 
@@ -71,7 +72,7 @@ public:
 
   /** Returns a list of all tables found in JSON string. */
   static std::vector<DBTable *> parseString(const std::string &data);
-  
+
   /** Converts a JSON document to a RATDB table */
   static DBTable *convertTable(json::Value &jsonDoc);
 };
@@ -88,10 +89,10 @@ public:
    *  @param _index  Index of table in which field could not be found
    *  @param _field  Name of field which could not be found
    */
-  DBNotFoundError (const std::string &_table, const std::string &_index, 
-          const std::string &_field) :
+  DBNotFoundError (const std::string &_table, const std::string &_index,
+                   const std::string &_field) :
     table(_table), index(_index), field(_field) {
-      std::cout << "DBNotFoundError : " << table << " : " << index << " : " << field << std::endl;
+    std::cout << "DBNotFoundError : " << table << " : " << index << " : " << field << std::endl;
   };
 
   /** Compare if @p other has the same table, index and field as @p this. */
@@ -111,8 +112,8 @@ public:
 
 class DBROOTIO {
 public:
-  DBROOTIO(){};
-  ~DBROOTIO(){};
+  DBROOTIO() {};
+  ~DBROOTIO() {};
   std::vector<std::string> fIndex;
   std::vector<std::string> fFields;
   std::vector<std::string> fValues;

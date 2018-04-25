@@ -4,20 +4,19 @@
 // 1.00 JMV, LLNL, Jan-2007:  First version.
 //******************************************************************************
 //
-
-#include <iomanip>
 #include "CRYPrimaryGenerator.hh"
 #include "db/DB.hh"
 #include "db/DBLink.hh"
-using namespace std;
-#include "G4Event.hh"
+
 namespace COSMIC {
 
 //----------------------------------------------------------------------------//
-CRYPrimaryGenerator::CRYPrimaryGenerator()
+CRYPrimaryGenerator::CRYPrimaryGenerator() :
+InputState(-1),
+fSourceBox(0)
 {
   std::cout << "FLX: Building CRY Generator" << std::endl;
-  fTable = DB::Get()->GetLink("CRY", "config");
+  DBLink* table = DB::Get()->GetLink("CRY", "config");
 
   // Setup Defaults
   fGenNeutrons  = true;
@@ -40,20 +39,20 @@ CRYPrimaryGenerator::CRYPrimaryGenerator()
   fDataDirectory = DB::GetDataPath() + "/cry/";
 
   // Allow for overrides
-  if (fTable->Has("gen_neutrons"))  fGenNeutrons = fTable->GetB("gen_neutrons");
-  if (fTable->Has("gen_protons"))   fGenProtons = fTable->GetB("gen_protons");
-  if (fTable->Has("gen_gammas"))    fGenGammas = fTable->GetB("gen_gammas");
-  if (fTable->Has("gen_electrons")) fGenElectrons = fTable->GetB("gen_electrons");
-  if (fTable->Has("gen_muons"))     fGenMuons = fTable->GetB("gen_muons");
-  if (fTable->Has("gen_pions"))     fGenPions = fTable->GetB("gen_pions");
+  if (table->Has("gen_neutrons"))  fGenNeutrons = table->GetB("gen_neutrons");
+  if (table->Has("gen_protons"))   fGenProtons = table->GetB("gen_protons");
+  if (table->Has("gen_gammas"))    fGenGammas = table->GetB("gen_gammas");
+  if (table->Has("gen_electrons")) fGenElectrons = table->GetB("gen_electrons");
+  if (table->Has("gen_muons"))     fGenMuons = table->GetB("gen_muons");
+  if (table->Has("gen_pions"))     fGenPions = table->GetB("gen_pions");
 
-  if (fTable->Has("latitude")) fLatitude = fTable->GetD("latitude");
-  if (fTable->Has("altitude")) fAltitude = fTable->GetD("altitude");
+  if (table->Has("latitude")) fLatitude = table->GetD("latitude");
+  if (table->Has("altitude")) fAltitude = table->GetD("altitude");
 
-  if (fTable->Has("date")) fDate = fTable->GetS("date");
+  if (table->Has("date")) fDate = table->GetS("date");
 
-  if (fTable->Has("min_particles")) fNParticlesMin = fTable->GetI("min_particles");
-  if (fTable->Has("max_particles")) fNParticlesMax = fTable->GetI("max_particles");
+  if (table->Has("min_particles")) fNParticlesMin = table->GetI("min_particles");
+  if (table->Has("max_particles")) fNParticlesMax = table->GetI("max_particles");
 
   // Lateral box size is defined from the source box
   GetSourceBox();
@@ -70,6 +69,7 @@ CRYPrimaryGenerator::CRYPrimaryGenerator()
   // define a particle gun
   particleGun = new G4ParticleGun();
 
+  // Set exposure and nthrows
   fExposureTime = 0.0;
   fNthrows = 0;
 
@@ -104,9 +104,9 @@ void CRYPrimaryGenerator::UpdateCRY()
   cryconfigs << " date " << fDate;
 
   // Fill truncation if provided
-  // if (fNParticlesMin > 0) {
+  if (fNParticlesMin > 0) {
   cryconfigs << " nParticlesMin " << fNParticlesMin;
-  // }
+  }
   if (fNParticlesMax > 0) {
     cryconfigs << " nParticlesMax " << fNParticlesMax;
   }
@@ -342,7 +342,7 @@ void CRYPrimaryGenerator::GeneratePrimaries(G4Event* anEvent)
     delete (*vect)[j];
   }
 }
-
+//------------------------------------------------------------------
 
 
 //------------------------------------------------------------------
@@ -388,10 +388,6 @@ bool CRYPrimaryFluxProcessor::ProcessEvent(const G4Event* /*event*/) {
 G4double CRYPrimaryFluxProcessor::GetExposureTime() {
   return fGenerator->GetTime();
 }
+//------------------------------------------------------------------
 
-
-
-
-
-
-}
+} // - namespace COSMIC

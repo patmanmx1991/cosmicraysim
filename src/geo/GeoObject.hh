@@ -5,6 +5,7 @@
 
 class G4LogicalVolume;
 class G4VPhysicalVolume;
+class G4VSensitiveDetector;
 
 namespace COSMIC {
 
@@ -71,6 +72,8 @@ public:
   /// Set this objects physical mother volume pointer
   // inline void SetMotherPhysical(G4VPhysicalVolume* mpv){ fMotherPhysical = mpv; };
 
+  inline virtual G4VSensitiveDetector* GetSensitive(){ return fSensitive; };
+  inline virtual void SetSensitive(G4VSensitiveDetector* s){ fSensitive = s; };
 
   /// Build this GeoObject from a table
   virtual void Construct(DBLink* /*table*/) {};
@@ -89,6 +92,7 @@ protected:
   G4VPhysicalVolume* fPhysical;        ///< Pointer to physical volume
   G4LogicalVolume* fMotherLogical;     ///< Pointer to mother logic
   G4VPhysicalVolume* fMotherPhysical;  ///< Pointer to mother physical
+  G4VSensitiveDetector* fSensitive; ///< Pointer to sensitive detector object for this geometry
 
 };
 

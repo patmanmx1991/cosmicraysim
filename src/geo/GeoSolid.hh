@@ -64,7 +64,6 @@ public:
 protected:
 
   G4VSolid* fSolid; ///< Geant4 solid object for this geometry
-  G4VSensitiveDetector* fSensitive; ///< Pointer to sensitive detector object for this geometry
 
 };
 

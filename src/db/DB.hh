@@ -35,23 +35,24 @@ class DB {
 public:
 
   DB();
-  virtual ~DB();
+  ~DB();
   DB(std::string filename);
   
   // Make a static way to access the DB
   static inline DB *Get()
     { return fPrimary == 0 ? fPrimary = new DB : fPrimary; };
-  static std::string GetDataPath();
-  static void PrintSplashScreen();
-  bool HasTables(std::string name);
-  
   static DB *fPrimary;
 
+
+
+  static std::string GetDataPath();
+  static void PrintSplashScreen();
+
+
+  bool HasTables(std::string name);
   int Load(std::string filename);
   int LoadAll(std::string dirname, std::string pattern="/*");
   int LoadFile(std::string filename);
-  inline void SetOutputFile(std::string filename) { fOutputFile = filename; };
-  inline std::string GetOutputFile(){ return fOutputFile; };
   void Finalise();
 
   std::vector<DBTable*> ReadDBFile(const std::string &filename);
@@ -64,30 +65,34 @@ public:
   DBLink* CreateLink(std::string tablename, std::string index);
   DBLink* CloneLink(std::string tablename, std::string ind1, std::string ind2);
 
-
   void WriteDB(std::string s);
 
 
+
+  inline void SetOutputFile(std::string filename) { fOutputFile = filename; };
+  inline std::string GetOutputFile(){ return fOutputFile; };
+
+
+
+
+
+
+  DBTable  GetTable_NEW (std::string tablename, std::string index);
+  DBTable& GetLink_NEW  (std::string tablename, std::string index);
+
+  std::vector<DBTable>  GetTableGroup_NEW (std::string tablename);
+  std::vector<DBTable&> GetLinkGroup_NEW  (std::string tablename);
+
+  std::string fDataBaseChoice;
+  std::map<std::string, std::vector<DBTable> > fDataBaseMap;
+
+
+
 protected:
+
   std::vector<DBTable*> fAllTables;
   std::string fOutputFile;
 };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-} // namespace COSMIC
+} // - namespace COSMIC
 #endif
