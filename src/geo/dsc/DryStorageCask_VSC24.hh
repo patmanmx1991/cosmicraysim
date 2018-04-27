@@ -3,7 +3,7 @@
 
 #include "GeoObject.hh"
 #include "db/DB.hh"
-#include "db/DBLink.hh"
+#include "db/DBTable.hh"
 
 class G4LogicalVolume;
 class G4VPhysicalVolume;
@@ -16,10 +16,10 @@ class DryStorageCask_VSC24 : public GeoObject {
 public:
 
   /// Can only be constructed from a table
-  DryStorageCask_VSC24(DBLink* table);
+  DryStorageCask_VSC24(DBTable table);
 
   /// Builds the geometry from some template DB file
-  void Construct(DBLink* table);  
+  void Construct(DBTable table);  
 
 protected:
 

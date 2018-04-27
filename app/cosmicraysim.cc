@@ -76,7 +76,7 @@ std::string gRunTag = "cosmicoutput";
 int gRunID = 0;
 int gSubRunID = 0;
 
-long gSeed = -1; ///< Seed. -1 means generate from time+pid
+long int gSeed = -1; ///< Seed. -1 means generate from time+pid
 
 /// Mode : Interactive
 bool gInteractive = false; //< Run interactive viewer
@@ -120,7 +120,7 @@ void PrintHelpScreen() {
 int main(int argc, char** argv) {
 
   // Print Splash Screen
-  DB::PrintSplashScreen();
+  DBNEW::PrintSplashScreen();
 
   // Get User Inputs
   std::cout << "========================================= " << std::endl;
@@ -197,7 +197,7 @@ int main(int argc, char** argv) {
     long pid = getpid();
     std::cout << "APP: --> pid : " << pid << std::endl;
     std::cout << "APP: --> time : " << tl << std::endl;
-    gSeed = int( tl * 100000. / (pid+1.));
+    gSeed = int( tl + (pid + 1.));
     std::cout << "APP: --> seed : " << gSeed << std::endl;
   } else {
     std::cout << "APP: --> User specified seed. " << std::endl;
@@ -211,7 +211,7 @@ int main(int argc, char** argv) {
 // Setup the Database
   std::cout << "========================================= " << std::endl;
   std::cout << "APP: Loading Default Database " << std::endl;
-  DB *rdb = DB::Get();
+  DBNEW *rdb = DBNEW::Get();
   if ( getenv("GLG4DATA") != NULL ) rdb->Load(string(getenv("GLG4DATA")));
   else rdb->Load(string("data"));
 
@@ -221,8 +221,6 @@ int main(int argc, char** argv) {
     }
   }
   rdb->Finalise();
-
-
   std::cout << "========================================= " << std::endl;
 
   std::cout << "APP: Setting up Geant4 Run Manager " << std::endl;
@@ -277,9 +275,9 @@ int main(int argc, char** argv) {
     G4UIExecutive* ui = new G4UIExecutive(argc, argv);
 
 #ifdef G4VIS_USE
-    UImanager->ApplyCommand("/control/execute " + DB::GetDataPath() + "/init_vis.mac");
+    UImanager->ApplyCommand("/control/execute " + DBNEW::GetDataPath() + "/init_vis.mac");
 #else
-    UImanager->ApplyCommand("/control/execute " + DB::GetDataPath() + "/init.mac");
+    UImanager->ApplyCommand("/control/execute " + DBNEW::GetDataPath() + "/init.mac");
 #endif
     // start the session here: make the Geant4 prompt Idle>
     // available to the user
@@ -300,11 +298,11 @@ int main(int argc, char** argv) {
     std::cout << "APP: Running Batch Mode" << std::endl;
 
     // Run initial configuration commands
-    DBLink* tbl = rdb->GetLink("GLOBAL", "config");
-    if (tbl->Has("batchcommands")) {
+    DBTable tbl = rdb->GetTable("GLOBAL", "config");
+    if (tbl.Has("batchcommands")) {
 
       // Get users pre macro file
-      std::string commands = tbl->GetS("batchcommands");
+      std::string commands = tbl.GetS("batchcommands");
 
       // Execute the macro
       if (!commands.empty()) {
@@ -336,6 +334,7 @@ int main(int argc, char** argv) {
       std::cout << "APP: Running NTriggers" << std::endl;
       std::cout << "APP: --> Desired Triggers : " << gNTriggers << std::endl;
       std::cout << "APP: --> Processing Chunk : " << gProcessingChunks << std::endl << std::endl;
+      Analysis::Get()->SetChunkSize(gProcessingChunks);
 
       // Run first loop for estimate
       long int curtime = time(0);
@@ -375,6 +374,7 @@ int main(int argc, char** argv) {
       std::cout << "APP: Running Exposure" << std::endl;
       std::cout << "APP: --> Desired Exposure : " << gExposureTime << " s" << std::endl;
       std::cout << "APP: --> Processing Chunk : " << gProcessingChunks << std::endl << std::endl;
+      Analysis::Get()->SetChunkSize(gProcessingChunks);
 
       // Run first loop for estimate
       long int curtime = time(0);

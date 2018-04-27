@@ -1,19 +1,22 @@
 #include "PrimaryGeneratorFactory.hh"
 
 #include "db/DB.hh"
-#include "db/DBLink.hh"
+#include "db/DBTable.hh"
 #include "flux/ShuklaPrimaryGenerator.hh"
 #include "flux/CRYPrimaryGenerator.hh"
 
 namespace COSMIC{
 
-G4VUserPrimaryGeneratorAction* PrimaryGeneratorFactory::LoadGenerator(DBLink* table){
+G4VUserPrimaryGeneratorAction* PrimaryGeneratorFactory::LoadGenerator(){
+  // Get default config if requested
+  DBTable tbl = DBNEW::Get()->GetTable("GLOBAL","config");
+  return LoadGenerator(tbl);
+}
 
-  // Get Set of flux tables to check only one loaded.
-  if (!table) table = DB::Get()->GetLink("GLOBAL","config");
+G4VUserPrimaryGeneratorAction* PrimaryGeneratorFactory::LoadGenerator(DBTable table){
 
   // Read Flux Table using horrible ugly string comparisons!
-  std::string type = table->GetS("flux");
+  std::string type = table.GetS("flux");
   std::cout << "FLX: Loading Primary Generator : " << type << std::endl;
   if (type.compare("shukla")==0) return new ShuklaPrimaryGenerator();
   if (type.compare("cry")==0)    return new CRYPrimaryGenerator();
@@ -24,7 +27,6 @@ G4VUserPrimaryGeneratorAction* PrimaryGeneratorFactory::LoadGenerator(DBLink* ta
 
   // Return NULL generator
   return 0;
-};
-
+}
 } // - namespace COSMIC
 

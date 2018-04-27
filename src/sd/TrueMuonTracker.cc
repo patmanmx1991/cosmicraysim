@@ -1,12 +1,12 @@
 #include "TrueMuonTracker.hh"
 #include "analysis/Analysis.hh"
-#include "db/DBLink.hh"
+#include "db/DBTable.hh"
 
 namespace COSMIC {
 
 //------------------------------------------------------------------
-TrueMuonTracker::TrueMuonTracker(DBLink* tbl):
-  VDetector(tbl->GetIndexName(), "truemuon")
+TrueMuonTracker::TrueMuonTracker(DBTable tbl):
+  VDetector(tbl.GetIndexName(), "truemuon")
 {
   std::cout << "DET: Creating new " << GetType()
             << " detector : " << GetID() << std::endl;
@@ -16,7 +16,7 @@ TrueMuonTracker::TrueMuonTracker(DBLink* tbl):
 
   // By default also include the auto processor
   // std::cout << "TRUE MUON PROCESSOR : " << tbl->GetI("processor") << std::endl;
-  if (!tbl->Has("processor") or tbl->GetI("processor") > 0) {
+  if (!tbl.Has("processor") or tbl.GetI("processor") > 0) {
     Analysis::Get()->RegisterProcessor(new TrueMuonProcessor(this));
   }
 }

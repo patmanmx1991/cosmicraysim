@@ -61,7 +61,7 @@ CRYFunctionDict::CRYFunctionDict() {
 CRYAbsFunction *CRYFunctionDict::function(std::string data) {
 
 
-  functype type=CRYFunctionDict::UNKNOWN;
+  functype typef=CRYFunctionDict::UNKNOWN;
 
   std::istringstream iss( data );
   std::string lhs;
@@ -104,17 +104,17 @@ CRYAbsFunction *CRYFunctionDict::function(std::string data) {
 
   std::map<functype,std::string>::iterator iterKF;
   for ( iterKF=_knownFunctions.begin(); iterKF != _knownFunctions.end(); iterKF++) {
-    if ( iterKF->second == funcType ) type= iterKF->first;
+    if ( iterKF->second == funcType ) typef= iterKF->first;
   }
-  if ( type == CRYFunctionDict::UNKNOWN ) {
+  if ( typef == CRYFunctionDict::UNKNOWN ) {
     std::cerr << "CRY::CRYFunctionDict: Unknown function type " << funcType << " Data was:\n";
     std::cerr << data << std::endl;
     assert(0);
   }
 
-  if ( type == CRYFunctionDict::PrimarySpectrum1 ) 
+  if ( typef == CRYFunctionDict::PrimarySpectrum1 ) 
     return new CRYPrimarySpectrumFunction(funcName,rhs);
-  if ( type == CRYFunctionDict::cosLatitude ) 
+  if ( typef == CRYFunctionDict::cosLatitude ) 
     return new CRYCosLatitudeFunction(funcName,rhs);
   
   return 0;

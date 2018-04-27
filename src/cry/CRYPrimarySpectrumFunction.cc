@@ -42,8 +42,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CRYPrimarySpectrumFunction.h"
 #include <math.h>
 
-CRYPrimarySpectrumFunction::CRYPrimarySpectrumFunction(std::string name, std::string data):
-  CRYAbsFunction(name, CRYFunctionDict::PrimarySpectrum1, data)
+CRYPrimarySpectrumFunction::CRYPrimarySpectrumFunction(std::string namer, std::string datar):
+  CRYAbsFunction(namer, CRYFunctionDict::PrimarySpectrum1, datar)
 {
 }
 

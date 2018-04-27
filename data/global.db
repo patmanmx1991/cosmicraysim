@@ -2,6 +2,6 @@
   name: "GLOBAL",
   index: "config",
   flux: "cry",
-  physics: "shielding",
+  physics: "QGSP_BERT",
   batchcommands: "",
 }

@@ -2,8 +2,8 @@
 	name: "GEO",
 	index: "volume",
 	type: "tubs",
-	r_max: 1.36,
-	size_z: 2.4,
+	r_max: "1.36*m",
+	size_z: "4.8*m",
 	position: [0.0,0.0,-1.6],
 	rotation: [0.0,0.0,0.0],
 	material: "G4_AIR",
@@ -13,9 +13,9 @@
         index: "concrete_cask",
         mother: "volume",
         type: "tubs",
-        r_max: 1.34,
-	r_min: 0.80825,
-        size_z: 2.40,
+        r_max: "1.34*m",
+	r_min: "0.80825*m",
+        size_z: "4.8*m",
         position: [0.0,0.0,0.0],
         rotation: [0.0,0.0,0.0],
         material: "G4_CONCRETE",
@@ -27,10 +27,9 @@
         index: "concrete_bottom",
         mother: "volume",
         type: "tubs",
-        r_max: 0.80825,
-        size_z: 0.05,
-        position: [0.0,0.0,-2.35],
-        rotation: [0.0,0.0,0.0],
+        r_max: "0.80825*m",
+        size_z: "0.05*m",
+        position: ["0.0","0.0","-2.35*m"],
         material: "G4_CONCRETE",
         drawstyle: "solid",
         color: [0.3,0.3,0.3,0.4],
@@ -40,12 +39,10 @@
         index: "steel_shell",
         mother: "volume",
         type: "tubs",
-        r_max: 0.80825,
-	r_min: 0.78375,
-        size_z: 2.30,
-        position: [0.0,0.0,0.0],
-        rotation: [0.0,0.0,0.0],
-        material: "COSMIC_STEEL",
+        r_max: "0.80825*m",
+	r_min: "0.78375*m",
+        size_z: "4.6*m",
+        material: "G4_Fe",
         drawstyle: "solid",
         color: [0.3,0.3,0.3,0.8],
 }
@@ -55,11 +52,10 @@
         index: "steel_bottom",
         mother: "volume",
         type: "tubs",
-        r_max: 0.80825,
-        size_z: 0.0254,
-        position: [0.0,0.0,-2.3127],
-        rotation: [0.0,0.0,0.0],
-        material: "COSMIC_STEEL",
+        r_max: "0.80825*m",
+        size_z: "0.0254*m",
+        position: ["0.0","0.0","-2.3127*m"],
+        material: "G4_Fe",
         drawstyle: "solid",
         color: [0.3,0.3,0.3,0.8],
 }
@@ -71,9 +67,8 @@
         type: "tubs",
         r_max: 0.80825,
         size_z: 0.0254,
-        position: [0.0,0.0,2.3127],
-        rotation: [0.0,0.0,0.0],
-        material: "COSMIC_STEEL",
+        position: ["0.0","0.0","2.3127*m"],
+        material: "G4_Fe",
         drawstyle: "solid",
         color: [0.3,0.3,0.3,0.8],
 }
@@ -105,6 +100,7 @@
         rod_21: [ -0.36,  0.36, 0.0],
         rod_22: [ -0.60, -0.12, 0.0],
         rod_23: [ -0.60,  0.12, 0.0],
+	units: "m"
 }
 
 {
@@ -112,7 +108,7 @@
         index: "uranium_rod",
         mother: "volume",
         type: "box",
-        size: [0.21,0.21,4.0]
+        size: ["0.21*m","0.21*m","4.0*m"]
         rotation: [0.0,0.0,0.0],
         material: "G4_U",
         drawstyle: "solid",
@@ -126,6 +122,7 @@
         mother: "volume",
         type: "box",
         size: [0.21,0.21,4.0]
+	size_units: "m"
         rotation: [0.0,0.0,0.0],
         material: "G4_W",
         drawstyle: "solid",
@@ -138,6 +135,7 @@
         mother: "volume",
         type: "box",
         size: [0.21,0.21,4.0]
+	size_units: "m",
         rotation: [0.0,0.0,0.0],
         material: "G4_Pb",
         drawstyle: "solid",
@@ -150,6 +148,7 @@
         mother: "volume",
         type: "box",
         size: [0.21,0.21,4.0]
+	size_units: "m"
         rotation: [0.0,0.0,0.0],
         material: "G4_AIR",
         color: [0.1,0.1,0.1,0.4],

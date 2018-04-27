@@ -60,7 +60,14 @@ enum Type {
     TSTRING,
     TOBJECT,
     TARRAY,
-    TNULL
+    TNULL,
+    TINTEGER_ARRAY,
+    TUINTEGER_ARRAY,
+    TREAL_ARRAY,
+    TBOOL_ARRAY,
+    TSTRING_ARRAY,
+    TOBJECT_ARRAY,
+    TJSON
 };
 
 //JSON Value container class. Basic types (int,uint,real,bool) are stored by value, and structured types are stored by reference.

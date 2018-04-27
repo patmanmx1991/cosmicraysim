@@ -30,7 +30,7 @@
 namespace COSMIC {
 
 // Forward Declarations
-class DBLink;
+class DBTable;
 
 /// True Muon Tracker Detector Object :
 /// Saves the highest momentrum muon track
@@ -39,7 +39,7 @@ class LongDriftSD : public VDetector {
 public:
 
   /// Main constructor from a database table
-  LongDriftSD(DBLink* table);
+  LongDriftSD(DBTable table);
   /// Simple C++ constructor
   LongDriftSD(std::string name, std::string id, bool autoprocess = true, bool autosave = true);
   /// Destructor

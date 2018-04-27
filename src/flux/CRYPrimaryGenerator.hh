@@ -35,7 +35,6 @@
 #include "analysis/VFluxProcessor.hh"
 
 #include "db/DB.hh"
-#include "db/DBLink.hh"
 
 #include "cry/RNGWrapper.hh"
 #include "cry/CRYSetup.h"

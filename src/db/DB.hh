@@ -16,8 +16,6 @@
 #include <map>
 #include <set>
 #include <deque>
-#include "db/DBLink.hh"
-
 
 #include <string>
 #include <list>
@@ -25,74 +23,56 @@
 #include <set>
 #include <deque>
 
+#include "db/DBTable.hh"
 
-namespace COSMIC{
+namespace COSMIC {
 
-class DB;
-class DBTable;
-
-class DB {
+class DBNEW {
 public:
 
-  DB();
-  ~DB();
-  DB(std::string filename);
-  
   // Make a static way to access the DB
-  static inline DB *Get()
-    { return fPrimary == 0 ? fPrimary = new DB : fPrimary; };
-  static DB *fPrimary;
+  static inline DBNEW *Get()
+  { return fPrimary == 0 ? fPrimary = new DBNEW : fPrimary; };
+  static DBNEW *fPrimary;
 
-
+  DBNEW();
+  ~DBNEW();
+  DBNEW(std::string filename);
 
   static std::string GetDataPath();
   static void PrintSplashScreen();
 
+  void CreateDataBase(std::string dataid);
+
+  void SelectDataBase(std::string dataid);
 
   bool HasTables(std::string name);
+
   int Load(std::string filename);
-  int LoadAll(std::string dirname, std::string pattern="/*");
+  int LoadAll(std::string dirname, std::string pattern = "/*");
   int LoadFile(std::string filename);
   void Finalise();
 
-  std::vector<DBTable*> ReadDBFile(const std::string &filename);
+  DBTable  GetTable (std::string tablename, std::string index);
+  DBTable* GetLink  (std::string tablename, std::string index);
 
-  DBTable* GetTable(std::string tablename, std::string index);
+  std::vector<DBTable>  GetTableGroup (std::string tablename);
+  std::vector<DBTable*> GetLinkGroup  (std::string tablename);
 
-  DBLink* GetLink(std::string tablename, std::string index);
-  std::vector<DBLink*> GetLinkGroup(std::string tablename);
-  
-  DBLink* CreateLink(std::string tablename, std::string index);
-  DBLink* CloneLink(std::string tablename, std::string ind1, std::string ind2);
-
-  void WriteDB(std::string s);
-
-
+  void AddTable(DBTable tbl);
 
   inline void SetOutputFile(std::string filename) { fOutputFile = filename; };
-  inline std::string GetOutputFile(){ return fOutputFile; };
-
-
-
-
-
-
-  DBTable  GetTable_NEW (std::string tablename, std::string index);
-  DBTable& GetLink_NEW  (std::string tablename, std::string index);
-
-  std::vector<DBTable>  GetTableGroup_NEW (std::string tablename);
-  std::vector<DBTable&> GetLinkGroup_NEW  (std::string tablename);
-
-  std::string fDataBaseChoice;
-  std::map<std::string, std::vector<DBTable> > fDataBaseMap;
-
-
+  inline std::string GetOutputFile() { return fOutputFile; };
 
 protected:
 
-  std::vector<DBTable*> fAllTables;
+  std::map<std::string, std::vector<DBTable> > fAllTables;
+  std::vector<DBTable>* fCurrentTables;
+  std::vector<DBTable>* fDefaultTables;
   std::string fOutputFile;
-};
+  DBTable fNullTable;
+  int fDataBaseCalls;
 
+};
 } // - namespace COSMIC
 #endif

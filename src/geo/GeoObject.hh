@@ -1,7 +1,7 @@
 #ifndef __GEO_OBJECT_HH__
 #define __GEO_OBJECT_HH__
 
-#include "db/DBLink.hh"
+#include "db/DBTable.hh"
 
 class G4LogicalVolume;
 class G4VPhysicalVolume;
@@ -22,15 +22,6 @@ public:
     fPhysical(NULL),
     fMotherLogical(NULL),
     fMotherPhysical(NULL) {};
-
-  // /// Set name and type from table in constructor
-  // inline GeoObject(DBLink* tbl) :
-  //   fID(tbl->GetIndexName()),
-  //   fType(tbl->GetS("type")),
-  //   fLogical(NULL),
-  //   fPhysical(NULL),
-  //   fMotherLogical(NULL),
-  //   fMotherPhysical(NULL) {};
 
   /// Simple empty constructor
   inline GeoObject() :
@@ -76,8 +67,7 @@ public:
   inline virtual void SetSensitive(G4VSensitiveDetector* s){ fSensitive = s; };
 
   /// Build this GeoObject from a table
-  virtual void Construct(DBLink* /*table*/) {};
-
+  virtual void Construct(DBTable /*table*/) {};
 
   /// Construct the sensitive part ! REMOVE!
   // virtual void ConstructSensitive(DB* db) {};

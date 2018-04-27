@@ -22,15 +22,7 @@
 #include "analysis/Analysis.hh"
 
 
-#include "TH1.h"
-#include "TF1.h"
-#include "TMatrixD.h"
-#include "TVectorD.h"
-#include "Minuit2/FCNBase.h"
-#include "TFitterMinuit.h"
-#include "TSystem.h"
-#include "TFile.h"
-#include "TProfile.h"
+#include "db/ROOTHeaders.hh"
 
 
 #include <vector>
@@ -45,8 +37,19 @@
 #include "Math/Factory.h"
 #include "Math/Functor.h"
 #include "sd/LongDriftSD.hh"
+#include "sd/SimpleScintillatorSD.hh"
+#include "TH1.h"
+#include "TF1.h"
+#include "TRandom3.h"
+#include "TVirtualFitter.h"
+#include "TStyle.h"
+#include "Minuit2/FCNBase.h"
+#include "TFitterMinuit.h"
+#include "TSystem.h"
+#include "TStopwatch.h"
 
-
+#include <vector>
+#include <iostream>
 
 
 class G4LogicalVolume;
@@ -58,8 +61,8 @@ namespace COSMIC {
 class AWEMuonTomographyDetector : public GeoObject {
 public:
   inline AWEMuonTomographyDetector() {};
-  inline AWEMuonTomographyDetector(DBLink* table) {Construct(table);};
-  void Construct(DBLink* table);
+  inline AWEMuonTomographyDetector(DBTable table) {Construct(table);};
+  void Construct(DBTable table);
 
   std::vector<GeoObject*> GetDriftObjects() { return fDriftObjects; };
   GeoObject* GetScintillatorObject() { return fScintObject; };
@@ -73,38 +76,35 @@ protected:
 
 
 //! Wrapper for JointFCN to make ROOT minimization behave sensibly.
-class TrackFitter{
- public:
+class TrackFitter  {
+public:
 
   // Empty Construction
-  TrackFitter(){}
-  ~TrackFitter(){};
-
-  // Set Functions
-  void SetTimes(std::vector<double>* t){ fTimes = t; };
-  void SetPositions(std::vector<G4ThreeVector>* v){ fHitPositions= v; };
-  void SetErrors(std::vector<G4ThreeVector>* e){ fHitErrors = e;};
+  TrackFitter() {}
+  ~TrackFitter() {};
+  // double operator() (const std::vector<double> & x) const {
+  // return DoEval(&(x[0]));
+  // }
+  // Func Operator for vectors
+  // inline double operator() (const std::vector<double> & x) const
+  // {
+  // double* x_array = new double[x.size()];
+  // return this->DoEval(x_array);
+  // };
 
   // Actual Fitter
-  double DoEval(const double *x) const;
+  double DoEvalS(const double *x) const;
 
   // Func Operator for arrays
   inline double operator() (const double *x) const
   {
-    return this->DoEval(x);
+    return this->DoEvalS(x);
   };
-  
- private:
-  
-  std::vector<double>* fTimes;
-  std::vector<G4ThreeVector>* fHitPositions;
-  std::vector<G4ThreeVector>* fHitErrors;
+
+private:
+
 
 };
-
-
-
-
 
 
 /// True Muon Processor Object :
@@ -118,7 +118,7 @@ public:
   /// tracker object.
   AWEMuonTomographyProcessor(AWEMuonTomographyDetector* trkr);
   /// Destructor
-  ~AWEMuonTomographyProcessor(){};
+  ~AWEMuonTomographyProcessor() {};
 
   /// Setup Ntuple entries
   bool BeginOfRunAction(const G4Run* run);
@@ -126,10 +126,16 @@ public:
   /// Process the information the tracker recieved for this event
   bool ProcessEvent(const G4Event* event);
 
+
+  void GetMXC(G4double& m, G4double& c, std::vector<G4double>& x, std::vector<G4double>& y, std::vector<G4double>& yerr);
+
+
+
 protected:
 
   AWEMuonTomographyDetector* fAWEDetector; ///< Pointer to associated detector medium
   std::vector<LongDriftProcessor*> fDriftChamberProcs;
+  SimpleScintillatorProcessor* fScintProc;
 
   int fMuonTimeIndex; ///< Time Ntuple Index
   int fMuonMomXIndex; ///< MomX Ntuple Index
@@ -140,7 +146,7 @@ protected:
   int fMuonPosZIndex; ///< PosZ Ntuple Index
   int fMuonPDGIndex;  ///< MPDG Ntuple Index
 
-   // Create Fit Machinery
+  // Create Fit Machinery
   TrackFitter* fFitterFCN;
   ROOT::Math::Functor* fCallFunctor;
   ROOT::Math::Minimizer* fMinimizer;

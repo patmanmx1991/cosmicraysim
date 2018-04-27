@@ -49,6 +49,7 @@ using namespace COSMIC;
 CosmicRun::CosmicRun()
   : G4Run()
 {
+  fPrintSize = Analysis::Get()->GetChunkSize() / 10.0;
 }
 
 CosmicRun::~CosmicRun()
@@ -59,12 +60,14 @@ void CosmicRun::RecordEvent(const G4Event* event)
 {
   // Logging
   int eventid = event->GetEventID();
-  if (eventid % 10000 == 0) {
+  if (eventid % fPrintSize == 0) {
     std::cout << "RUN: --> Processing Event : " << eventid
               << "/" << numberOfEventToBeProcessed << std::endl;
   }
 
   Analysis::Get()->ProcessEvent(event);
+
+  // Reset analysis state for next event.
   Analysis::Get()->BeginOfEventAction();
 }
 

@@ -4,7 +4,7 @@
 #include "GeoSolid.hh"
 #include "G4Tubs.hh"
 
-class COSMIC::DBLink;
+class COSMIC::DBTable;
 
 namespace COSMIC {
 
@@ -12,10 +12,10 @@ namespace COSMIC {
 class GeoTubs : public GeoSolid {
 public:
   /// Create a GeoTubs from a table
-  GeoTubs(DBLink* table);
+  GeoTubs(DBTable table);
 
   /// Construct the solid volume for this geobox
-  G4VSolid *ConstructSolidVolume(DBLink* table);
+  G4VSolid *ConstructSolidVolume(DBTable table);
 };
 
 } // namespace COSMIC

@@ -108,6 +108,9 @@ public:
 
   int GetNSavedEvents(){ return fSavedEvents; };
   
+  void SetChunkSize(int i){ fChunkSize = i; };
+  int GetChunkSize(){ return fChunkSize; };
+  
 protected:
 
   static Analysis *fPrimary; ///< Singleton Object
@@ -133,6 +136,8 @@ protected:
   std::string fOutputTag;
   int fRunID;
   int fSubRunID;
+
+  int fChunkSize;
 
 };
 

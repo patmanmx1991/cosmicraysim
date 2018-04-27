@@ -158,7 +158,7 @@ CRYPdf::CRYPdf(std::string data) {
 }
 
 
-CRYPdf::CRYPdf(std::string name,
+CRYPdf::CRYPdf(std::string namer,
 	       double minVal, double maxVal,
 	       pdfType pType,
 	       std::string binning,
@@ -171,7 +171,7 @@ CRYPdf::CRYPdf(std::string name,
     _max=log10(_max);
   }
 
-  _name=name;
+  _name=namer;
   _type=pType;
   _binningKey=binning;
   _params=new std::vector< std::vector<double> >;
@@ -182,13 +182,13 @@ CRYPdf::CRYPdf(std::string name,
     _params->push_back(values[i]);
     std::vector<double> cdf;
 
-    double sum=0.;
+    double sumtemp=0.;
     for ( unsigned int j=0; j<values[i].size(); j++)
-      sum+=values[i][j];
+      sumtemp+=values[i][j];
 
     double culm=0.;
     for ( unsigned int j=0; j<values[i].size(); j++) {
-      culm+=(values[i][j]/sum);
+      culm+=(values[i][j]/sumtemp);
       cdf.push_back(culm);
     }
     _cdfs->push_back(cdf);
@@ -226,23 +226,23 @@ void CRYPdf::readSetOfParams(std::string data) {
   std::vector<double> results;
 
   std::istringstream iss(data);
-  std::string key="";
+  std::string keytemp="";
   while ( !iss.eof()) {
-    std::getline(iss,key,' ');
-    if ( key.length()>0 && 0!=strcmp(key.c_str()," ")) {
-      results.push_back(atof(key.c_str()));
+    std::getline(iss,keytemp,' ');
+    if ( keytemp.length()>0 && 0!=strcmp(keytemp.c_str()," ")) {
+      results.push_back(atof(keytemp.c_str()));
     }
   }
   _params->push_back(results);
 
-  double sum=0.;
+  double sumtemp=0.;
   for ( unsigned int i=0; i<results.size(); i++)
-    sum+=results[i];
+    sumtemp+=results[i];
 
   std::vector<double> cdf;
   double culm=0.;
   for ( unsigned int i=0; i<results.size(); i++) {
-    culm+=(results[i]/sum);
+    culm+=(results[i]/sumtemp);
     cdf.push_back(culm);
   }
   _cdfs->push_back(cdf);
@@ -284,14 +284,14 @@ double CRYPdf::draw( CRYUtils *utils, int bin ) {
 
 std::string CRYPdf::spaceTrimmer(std::string str, int nskip) {
   std::istringstream iss2(str);
-  std::string key="";
+  std::string keytemp="";
   std::string retval="";
   int c=0;
   while ( !iss2.eof()) {
-    std::getline(iss2,key,' ');
-    if ( 0!=strcmp(key.c_str()," ")) {
+    std::getline(iss2,keytemp,' ');
+    if ( 0!=strcmp(keytemp.c_str()," ")) {
       c++;
-      if ( c> nskip ) retval.append(key);
+      if ( c> nskip ) retval.append(keytemp);
     }
   }
   return retval;

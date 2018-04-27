@@ -18,25 +18,11 @@ else()
   find_package(Geant4 REQUIRED)
 endif()
 
-
-
-
 #----------------------------------------------------------------------------
 # Find ROOT variables if the variable G4ANALYSIS_USE_ROOT is set
 #
-find_package(ROOT QUIET)
-
-
-
-#---Set Link and include directories--------------------------------------------------------------
-#include_directories(${ROOT_INCLUDE_DIRS})
-#link_directories(${ROOT_LIBRARY_DIR})
-
-#---Set Flags-------------------------------------------------------------------------------------
-#add_definitions(${ROOT_DEFINITIONS})
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ROOT_CXX_FLAGS}")
-#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${ROOT_C_FLAGS}")
-#set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} ${ROOT_fortran_FLAGS}")
+#find_package(ROOT QUIET)
+find_package(ROOT REQUIRED COMPONENTS RIO Net Hist Graf Graf3d Gpad Tree Rint Postscript Matrix Physics MathCore Thread)
 
 #----------------------------------------------------------------------------
 # Setup Geant4 include directories and compile definitions
@@ -60,32 +46,24 @@ file(GLOB sources ${PROJECT_SOURCE_DIR}/src/*/*.cc ${PROJECT_SOURCE_DIR}/src/geo
 file(GLOB headers ${PROJECT_SOURCE_DIR}/src/*/*.hh ${PROJECT_SOURCE_DIR}/src/geo/*/*.cc)
 
 #----------------------------------------------------------------------------
-# Create the DB Library
-
-
-#ROOT_GENERATE_DICTIONARY(DBlib ${PROJECT_SOURCE_DIR}/src/db/DBTable.h LINKDEF ${PROJECT_SOURCE_DIR}/src/db/DBTable_LinkDef.h)
-#add_library(myDBlib SHARED ${PROJECT_SOURCE_DIR}/src/db/DBTable.cc DBlib.cxx)
-#target_link_libraries(myDBlib ${ROOT_LIBRARIES})
-
-#----------------------------------------------------------------------------
+configure_file(cmake/setup.sh.in
+  "${PROJECT_BINARY_DIR}/setup.sh" @ONLY)
 
 #----------------------------------------------------------------------------
 # Add the executable, and link it to the Geant4 libraries
 #
 add_executable(cosmicraysim ${PROJECT_SOURCE_DIR}/app/cosmicraysim.cc ${sources} ${headers})
 if(ROOT_FOUND)
-target_link_libraries(cosmicraysim ${Geant4_LIBRARIES} ${ROOT_LIBRARIES})
+target_link_libraries(cosmicraysim ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} )
 else()
 target_link_libraries(cosmicraysim ${Geant4_LIBRARIES})
 endif()
-
 
 #----------------------------------------------------------------------------
 # For internal Geant4 use - but has no effect if you build this
 # example standalone
 #
 add_custom_target(COSMO DEPENDS cosmicraysim)
-
 
 #----------------------------------------------------------------------------
 # Copy all scripts to the build directory, i.e. the directory in which we

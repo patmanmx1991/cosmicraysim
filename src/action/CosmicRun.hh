@@ -41,6 +41,7 @@ class CosmicRun : public G4Run
     virtual ~CosmicRun();
     virtual void RecordEvent(const G4Event*);
     virtual void Merge(const G4Run*);
+    int fPrintSize;
 };
 
 #endif

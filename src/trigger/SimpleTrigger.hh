@@ -9,7 +9,7 @@
 namespace COSMIC {
 
 // Forward declarations
-class DBLink;
+class DBTable;
 class VProcessor;
 
 /// Simple co-incident trigger class, with
@@ -18,7 +18,7 @@ class SimpleTrigger : public VTrigger {
 public:
 
   /// Database constructor
-  SimpleTrigger(DBLink* tbl);
+  SimpleTrigger(DBTable tbl);
 
   /// Simple Generic C++ Constructor
   SimpleTrigger(std::string name,

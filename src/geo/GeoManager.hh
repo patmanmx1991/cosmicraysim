@@ -39,12 +39,12 @@ public:
   GeoManager();
   ~GeoManager() {};
 
-  G4LogicalVolume* GetMother(DBLink* geo_tab);
+  G4LogicalVolume* GetMother(DBTable geo_tab);
 
   G4VPhysicalVolume* ConstructAll();
-  std::vector<DBLink*> fGeoTables;
+  //  std::vector<DBTable> fGeoTables;
   std::map<std::string, GeoObject*> fGeoObjects;
-  int MotherStatus(DBLink* geo_tab);
+  int MotherStatus(DBTable geo_tab);
   bool HasGeoObject(std::string name);
 
   // void ConstructSensitive();
@@ -57,7 +57,7 @@ public:
 
 
 namespace GeoObjectFactory {
-GeoObject* Construct(DBLink* table);
+GeoObject* Construct(DBTable table);
 }
 
 }

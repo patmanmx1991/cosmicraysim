@@ -6,13 +6,14 @@
 #include "G4ParticleGun.hh"
 #include "globals.hh"
 
-#include "db/DBLink.hh"
+#include "db/DBTable.hh"
 
 namespace COSMIC{
 
 /// Flux Factory function to load generators from table
 namespace PrimaryGeneratorFactory {
-  G4VUserPrimaryGeneratorAction* LoadGenerator(DBLink* table=0);
+  G4VUserPrimaryGeneratorAction* LoadGenerator();
+  G4VUserPrimaryGeneratorAction* LoadGenerator(DBTable table);
 }
 
 } // - namespace COSMIC

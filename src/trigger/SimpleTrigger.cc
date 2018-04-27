@@ -3,28 +3,28 @@
 #include "G4Event.hh"
 
 #include "db/DB.hh"
-#include "db/DBLink.hh"
+#include "db/DBTable.hh"
 #include "analysis/VTrigger.hh"
 #include "analysis/VProcessor.hh"
 #include "analysis/Analysis.hh"
 
 namespace COSMIC {
 
-SimpleTrigger::SimpleTrigger(DBLink* tbl)
-  : VTrigger(tbl->GetIndexName())
+SimpleTrigger::SimpleTrigger(DBTable tbl)
+  : VTrigger(tbl.GetIndexName())
 {
-  std::cout << "TRG: Loading Simple Trigger : " << tbl->GetIndexName() << std::endl;
+  std::cout << "TRG: Loading Simple Trigger : " << tbl.GetIndexName() << std::endl;
 
   // Get list of detector objects
-  if (tbl->Has("processors")){
-    SetupProcessors(tbl->GetVecS("processors"));
+  if (tbl.Has("processors")){
+    SetupProcessors(tbl.GetVecS("processors"));
   }
 
   // Get thresholds
   fEnergyThreshold = -1.0;
   fTimeThreshold = -1.0;
-  if (tbl->Has("energy_threshold")) fEnergyThreshold = tbl->GetD("energy_threshold") * MeV;
-  if (tbl->Has("time_threshold"))   fEnergyThreshold = tbl->GetD("time_threshold") * ns;
+  if (tbl.Has("energy_threshold")) fEnergyThreshold = tbl.GetD("energy_threshold") * MeV;
+  if (tbl.Has("time_threshold"))   fEnergyThreshold = tbl.GetD("time_threshold") * ns;
 
 }
 

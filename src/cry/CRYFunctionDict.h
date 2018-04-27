@@ -70,7 +70,7 @@ public:
   
   CRYAbsFunction *function(std::string data="");
 
-  std::string type(functype type) {return _knownFunctions[type];}
+  std::string type(functype typer) {return _knownFunctions[typer];}
 
 private:
 

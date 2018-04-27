@@ -33,6 +33,7 @@
 #include "G4VVisManager.hh"
 #include "G4VisAttributes.hh"
 #include "G4Circle.hh"
+#include "G4Square.hh"
 #include "G4Colour.hh"
 #include "G4AttDefStore.hh"
 #include "G4AttDef.hh"
@@ -44,7 +45,7 @@
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-G4ThreadLocal G4Allocator<ScintillatorHit>* ScintillatorHitAllocator=0;
+G4ThreadLocal G4Allocator<ScintillatorHit>* ScintillatorHitAllocator = 0;
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -59,14 +60,14 @@ ScintillatorHit::~ScintillatorHit()
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 ScintillatorHit::ScintillatorHit(const ScintillatorHit &right)
-: G4VHit() {
+    : G4VHit() {
     fId = right.fId;
     fTime = right.fTime;
     fEdep = right.fEdep;
     fType = right.fType;
     fPos = right.fPos;
     fRot = right.fRot;
-   // fPLogV = right.fPLogV;
+    // fPLogV = right.fPLogV;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -92,21 +93,20 @@ int ScintillatorHit::operator==(const ScintillatorHit &/*right*/) const
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-/*void ScintillatorHit::Draw()
+void ScintillatorHit::Draw()
 {
     G4VVisManager* pVVisManager = G4VVisManager::GetConcreteInstance();
     if (pVVisManager)
     {
-        G4Transform3D trans(fRot.inverse(),fPos);
-        G4VisAttributes attribs;
-        const G4VisAttributes* pVA = fPLogV->GetVisAttributes();
-        if (pVA) attribs = *pVA;
-        G4Colour colour(0.,1.,1.);
-        attribs.SetColour(colour);
-        attribs.SetForceSolid(true);
-        pVVisManager->Draw(*fPLogV,attribs,trans);
+        G4Square square(fPos);
+        square.SetScreenSize(6);
+        square.SetFillStyle(G4Square::filled);
+        G4Colour colour(1., 0., 0.);
+        G4VisAttributes attribs(colour);
+        square.SetVisAttributes(attribs);
+        pVVisManager->Draw(square);
     }
-}*/
+}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 /*
@@ -163,13 +163,13 @@ std::vector<G4AttValue>* ScintillatorHit::CreateAttValues() const
 void ScintillatorHit::Print()
 {
 //    G4cout << "  Hodoscope[" << fId << "] " << fTime/ns << " (nsec)" << G4endl;
-G4cout << G4endl;
-G4cout << G4endl;
-G4cout << G4endl;
-    G4cout << "  Hit : " << particle_type << " Time : " << fTime/ns << " (nsec)" << " Pos. : " << fPos/m << G4endl;
-G4cout << G4endl;
-G4cout << G4endl;
-G4cout << G4endl;
+    G4cout << G4endl;
+    G4cout << G4endl;
+    G4cout << G4endl;
+    G4cout << "  Hit : " << particle_type << " Time : " << fTime / ns << " (nsec)" << " Pos. : " << fPos / m << G4endl;
+    G4cout << G4endl;
+    G4cout << G4endl;
+    G4cout << G4endl;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

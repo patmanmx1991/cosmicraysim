@@ -13,7 +13,7 @@ ShuklaPrimaryGenerator::ShuklaPrimaryGenerator()
     std::cout << "FLX: Building Shukla Generator" << std::endl;
 
     // Setup Table
-    DBLink* table = DB::Get()->GetLink("SHUKLA", "config");
+    DBTable table = DBNEW::Get()->GetTable("SHUKLA", "config");
 
     // Setup Defaults + Table Inputs
     fMinEnergy = 0.1;
@@ -27,8 +27,8 @@ ShuklaPrimaryGenerator::ShuklaPrimaryGenerator()
     fPar_dis = 36.61;
 
     // Check for predef sets
-    if (table->Has("parameters")) {
-        std::string parset = table->GetS("parameters");
+    if (table.Has("parameters")) {
+        std::string parset = table.GetS("parameters");
 
         if (parset.compare("nottingham") == 0) {
             std::cout << "FLX: --> Using Nottingham parset." << std::endl;
@@ -63,15 +63,15 @@ ShuklaPrimaryGenerator::ShuklaPrimaryGenerator()
     }
 
     // Now look for manual overrides
-    if (table->Has("min_energy")) fMaxEnergy = table->GetD("min_energy");
-    if (table->Has("max_energy")) fMaxEnergy = table->GetD("max_energy");
+    if (table.Has("min_energy")) fMaxEnergy = table.GetD("min_energy");
+    if (table.Has("max_energy")) fMaxEnergy = table.GetD("max_energy");
 
-    if (table->Has("I0")) fPar_I0 = table->GetD("I0");
-    if (table->Has("n"))  fPar_n  = table->GetD("n");
-    if (table->Has("E0")) fPar_E0 = table->GetD("E0");
-    if (table->Has("epsilon"))  fPar_eps = table->GetD("epsilon");
-    if (table->Has("radius"))   fPar_rad = table->GetD("radius");
-    if (table->Has("distance")) fPar_dis = table->GetD("distance");
+    if (table.Has("I0"))       fPar_I0  = table.GetD("I0");
+    if (table.Has("n"))        fPar_n   = table.GetD("n");
+    if (table.Has("E0"))       fPar_E0  = table.GetD("E0");
+    if (table.Has("epsilon"))  fPar_eps = table.GetD("epsilon");
+    if (table.Has("radius"))   fPar_rad = table.GetD("radius");
+    if (table.Has("distance")) fPar_dis = table.GetD("distance");
 
     // Print Setup
     std::cout << "FLX: --> Min Energy : " << fMinEnergy << " GeV" << std::endl;
@@ -183,19 +183,20 @@ void ShuklaPrimaryGenerator::GetSourceBox() {
 
     // Already has good source_box
     if (fSourceBox) return;
+    std::cout << "FLX: --> Creating Source box" << std::endl;
 
-    std::vector<DBLink*> targetlinks = DB::Get()->GetLinkGroup("FLUX");
+    std::vector<DBTable> targetlinks = DBNEW::Get()->GetTableGroup("FLUX");
     for (uint i = 0; i < targetlinks.size(); i++) {
-        DBLink* tbl = targetlinks[i];
+        DBTable tbl = targetlinks[i];
 
         // Select tables with target box names
-        std::string index = tbl->GetIndexName();
+        std::string index = tbl.GetIndexName();
         if (index.compare("source_box") != 0) continue;
 
-        std::vector<double> size = tbl->GetVecD("size");
-        std::vector<double> pos = tbl->GetVecD("position");
-        fSourceBoxWidth    = G4ThreeVector(0.5 * size[0] * m, 0.5 * size[1] * m, 0.0);
-        fSourceBoxPosition = G4ThreeVector(pos[0] * m, pos[1] * m, pos[2] * m);
+        std::vector<G4double> size = tbl.GetVecG4D("size");
+        std::vector<G4double> pos  = tbl.GetVecG4D("position");
+        fSourceBoxWidth    = G4ThreeVector(0.5 * size[0], 0.5 * size[1], 0.0);
+        fSourceBoxPosition = G4ThreeVector(pos[0], pos[1], pos[2]);
 
         fArea = size[0] * size[1];
         break;
@@ -222,28 +223,29 @@ std::vector<G4Box*> ShuklaPrimaryGenerator::GetTargetBoxes() {
         fCheckTargetBoxes = true;
         return fTargetBoxes;
     }
+    std::cout << "FLX: --> Creating Target boxes" << std::endl;
 
     // If none set then make it
-    std::vector<DBLink*> targetlinks = DB::Get()->GetLinkGroup("FLUX");
+    std::vector<DBTable> targetlinks = DBNEW::Get()->GetTableGroup("FLUX");
     for (uint i = 0; i < targetlinks.size(); i++) {
-        DBLink* tbl = targetlinks[i];
+        DBTable tbl = targetlinks[i];
 
         // Select tables with target box names
-        std::string index = tbl->GetIndexName();
+        std::string index = tbl.GetIndexName();
         if (index.find("target_box_") == std::string::npos) continue;
 
         // If it has position and size we can use it
-        if (!tbl->Has("position") || !tbl->Has("size")) {
+        if (!tbl.Has("position") || !tbl.Has("size")) {
             std::cout << "Failed to find/create target box!" << std::endl;
             throw;
         }
 
         // Create objects
-        std::vector<double> size = tbl->GetVecD("size");
-        std::vector<double> pos = tbl->GetVecD("position");
+        std::vector<G4double> size = tbl.GetVecG4D("size");
+        std::vector<G4double> pos  = tbl.GetVecG4D("position");
 
-        G4Box* box_sol = new G4Box(index, 0.5 * size[0]*m, 0.5 * size[1]*m, 0.5 * size[2]*m);
-        G4ThreeVector box_pos = G4ThreeVector(pos[0] * m, pos[1] * m, pos[2] * m);
+        G4Box* box_sol = new G4Box(index, 0.5 * size[0], 0.5 * size[1], 0.5 * size[2]);
+        G4ThreeVector box_pos = G4ThreeVector(pos[0], pos[1], pos[2]);
 
         // Save Box
         fTargetBoxes.push_back(box_sol);

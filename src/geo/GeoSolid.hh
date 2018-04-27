@@ -18,7 +18,7 @@
 #include "G4SystemOfUnits.hh"
 #include "GeoObject.hh"
 #include "GeoUtils.hh"
-#include "db/DBLink.hh"
+#include "db/DBTable.hh"
 #include "db/DB.hh"
 #include "materials/MaterialManager.hh"
 
@@ -29,7 +29,7 @@ namespace COSMIC {
 
 /// Solid geometry object, building on the GeoObject template.
 /// Contains all functions to produce logical and physical volumes
-/// from a DBLink.
+/// from a DBTable.
 class GeoSolid : public GeoObject {
 public:
 
@@ -37,28 +37,28 @@ public:
   GeoSolid();
 
   /// Function to actually create each volume from a table.
-  void Construct(DBLink* table);
+  void Construct(DBTable table);
 
   /// Create the solid volume for this objet. Children must implement.
-  virtual G4VSolid *ConstructSolidVolume(DBLink* table) = 0;
+  virtual G4VSolid *ConstructSolidVolume(DBTable table) = 0;
   
   /// Construct logical volume given materials etc in a table
-  virtual G4LogicalVolume *ConstructLogicalVolume(DBLink* table, G4VSolid* solid);
+  virtual G4LogicalVolume *ConstructLogicalVolume(DBTable table, G4VSolid* solid);
 
   /// Construct a physical volume placement given the settings in a table and the provided mother+logic
-  virtual G4VPhysicalVolume* ConstructPhysicalVolume(DBLink* table, G4LogicalVolume* mother, G4LogicalVolume* logic);
+  virtual G4VPhysicalVolume* ConstructPhysicalVolume(DBTable table, G4LogicalVolume* mother, G4LogicalVolume* logic);
 
   /// Construct a sensitive detector from the table and attach to the logic
-  virtual G4VSensitiveDetector* ConstructSensitiveDetector(DBLink* table, G4LogicalVolume* logic, G4VPhysicalVolume* vol);
+  virtual G4VSensitiveDetector* ConstructSensitiveDetector(DBTable table, G4LogicalVolume* logic, G4VPhysicalVolume* vol);
 
   /// Construct a physical volume placement given the settings in a table and the provided mother+logic
-  virtual G4VPhysicalVolume* ConstructPhysicalReplica(DBLink* table, G4LogicalVolume* mother, G4LogicalVolume* logic);
+  virtual G4VPhysicalVolume* ConstructPhysicalReplica(DBTable table, G4LogicalVolume* mother, G4LogicalVolume* logic);
  
   /// Construct a physical volume placement given the settings in a table and the provided mother+logic
-  virtual G4VPhysicalVolume* ConstructPhysicalPlacement(DBLink* table, G4LogicalVolume* mother, G4LogicalVolume* logic);
+  virtual G4VPhysicalVolume* ConstructPhysicalPlacement(DBTable table, G4LogicalVolume* mother, G4LogicalVolume* logic);
 
   /// Construct a physical volume placement given the settings in a table and the provided mother+logic
-  virtual G4VPhysicalVolume* ConstructPhysicalParametrisation(DBLink* table, G4LogicalVolume* mother, G4LogicalVolume* logic);
+  virtual G4VPhysicalVolume* ConstructPhysicalParametrisation(DBTable table, G4LogicalVolume* mother, G4LogicalVolume* logic);
 
 
 protected:

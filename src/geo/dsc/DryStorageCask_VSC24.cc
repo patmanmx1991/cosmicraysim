@@ -23,33 +23,46 @@
 
 namespace COSMIC {
 
-DryStorageCask_VSC24::DryStorageCask_VSC24(DBLink* table){
+DryStorageCask_VSC24::DryStorageCask_VSC24(DBTable table){
   Construct(table);
 }
 
-void DryStorageCask_VSC24::Construct(DBLink* table)
+void DryStorageCask_VSC24::Construct(DBTable table)
 {
 
-  SetID(table->GetIndexName());
-  SetType(table->GetS("type"));
+  // Set main details
+  SetID(table.GetIndexName());
+  SetType(table.GetS("type"));
+  std::string fName = table.GetIndexName();
+  std::string fMotherName = table.GetS("mother");
 
-  std::string fName = table->GetIndexName();
-  std::string fMotherName = table->GetS("mother");
 
-  // Make a temporary DB from geo file
-  DB* tdb = new DB("dsc/vsc24.geo");
+  // Load the temporary DB from geo file
+  DBNEW* tdb = DBNEW::Get();
+  tdb->CreateDataBase("vsc24");
+  tdb->SelectDataBase("vsc24");
+  tdb->LoadFile(DBNEW::GetDataPath() + "/dsc/vsc24.geo");
+
 
   // Make the main logical volume (with mother and position/rotation overriden)
-  DBLink* voltable = tdb->GetLink("GEO", "volume");
-  voltable->SetIndexName(fName + "_volume");
-  voltable->Set("mother", fMotherName);
-  voltable->Set("position", table->GetVecD("position"));
-  voltable->Set("rotation", table->GetVecD("rotation"));
+  // Have to create a table from template and edit with what we want.
+  DBTable voltable = DBNEW::Get()->GetTable("GEO", "volume");
+  
+  voltable.SetIndexName(fName + "_volume");
+  voltable.Set("mother",   fMotherName);
+  if (table.Has("position"))
+    voltable.Set("position", table.GetVecG4D("position"));
+  if (table.Has("rotation"))
+    voltable.Set("rotation", table.GetVecG4D("rotation"));
+
+
+  // Create the main volume holding the complex geometry
   GeoObject* volume = new GeoTubs( voltable );
   fSubObjects.push_back(volume);
   fLogical = volume->GetLogical();
   fPhysical = volume->GetPhysical();
   fMotherLogical = volume->GetMotherLogical();
+
 
   // Now make the remaining objects inside this volume
   std::vector<std::string> tubs;
@@ -58,23 +71,24 @@ void DryStorageCask_VSC24::Construct(DBLink* table)
   tubs.push_back("steel_shell");
   tubs.push_back("steel_top");
   tubs.push_back("steel_bottom");
+
   for (uint i = 0; i < tubs.size(); i++) {
-    DBLink* tbl = tdb->GetLink("GEO", tubs[i]);
-    tbl->SetIndexName(fName + "_" + tubs[i]);
-    tbl->Prefix("mother", fName + "_");
+    DBTable tbl = DBNEW::Get()->GetTable("GEO", tubs[i]);
+    tbl.SetIndexName(fName + "_" + tubs[i]);
+    tbl.Prefix("mother", fName + "_");
     fSubObjects.push_back(new GeoTubs(tbl));
   }
 
   // Now Make the uranium rod array
-  DBLink* rodpositions = tdb->GetLink("GEO", "rod_positions");
+  DBTable rodpositions = DBNEW::Get()->GetTable("GEO", "rod_positions");
 
   std::vector<int> rodmask;
-  if (table->Has("storage_mask")) rodmask = table->GetVecI("storage_mask");
+  if (table.Has("storage_mask")) rodmask = table.GetVecI("storage_mask");
 
   std::vector<int> rodmatindex;
   std::vector<std::string> radmatstring;
-  if (table->Has("matrep_index")) rodmatindex = table->GetVecI("matrep_index");
-  if (table->Has("matrep_material")) radmatstring = table->GetVecS("matrep_material");
+  if (table.Has("matrep_index")) rodmatindex = table.GetVecI("matrep_index");
+  if (table.Has("matrep_material")) radmatstring = table.GetVecS("matrep_material");
 
   // Loop over possible positions and place rods
   for (int i = 0; i < 24; i++) {
@@ -99,19 +113,20 @@ void DryStorageCask_VSC24::Construct(DBLink* table)
 
     // Get this rods position
     std::string rodname = "rod_" + std::to_string(i);
-    std::vector<double> position = rodpositions->GetVecD(rodname);
+    std::vector<G4double> position = rodpositions.GetVecG4D(rodname);
 
     // Create the target rod by overloading table
-    DBLink* rodtemplate  = tdb->CloneLink("GEO", rodtype, fName + "_" + rodname);
-    rodtemplate->Prefix("mother", fName + "_");
-    rodtemplate->Set("position", position);
-    fSubObjects.push_back(new GeoBox(rodtemplate));
+    DBTable rodtemplate  = DBNEW::Get()->GetTable("GEO", rodtype);
+    rodtemplate.SetIndexName(fName + "_" + rodname);
+    rodtemplate.Prefix("mother", fName + "_");
+    rodtemplate.Set("position", position);
 
+    fSubObjects.push_back(new GeoBox(rodtemplate));
   }
 
   // Remove the temporary database.
-  delete tdb;
-
+  tdb->SelectDataBase("default");
+  std::cout << "GEO: --> Created DRY Storage Cask" << std::endl;
 }
 
 } // namespace COSMIC

@@ -21,7 +21,8 @@ Analysis::Analysis() :
   fFluxProcessor(0),
   fNTuplesSetup(0),
   fSavedEvents(0),
-  fGeneratedEvents(0)
+  fGeneratedEvents(0),
+  fChunkSize(10000)
 {
 }
 
@@ -123,8 +124,6 @@ bool Analysis::IsTriggered() {
 
   // If no valid triggers loaded, save everything
   if (fTriggers.size() < 1) return true;
-
-  // std::cout << "Checking for at least one trigger" << std::endl;
 
   // For now just find at least one true trigger
   std::vector<VTrigger*>::iterator iter;

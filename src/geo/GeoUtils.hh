@@ -6,7 +6,7 @@
 #include "G4SolidStore.hh"
 #include "G4LogicalVolumeStore.hh"
 #include "G4LogicalVolume.hh"
-#include "db/DBLink.hh"
+#include "db/DBTable.hh"
 
 namespace COSMIC {
 
@@ -20,7 +20,7 @@ G4Box* GetBoxFromStore(std::string name, bool verbose = true);
 /// Get a logical volume from the Geant4 logical volume store via name
 G4LogicalVolume* GetLogicalFromStore(std::string name, bool verbose = true);
 /// Get a mother logical volume from the store via a table
-G4LogicalVolume* GetMotherLogicalFromStore(DBLink* tb, bool verbose = true);
+G4LogicalVolume* GetMotherLogicalFromStore(DBTable tb, bool verbose = true);
 
 } // - namespace GEO
 } // - namespace COSMIC

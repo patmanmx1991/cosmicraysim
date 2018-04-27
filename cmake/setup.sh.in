@@ -1,0 +1,5 @@
+#!/bin/sh
+
+export COSMICRAYSIM="@PROJECT_BINARY_DIR@/"
+export GLG4DATA="@PROJECT_SOURCE_DIR@/data/"
+export PATH="$COSMICRAYSIM/:$PATH"

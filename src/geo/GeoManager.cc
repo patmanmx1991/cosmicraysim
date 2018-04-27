@@ -22,6 +22,8 @@
 
 #include "simple/GeoBox.hh"
 #include "simple/GeoTubs.hh"
+#include "simple/GeoCone.hh"
+#include "simple/GeoEllipticalTube.hh"
 #include "dsc/DryStorageCask_VSC24.hh"
 #include "awemuontom/AWEMuonTomographyDetector.hh"
 
@@ -32,17 +34,20 @@
 namespace COSMIC{
 
 
-GeoObject* GeoObjectFactory::Construct(DBLink* table){
+GeoObject* GeoObjectFactory::Construct(DBTable table){
 
-  std::string type = table->GetS("type");
+  std::string type = table.GetS("type");
   
-  std::cout << "GEO: Constructing " << type << " : " << table->GetIndexName() <<  std::endl;
+  std::cout << "GEO: Constructing " << type << " : " << table.GetIndexName() <<  std::endl;
   if (type.compare("box")==0) return new GeoBox(table);
   else if (type.compare("tubs")==0) return new GeoTubs(table);
+  else if (type.compare("cons")==0) return new GeoCone(table);
+  else if (type.compare("eliptube")==0) return new GeoEllipticalTube(table);
   else if (type.compare("DSC_VSC24") == 0) return new DryStorageCask_VSC24(table);
   else if (type.compare("awe_muontom") == 0) return new AWEMuonTomographyDetector(table);
 
   std::cout << "Failed to Construct Geometry" << std::endl;
+  throw;
   return 0;
 }
 
@@ -54,34 +59,34 @@ GeoObject* GeoObjectFactory::Construct(DBLink* table){
 GeoManager *GeoManager::fPrimary(0);
 
 GeoManager::GeoManager(){
-  fGeoTables = DB::Get()->GetLinkGroup("GEO");
 }
 
 G4VPhysicalVolume* GeoManager::ConstructAll(){
   std::cout << "===============================" << std::endl;
   std::cout << "GEO: Building Geometry " << std::endl;
-  std::vector<DBLink*> tables_clone = fGeoTables;
-  std::vector<DBLink*>::iterator geo_iter = tables_clone.begin();
+  std::vector<DBTable> tables_clone = DBNEW::Get()->GetTableGroup("GEO");
+  std::vector<DBTable>::iterator geo_iter = tables_clone.begin();
 
   int count = 0;
   while (tables_clone.size() > 0){
 
     for (geo_iter = tables_clone.begin(); geo_iter != tables_clone.end();){
 
-      DBLink* geo_tab = (*geo_iter);
-      std::string geo_id = geo_tab->GetIndexName();
+      DBTable geo_tab = (*geo_iter);
+      std::string geo_id = geo_tab.GetIndexName();
 
       // Check doesn't already exist
       if (HasGeoObject(geo_id)){
         std::cout << "Trying to add duplicate GEOM! " 
                   << "INDEX : " << geo_id << std::endl;
-        geo_tab->Print();
+        geo_tab.Print();
         throw;
       }
         
       // Check if mother already created
       int mother_status = MotherStatus(geo_tab);
       if (mother_status == 2){
+        count++;
         ++geo_iter;
         continue; // If it hasn't skip for now
       }
@@ -105,9 +110,9 @@ G4VPhysicalVolume* GeoManager::ConstructAll(){
 }
 
 
-int GeoManager::MotherStatus(DBLink* geo_tab){
-  if (geo_tab->Has("mother")){
-    std::string mother = (geo_tab)->GetS("mother");
+int GeoManager::MotherStatus(DBTable geo_tab){
+  if (geo_tab.Has("mother")){
+    std::string mother = (geo_tab).GetS("mother");
     if (this->HasGeoObject(mother)){
       return 1;
     } else{

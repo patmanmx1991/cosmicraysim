@@ -34,6 +34,7 @@
 #include "G4VisAttributes.hh"
 #include "G4Circle.hh"
 #include "G4Colour.hh"
+#include "G4Square.hh"
 #include "G4AttDefStore.hh"
 #include "G4AttDef.hh"
 #include "G4AttValue.hh"
@@ -41,21 +42,22 @@
 #include "G4UnitsTable.hh"
 #include "G4SystemOfUnits.hh"
 #include "G4ios.hh"
+#include "G4Box.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-G4ThreadLocal G4Allocator<DriftChamberHit>* DriftChamberHitAllocator=0;
+G4ThreadLocal G4Allocator<DriftChamberHit>* DriftChamberHitAllocator = 0;
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 DriftChamberHit::DriftChamberHit()
-: G4VHit(), fLayerID(-1), fTime(0.), fLocalPos(0), fWorldPos(0)
+    : G4VHit(), fLayerID(-1), fTime(0.), fLocalPos(0), fWorldPos(0)
 {}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 DriftChamberHit::DriftChamberHit(G4int z)
-: G4VHit(), fLayerID(z), fTime(0.), fLocalPos(0), fWorldPos(0)
+    : G4VHit(), fLayerID(z), fTime(0.), fLocalPos(0), fWorldPos(0)
 {}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -66,7 +68,7 @@ DriftChamberHit::~DriftChamberHit()
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 DriftChamberHit::DriftChamberHit(const DriftChamberHit &right)
-: G4VHit() {
+    : G4VHit() {
     fLayerID = right.fLayerID;
     fWorldPos = right.fWorldPos;
     fLocalPos = right.fLocalPos;
@@ -93,43 +95,40 @@ int DriftChamberHit::operator==(const DriftChamberHit &/*right*/) const
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void DriftChamberHit::Draw() const
+void DriftChamberHit::Draw()
 {
-        std::cout << "Attempting to draw drift hit" << std::endl;
     G4VVisManager* pVVisManager = G4VVisManager::GetConcreteInstance();
-    if(pVVisManager)
+    if (pVVisManager)
     {
-        std::cout << "Drawing Hit" << std::endl;
-        G4Circle circle(fWorldPos);
-        circle.SetScreenSize(10);
-        circle.SetFillStyle(G4Circle::filled);
-        G4Colour colour(1.,1.,0.);
+        // Build G4Box from Errors
+        G4Box hitbox =  G4Box("hitbox", fabs(fWorldPosErr[0]), fabs(fWorldPosErr[1]), fabs(fWorldPosErr[2]));
+        G4Transform3D tr = G4Transform3D(G4RotationMatrix(), fWorldPos);
+        G4Colour colour(0., 1., 0.);
         G4VisAttributes attribs(colour);
-        circle.SetVisAttributes(attribs);
-        pVVisManager->Draw(circle);
+        pVVisManager->Draw(hitbox, attribs, tr);
     }
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-const std::map<G4String,G4AttDef>* DriftChamberHit::GetAttDefs() const
+const std::map<G4String, G4AttDef>* DriftChamberHit::GetAttDefs() const
 {
     G4bool isNew;
-    std::map<G4String,G4AttDef>* store
-      = G4AttDefStore::GetInstance("DriftChamberHit",isNew);
+    std::map<G4String, G4AttDef>* store
+        = G4AttDefStore::GetInstance("DriftChamberHit", isNew);
 
     if (isNew) {
-        (*store)["HitType"] 
-          = G4AttDef("HitType","Hit Type","Physics","","G4String");
-        
-        (*store)["ID"] 
-          = G4AttDef("ID","ID","Physics","","G4int");
-        
-        (*store)["Time"] 
-          = G4AttDef("Time","Time","Physics","G4BestUnit","G4double");
-        
-        (*store)["Pos"] 
-          = G4AttDef("Pos", "Position", "Physics","G4BestUnit","G4ThreeVector");
+        (*store)["HitType"]
+            = G4AttDef("HitType", "Hit Type", "Physics", "", "G4String");
+
+        (*store)["ID"]
+            = G4AttDef("ID", "ID", "Physics", "", "G4int");
+
+        (*store)["Time"]
+            = G4AttDef("Time", "Time", "Physics", "G4BestUnit", "G4double");
+
+        (*store)["Pos"]
+            = G4AttDef("Pos", "Position", "Physics", "G4BestUnit", "G4ThreeVector");
     }
     return store;
 }
@@ -139,16 +138,16 @@ const std::map<G4String,G4AttDef>* DriftChamberHit::GetAttDefs() const
 std::vector<G4AttValue>* DriftChamberHit::CreateAttValues() const
 {
     std::vector<G4AttValue>* values = new std::vector<G4AttValue>;
-    
+
     values
-      ->push_back(G4AttValue("HitType","DriftChamberHit",""));
+    ->push_back(G4AttValue("HitType", "DriftChamberHit", ""));
     values
-      ->push_back(G4AttValue("ID",G4UIcommand::ConvertToString(fLayerID),""));
+    ->push_back(G4AttValue("ID", G4UIcommand::ConvertToString(fLayerID), ""));
     values
-      ->push_back(G4AttValue("Time",G4BestUnit(fTime,"Time"),""));
+    ->push_back(G4AttValue("Time", G4BestUnit(fTime, "Time"), ""));
     values
-      ->push_back(G4AttValue("Pos",G4BestUnit(fWorldPos,"Length"),""));
-    
+    ->push_back(G4AttValue("Pos", G4BestUnit(fWorldPos, "Length"), ""));
+
     return values;
 }
 
@@ -156,9 +155,9 @@ std::vector<G4AttValue>* DriftChamberHit::CreateAttValues() const
 
 void DriftChamberHit::Print() const
 {
-    G4cout << "  Layer[" << fLayerID << "] : time " << fTime/ns
-    << " (nsec) --- local (x,y) " << fLocalPos.x()
-    << ", " << fLocalPos.y() << G4endl;
+    G4cout << "  Layer[" << fLayerID << "] : time " << fTime / ns
+           << " (nsec) --- local (x,y) " << fLocalPos.x()
+           << ", " << fLocalPos.y() << G4endl;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

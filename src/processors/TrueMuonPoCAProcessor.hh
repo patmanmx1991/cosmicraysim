@@ -26,7 +26,7 @@
 #include "analysis/VProcessor.hh"
 #include "analysis/VDetector.hh"
 #include "sd/TrueMuonTracker.hh"
-#include "db/DBLink.hh"
+#include "db/DBTable.hh"
 
 namespace COSMIC {
 
@@ -39,7 +39,7 @@ public:
 
   /// Processor can only be created with an associated
   /// tracker object.
-  TrueMuonPoCAProcessor(DBLink* tbl);
+  TrueMuonPoCAProcessor(DBTable tbl);
 
   /// Destructor
   ~TrueMuonPoCAProcessor(){};

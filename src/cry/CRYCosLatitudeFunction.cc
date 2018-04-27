@@ -42,8 +42,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CRYCosLatitudeFunction.h"
 #include <math.h>
 
-CRYCosLatitudeFunction::CRYCosLatitudeFunction(std::string name, std::string data):
-  CRYAbsFunction(name, CRYFunctionDict::cosLatitude, data)
+CRYCosLatitudeFunction::CRYCosLatitudeFunction(std::string namer, std::string datar):
+  CRYAbsFunction(namer, CRYFunctionDict::cosLatitude, datar)
 {
 }
 

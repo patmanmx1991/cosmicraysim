@@ -41,10 +41,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "CRYParticle.h"
 
-CRYParticle::CRYParticle( CRYId id, int charge, double KE) {
-  _id=id;
-  _charge=charge;
-  _KE=KE;
+CRYParticle::CRYParticle( CRYId idr, int charger, double KEr) {
+  _id=idr;
+  _charge=charger;
+  _KE=KEr;
 }
 
 CRYParticle::CRYParticle( const CRYParticle& part) :
@@ -62,20 +62,20 @@ CRYParticle::CRYParticle( const CRYParticle& part) :
 }
 
 
-void CRYParticle::fill( CRYParticle::CRYId &id, int &q,
-			double &ke, double &x, double &y, double &z,
-			double &u, double &v, double &w, double &t) {
+void CRYParticle::fill( CRYParticle::CRYId &idr, int &qr,
+			double &ker, double &xr, double &yr, double &zr,
+			double &ur, double &vr, double &wr, double &tr) {
 
-  id=_id;
-  q=_charge;
-  ke=_KE;
-  x=_x;
-  y=_y;
-  z=_z;
-  u=_u;
-  v=_v;
-  w=_w;
-  t=_t;
+  idr=_id;
+  qr=_charge;
+  ker=_KE;
+  xr=_x;
+  yr=_y;
+  zr=_z;
+  ur=_u;
+  vr=_v;
+  wr=_w;
+  tr=_t;
 }
 
 //....return PDG number: http://pdg.lbl.gov/mc_particle_id_contents.html

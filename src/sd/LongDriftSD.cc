@@ -1,13 +1,13 @@
 #include "LongDriftSD.hh"
 #include "analysis/Analysis.hh"
-#include "db/DBLink.hh"
+#include "db/DBTable.hh"
 #include "DriftHit.hh"
 
 namespace COSMIC {
 
 //------------------------------------------------------------------
-LongDriftSD::LongDriftSD(DBLink* tbl):
-    VDetector(tbl->GetIndexName(), "longdrift")
+LongDriftSD::LongDriftSD(DBTable tbl):
+    VDetector(tbl.GetIndexName(), "longdrift")
 {
     std::cout << "DET: Creating new " << GetType()
               << " detector : " << GetID() << std::endl;
@@ -16,17 +16,17 @@ LongDriftSD::LongDriftSD(DBLink* tbl):
     ResetState();
 
     // By default also include the auto processor
-    // if (!tbl->Has("processor") or tbl->GetI("processor") > 0) {
-    Analysis::Get()->RegisterProcessor(new LongDriftProcessor(this));
-    // }
+    if (!tbl.Has("processor") or tbl.GetI("processor") > 0) {
+        Analysis::Get()->RegisterProcessor(new LongDriftProcessor(this));
+    }
 
-    fResolutionX = 0.0;
-    fResolutionY = 0.0;
-    fResolutionZ = 0.0;
+    fResolutionX = tbl.Has("resolution_x") ? tbl.GetG4D("resolution_x") : 0.1 * mm;
+    fResolutionY = tbl.Has("resolution_y") ? tbl.GetG4D("resolution_y") : 0.1 * mm;
+    fResolutionZ = tbl.Has("resolution_z") ? tbl.GetG4D("resolution_z") : 0.1 * mm;
 
-    fRestrictX = true;
-    fRestrictY = true;
-    fRestrictZ = false;
+    fRestrictX = tbl.Has("restrict_x") ? tbl.GetB("restrict_x") : false;
+    fRestrictY = tbl.Has("restrict_y") ? tbl.GetB("restrict_y") : false;
+    fRestrictZ = tbl.Has("restrict_z") ? tbl.GetB("restrict_z") : false;
 
     fDetectorSizeX = 0.0;
     fDetectorSizeY = 0.0;
@@ -51,9 +51,9 @@ LongDriftSD::LongDriftSD(std::string name, std::string id,
         Analysis::Get()->RegisterProcessor(new LongDriftProcessor(this, autosave));
     }
 
-    fResolutionX = 0.0;
-    fResolutionY = 0.0;
-    fResolutionZ = 0.0;
+    fResolutionX = 0.1 * mm;
+    fResolutionY = 0.1 * mm;
+    fResolutionZ = 0.1 * mm;
 
     fRestrictX = true;
     fRestrictY = true;
@@ -110,15 +110,15 @@ G4bool LongDriftSD::ProcessHits(G4Step* step, G4TouchableHistory* /*touch*/)
 
     // Restrict to DOF
     if (fRestrictX) {
-        localPosP[0] = 0.0;
+        localPosP[0] = 0.0 * mm;
         localPosE[0] = fDetectorSizeX;
     }
     if (fRestrictY) {
-        localPosP[1] = 0.0;
+        localPosP[1] = 0.0 * mm;
         localPosE[1] = fDetectorSizeY;
     }
     if (fRestrictZ) {
-        localPosP[2] = 0.0;
+        localPosP[2] = 0.0 * mm;
         localPosE[2] = fDetectorSizeZ;
     }
 
@@ -185,39 +185,27 @@ LongDriftProcessor::LongDriftProcessor(LongDriftSD* trkr, bool autosave) :
 
 bool LongDriftProcessor::BeginOfRunAction(const G4Run* /*run*/) {
 
-    std::string tableindex = GetID();
-    std::cout << "Registering LongDriftProcessor NTuples " << tableindex << std::endl;
+    if (fSave) {
+        std::string tableindex = GetID();
+        std::cout << "Registering LongDriftProcessor NTuples " << tableindex << std::endl;
 
-    G4AnalysisManager* man = G4AnalysisManager::Instance();
+        G4AnalysisManager* man = G4AnalysisManager::Instance();
 
-    // Fill index energy
-    fEdepIndex = man ->CreateNtupleDColumn(tableindex + "_E");
-    fTimeIndex = man ->CreateNtupleDColumn(tableindex + "_t");
-    fPosXIndex = man ->CreateNtupleDColumn(tableindex + "_x");
-    fPosYIndex = man ->CreateNtupleDColumn(tableindex + "_y");
-    fPosZIndex = man ->CreateNtupleDColumn(tableindex + "_z");
-    fErrXIndex = man ->CreateNtupleDColumn(tableindex + "_ex");
-    fErrYIndex = man ->CreateNtupleDColumn(tableindex + "_ey");
-    fErrZIndex = man ->CreateNtupleDColumn(tableindex + "_ez");
-
+        // Fill index energy
+        fEdepIndex = man ->CreateNtupleDColumn(tableindex + "_E");
+        fTimeIndex = man ->CreateNtupleDColumn(tableindex + "_t");
+        fPosXIndex = man ->CreateNtupleDColumn(tableindex + "_x");
+        fPosYIndex = man ->CreateNtupleDColumn(tableindex + "_y");
+        fPosZIndex = man ->CreateNtupleDColumn(tableindex + "_z");
+        fErrXIndex = man ->CreateNtupleDColumn(tableindex + "_ex");
+        fErrYIndex = man ->CreateNtupleDColumn(tableindex + "_ey");
+        fErrZIndex = man ->CreateNtupleDColumn(tableindex + "_ez");
+    }
     Reset();
     return true;
 }
 
 bool LongDriftProcessor::ProcessEvent(const G4Event* event) {
-
-    // Set default values
-    G4AnalysisManager* man = G4AnalysisManager::Instance();
-    man->FillNtupleDColumn(fEdepIndex, -999.);
-    man->FillNtupleDColumn(fTimeIndex, -999.);
-    man->FillNtupleDColumn(fPosXIndex, -999.);
-    man->FillNtupleDColumn(fPosYIndex, -999.);
-    man->FillNtupleDColumn(fPosZIndex, -999.);
-    man->FillNtupleDColumn(fErrXIndex, -999.);
-    man->FillNtupleDColumn(fErrYIndex, -999.);
-    man->FillNtupleDColumn(fErrZIndex, -999.);
-
-    // return true;
 
     // Average over hits
     fHCID = fDetector->GetHCID();
@@ -262,10 +250,15 @@ bool LongDriftProcessor::ProcessEvent(const G4Event* event) {
     fHasInfo = nhits > 0.0;
     fEnergy  = 0.0;
 
+    if (!fSave) return false;
+
     // If Triggered then fill
-    if (fHasInfo and fSave) {
+    if (fHasInfo) {
 
         // Fill muon vectors
+        G4AnalysisManager* man = G4AnalysisManager::Instance();
+        std::cout << "Filling processor " << GetID() << std::endl;
+
         man->FillNtupleDColumn(fTimeIndex, fTime);
         man->FillNtupleDColumn(fPosXIndex, fPosX);
         man->FillNtupleDColumn(fPosYIndex, fPosY);
@@ -276,6 +269,20 @@ bool LongDriftProcessor::ProcessEvent(const G4Event* event) {
 
         return true;
     } else {
+
+        // Set default values
+        G4AnalysisManager* man = G4AnalysisManager::Instance();
+        std::cout << "Filling processor " << GetID() << std::endl;
+
+        man->FillNtupleDColumn(fEdepIndex, -999.);
+        man->FillNtupleDColumn(fTimeIndex, -999.);
+        man->FillNtupleDColumn(fPosXIndex, -999.);
+        man->FillNtupleDColumn(fPosYIndex, -999.);
+        man->FillNtupleDColumn(fPosZIndex, -999.);
+        man->FillNtupleDColumn(fErrXIndex, -999.);
+        man->FillNtupleDColumn(fErrYIndex, -999.);
+        man->FillNtupleDColumn(fErrZIndex, -999.);
+
         return false;
     }
 }

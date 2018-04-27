@@ -72,15 +72,15 @@ public:
   // Set location of particle 
   //   Units will match units of data tables
   //   Currently m
-  void setPosition(double x, double y, double z) { _x=x; _y=y; _z=z;}
+  void setPosition(double xr, double yr, double zr) { _x=xr; _y=yr; _z=zr;}
 
   // Set direction of particle 
-  void setDirection(double u, double v, double w) { _u=u; _v=v; _w=w;}
+  void setDirection(double ur, double vr, double wr) { _u=ur; _v=vr; _w=wr;}
 
   // Set time of particle 
   //   Units will match units of data tables
   //   Currently seconds
-  void setTime(double t) {_t=t;}
+  void setTime(double tr) {_t=tr;}
 
   //accessors
 

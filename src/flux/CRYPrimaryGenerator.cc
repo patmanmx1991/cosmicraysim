@@ -6,7 +6,6 @@
 //
 #include "CRYPrimaryGenerator.hh"
 #include "db/DB.hh"
-#include "db/DBLink.hh"
 
 namespace COSMIC {
 
@@ -16,7 +15,7 @@ InputState(-1),
 fSourceBox(0)
 {
   std::cout << "FLX: Building CRY Generator" << std::endl;
-  DBLink* table = DB::Get()->GetLink("CRY", "config");
+  DBTable table = DBNEW::Get()->GetTable("CRY", "config");
 
   // Setup Defaults
   fGenNeutrons  = true;
@@ -36,23 +35,23 @@ fSourceBox(0)
 
   fLateralBoxSize = -1; // This is tricker, define in GetSourceBox().
 
-  fDataDirectory = DB::GetDataPath() + "/cry/";
+  fDataDirectory = DBNEW::GetDataPath() + "/cry/";
 
   // Allow for overrides
-  if (table->Has("gen_neutrons"))  fGenNeutrons = table->GetB("gen_neutrons");
-  if (table->Has("gen_protons"))   fGenProtons = table->GetB("gen_protons");
-  if (table->Has("gen_gammas"))    fGenGammas = table->GetB("gen_gammas");
-  if (table->Has("gen_electrons")) fGenElectrons = table->GetB("gen_electrons");
-  if (table->Has("gen_muons"))     fGenMuons = table->GetB("gen_muons");
-  if (table->Has("gen_pions"))     fGenPions = table->GetB("gen_pions");
+  if (table.Has("gen_neutrons"))  fGenNeutrons = table.GetB("gen_neutrons");
+  if (table.Has("gen_protons"))   fGenProtons = table.GetB("gen_protons");
+  if (table.Has("gen_gammas"))    fGenGammas = table.GetB("gen_gammas");
+  if (table.Has("gen_electrons")) fGenElectrons = table.GetB("gen_electrons");
+  if (table.Has("gen_muons"))     fGenMuons = table.GetB("gen_muons");
+  if (table.Has("gen_pions"))     fGenPions = table.GetB("gen_pions");
 
-  if (table->Has("latitude")) fLatitude = table->GetD("latitude");
-  if (table->Has("altitude")) fAltitude = table->GetD("altitude");
+  if (table.Has("latitude")) fLatitude = table.GetD("latitude");
+  if (table.Has("altitude")) fAltitude = table.GetD("altitude");
 
-  if (table->Has("date")) fDate = table->GetS("date");
+  if (table.Has("date")) fDate = table.GetS("date");
 
-  if (table->Has("min_particles")) fNParticlesMin = table->GetI("min_particles");
-  if (table->Has("max_particles")) fNParticlesMax = table->GetI("max_particles");
+  if (table.Has("min_particles")) fNParticlesMin = table.GetI("min_particles");
+  if (table.Has("max_particles")) fNParticlesMax = table.GetI("max_particles");
 
   // Lateral box size is defined from the source box
   GetSourceBox();
@@ -134,38 +133,38 @@ G4Box* CRYPrimaryGenerator::GetSourceBox() {
 
   // Already has good source_box
   if (fSourceBox) return fSourceBox;
+  std::cout << "FLX: --> Creating Source box" << std::endl;
 
-  std::vector<DBLink*> targetlinks = DB::Get()->GetLinkGroup("FLUX");
+  std::vector<DBTable> targetlinks = DBNEW::Get()->GetTableGroup("FLUX");
   for (uint i = 0; i < targetlinks.size(); i++) {
-    DBLink* tbl = targetlinks[i];
+    DBTable tbl = (targetlinks[i]);
 
     // Select tables with target box names
-    std::string index = tbl->GetIndexName();
+    std::string index = tbl.GetIndexName();
     if (index.compare("source_box") != 0) continue;
 
     // Get size and provide some checks
-    std::vector<double> size = tbl->GetVecD("size");
+    std::vector<G4double> size = tbl.GetVecG4D("size");
     if (size[1] != size[0]) {
       std::cout << "CRY box can only be square! Change to : "
                 << size[0] << "*" << size[0] << std::endl;
       throw;
     }
 
-    if (size[2] > 0.5) {
+    if (size[2] / m > 0.5) {
       std::cout << "CRY box z-size shouldn't be larger than 50cm,"
                 << " and should be above all other geometry!" << std::endl;
       throw;
     }
 
     // Set our lateral box size for the CRY Engine
-    fLateralBoxSize = size[0];
+    fLateralBoxSize = size[0] / m;
 
     // Create the box
-    fSourceBox = new G4Box(index, 0.5 * size[0]*m, 0.5 * size[1]*m, 0.5 * size[2]*m);
-
+    fSourceBox = new G4Box(index, 0.5 * size[0], 0.5 * size[1], 0.5 * size[2]);
     // Find box placement
-    std::vector<double> pos = tbl->GetVecD("position");
-    fSourceBoxPosition = G4ThreeVector(pos[0] * m, pos[1] * m, pos[2] * m);
+    std::vector<G4double> pos = tbl.GetVecG4D("position");
+    fSourceBoxPosition = G4ThreeVector(pos[0], pos[1], pos[2]);
 
     break;
   }
@@ -188,28 +187,29 @@ std::vector<G4Box*> CRYPrimaryGenerator::GetTargetBoxes() {
     fCheckTargetBoxes = true;
     return fTargetBoxes;
   }
+  std::cout << "FLX: --> Creating Target boxes" << std::endl;
 
   // If none set then make it
-  std::vector<DBLink*> targetlinks = DB::Get()->GetLinkGroup("FLUX");
+  std::vector<DBTable> targetlinks = DBNEW::Get()->GetTableGroup("FLUX");
   for (uint i = 0; i < targetlinks.size(); i++) {
-    DBLink* tbl = targetlinks[i];
+    DBTable tbl = targetlinks[i];
 
     // Select tables with target box names
-    std::string index = tbl->GetIndexName();
+    std::string index = tbl.GetIndexName();
     if (index.find("target_box_") == std::string::npos) continue;
 
     // If it has position and size we can use it
-    if (!tbl->Has("position") || !tbl->Has("size")) {
+    if (!tbl.Has("position") || !tbl.Has("size")) {
       std::cout << "Failed to find/create target box!" << std::endl;
       throw;
     }
 
     // Create objects
-    std::vector<double> size = tbl->GetVecD("size");
-    std::vector<double> pos = tbl->GetVecD("position");
+    std::vector<G4double> size = tbl.GetVecG4D("size");
+    std::vector<G4double> pos = tbl.GetVecG4D("position");
 
-    G4Box* box_sol = new G4Box(index, 0.5 * size[0]*m, 0.5 * size[1]*m, 0.5 * size[2]*m);
-    G4ThreeVector box_pos = G4ThreeVector(pos[0] * m, pos[1] * m, pos[2] * m);
+    G4Box* box_sol = new G4Box(index, 0.5 * size[0], 0.5 * size[1], 0.5 * size[2]);
+    G4ThreeVector box_pos = G4ThreeVector(pos[0], pos[1], pos[2]);
 
     // Save Box
     fTargetBoxes.push_back(box_sol);
@@ -243,8 +243,6 @@ void CRYPrimaryGenerator::GeneratePrimaries(G4Event* anEvent)
     // lock.unlock();
   }
 
-
-
   G4String particleName;
   uint stacksize = 0;
   uint throws = 0;
@@ -258,7 +256,6 @@ void CRYPrimaryGenerator::GeneratePrimaries(G4Event* anEvent)
 
     // Number of trajectories that intercept at least one targetbox
     stacksize = 0;
-
     // Loop over all vectors and change their y values to match our box position
     for (unsigned j = 0; j < vect->size(); j++) {
 
@@ -267,7 +264,7 @@ void CRYPrimaryGenerator::GeneratePrimaries(G4Event* anEvent)
 
       // Setup new vector position
       G4ThreeVector position  = G4ThreeVector((*vect)[j]->x() * m, (*vect)[j]->y() * m, boxposthrow[2]);
-      (*vect)[j]->setPosition(position[0] / m, position[1] / m, position[2] / m);
+      (*vect)[j]->setPosition(position[0], position[1], position[2]);
 
       // Get Direction for trjacetory pre-selection
       G4ThreeVector direction = G4ThreeVector((*vect)[j]->u(), (*vect)[j]->v(), (*vect)[j]->w());
@@ -333,7 +330,7 @@ void CRYPrimaryGenerator::GeneratePrimaries(G4Event* anEvent)
     // Add particles to gun
     particleGun->SetParticleDefinition(particleTable->FindParticle((*vect)[j]->PDGid()));
     particleGun->SetParticleEnergy((*vect)[j]->ke()*MeV);
-    particleGun->SetParticlePosition(G4ThreeVector((*vect)[j]->x()*m, (*vect)[j]->y()*m, (*vect)[j]->z()*m));
+    particleGun->SetParticlePosition(G4ThreeVector((*vect)[j]->x(), (*vect)[j]->y(), (*vect)[j]->z()));
     particleGun->SetParticleMomentumDirection(G4ThreeVector((*vect)[j]->u(), (*vect)[j]->v(), (*vect)[j]->w()));
     particleGun->SetParticleTime((*vect)[j]->t());
     particleGun->GeneratePrimaryVertex(anEvent);

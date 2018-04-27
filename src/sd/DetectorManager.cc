@@ -2,7 +2,7 @@
 
 #include "G4LogicalVolume.hh"
 
-#include "db/DBLink.hh"
+#include "db/DBTable.hh"
 #include "TrueMuonTracker.hh"
 #include "SimpleScintillatorSD.hh"
 #include "LongDriftSD.hh"
@@ -10,10 +10,10 @@
 
 namespace COSMIC {
 
-VDetector* DetectorObjectFactory::CreateSD(DBLink* tbl) {
+VDetector* DetectorObjectFactory::CreateSD(DBTable tbl) {
 
   // Retrieve the table that matches this sensitive
-  std::string type = tbl->GetS("type");
+  std::string type = tbl.GetS("type");
 
   // Now Search for different types
   if (type.compare("truemuon") == 0) return new TrueMuonTracker(tbl);

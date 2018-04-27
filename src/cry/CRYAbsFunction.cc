@@ -50,13 +50,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string.h>  // For Ubuntu Linux
 #include <stdlib.h>  // For Ubuntu Linux
 
-CRYAbsFunction::CRYAbsFunction(std::string name, CRYFunctionDict::functype type, 
+CRYAbsFunction::CRYAbsFunction(std::string namer, CRYFunctionDict::functype typer, 
 			       std::string rhs) {
 
   _params=new std::vector<double>;
 
-  _type=type;
-  _name=name;
+  _type=typer;
+  _name=namer;
 
   // then rhs has the data...
   std::string::size_type start=rhs.find("{");
@@ -84,7 +84,7 @@ CRYAbsFunction::CRYAbsFunction(std::string name, CRYFunctionDict::functype type,
 
 }
 
-void CRYAbsFunction::print(std::ostream& o, bool printData) {
+void CRYAbsFunction::print(std::ostream& o, bool /*printData*/) {
   static CRYFunctionDict d;
   o << "Function name: " << _name << std::endl;
   o << "  Type " << d.type(_type) << std::endl;

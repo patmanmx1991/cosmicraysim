@@ -22,8 +22,6 @@
 #include "G4Pow.hh"
 #include "db/DB.hh"
 
-#include "db/DBLink.hh"
-
 namespace COSMIC {
 
 
@@ -33,15 +31,14 @@ G4Element* MaterialFactory::GetElement(std::string name) {
   G4Element* mat;
 
   // Try to find by atomic symbol
-  // nist->FindOrBuildMaterial(name);
   mat = nist->FindOrBuildElement(name);
   if (mat) return mat;
 
   // If not available we have to build the element
-  DBLink* mattbl = DB::Get()->GetLink("ELEMENT", name);
-  double atomicmass  = mattbl->GetD("atomic_mass") * g / mole;
-  int atomicnumber   = mattbl->GetI("atomic_number");
-  std::string symbol = mattbl->GetS("symbol");
+  DBTable mattbl = DBNEW::Get()->GetTable("ELEMENT", name);
+  double atomicmass  = mattbl.GetG4D("atomic_mass");
+  int atomicnumber   = mattbl.GetI("atomic_number");
+  std::string symbol = mattbl.GetS("symbol");
 
   // Create material
   mat = new G4Element(name, symbol, atomicnumber, atomicmass );
@@ -58,11 +55,11 @@ G4Material* MaterialFactory::GetMaterial(std::string name) {
   if (mat) return mat;
 
   // If not, find the material inside custom database
-  DBLink* mattbl = DB::Get()->GetLink("MATERIAL", name);
+  DBTable mattbl = DBNEW::Get()->GetTable("MATERIAL", name);
 
-  std::vector<std::string> elements = mattbl->GetVecS("element_names");
-  std::vector<int>         counts   = mattbl->GetVecI("element_counts");
-  G4double density = mattbl->GetD("density") * g / cm3;
+  std::vector<std::string> elements = mattbl.GetVecS("element_names");
+  std::vector<int>         counts   = mattbl.GetVecI("element_counts");
+  G4double density = mattbl.GetG4D("density");
 
   // Create the material
   std::cout << "MAT: Creating : " << name << std::endl;
@@ -72,7 +69,6 @@ G4Material* MaterialFactory::GetMaterial(std::string name) {
     G4Element* ele = GetElement(elements[j]);
     mat->AddElement( ele, counts[j] );
   }
-
 
   // Dump the Table of registered materials
   // G4cout << *(G4Material::GetMaterialTable()) << G4endl;

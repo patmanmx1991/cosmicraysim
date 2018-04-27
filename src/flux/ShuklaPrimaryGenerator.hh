@@ -32,7 +32,7 @@
 #include "globals.hh"
 #include "G4Types.hh"
 
-#include "db/DBLink.hh"
+#include "db/DB.hh"
 #include "analysis/Analysis.hh"
 #include "analysis/VFluxProcessor.hh"
 #include "geo/simple/GeoBox.hh"

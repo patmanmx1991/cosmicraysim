@@ -66,7 +66,7 @@ public:
     inline void *operator new(size_t);
     inline void operator delete(void*aHit);
 
-   // void Draw();
+   void Draw();
    // virtual const std::map<G4String,G4AttDef>* GetAttDefs() const;
    // virtual std::vector<G4AttValue>* CreateAttValues() const;
     void Print();

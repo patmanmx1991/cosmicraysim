@@ -27,10 +27,9 @@
 #include "analysis/VDetector.hh"
 #include "ScintillatorHit.hh"
 
-namespace COSMIC {
+#include "db/DBTable.hh"
 
-// Forward Declarations
-class DBLink;
+namespace COSMIC {
 
 /// True Muon Tracker Detector Object :
 /// Saves the highest momentrum muon track
@@ -39,7 +38,7 @@ class SimpleScintillatorSD : public VDetector {
 public:
 
   /// Main constructor from a database table
-  SimpleScintillatorSD(DBLink* table);
+  SimpleScintillatorSD(DBTable table);
   /// Simple C++ constructor
   SimpleScintillatorSD(std::string name, std::string id, bool autoprocess = true, bool autosave = true);
   /// Destructor

@@ -44,9 +44,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <assert.h>
 #include <iostream>
 
-CRYWeightFunc::CRYWeightFunc(CRYBinning *bins, std::vector<double> weights) {
+CRYWeightFunc::CRYWeightFunc(CRYBinning *binsr, std::vector<double> weights) {
 
-  _bins=bins;
+  _bins=binsr;
   _weights=new std::vector<double>(weights);
 
   

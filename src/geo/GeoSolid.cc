@@ -21,7 +21,8 @@
 #include "analysis/VDetector.hh"
 #include "analysis/Analysis.hh"
 #include "db/DB.hh"
-#include "db/DBLink.hh"
+#include "db/DBTable.hh"
+#include "physics/PhysicsFactory.hh"
 
 #include "materials/MaterialManager.hh"
 
@@ -31,10 +32,10 @@ GeoSolid::GeoSolid()
 {
 }
 
-void GeoSolid::Construct(DBLink* table)
+void GeoSolid::Construct(DBTable table)
 {
-  SetID(table->GetIndexName());
-  SetType(table->GetS("type"));
+  SetID(table.GetIndexName());
+  SetType(table.GetS("type"));
 
   // Get mother
   fMotherLogical = GEO::GetMotherLogicalFromStore(table);
@@ -53,13 +54,13 @@ void GeoSolid::Construct(DBLink* table)
 }
 
 
-G4LogicalVolume* GeoSolid::ConstructLogicalVolume(DBLink* table, G4VSolid* solid) {
+G4LogicalVolume* GeoSolid::ConstructLogicalVolume(DBTable table, G4VSolid* solid) {
   G4NistManager* nist = G4NistManager::Instance();
-  std::string name = table->GetIndexName();
+  std::string name = table.GetIndexName();
 
   G4Material* geo_material = NULL;
-  if (table->Has("material")) {
-    std::string geo_matname = table->GetS("material");
+  if (table.Has("material")) {
+    std::string geo_matname = table.GetS("material");
     geo_material = MaterialFactory::GetMaterial(geo_matname);
   }
   G4LogicalVolume* geo_logic = new G4LogicalVolume(solid, geo_material, name);
@@ -67,21 +68,21 @@ G4LogicalVolume* GeoSolid::ConstructLogicalVolume(DBLink* table, G4VSolid* solid
 
   // Optional visualization parts
   G4VisAttributes *vis = new G4VisAttributes();
-  if (table->Has("color")) {
-    std::vector<double> color = table->GetVecD("color");
+  if (table.Has("color")) {
+    std::vector<double> color = table.GetVecD("color");
     if (color.size() == 3) // RGB
       vis->SetColour(G4Colour(color[0], color[1], color[2]));
     else if (color.size() == 4) // RGBA
       vis->SetColour(G4Colour(color[0], color[1], color[2], color[3]));
   }
 
-  if (table->Has("optimize")) {
-    int optimize = table->GetI("optimize");
+  if (table.Has("optimize")) {
+    int optimize = table.GetI("optimize");
     if (optimize == 0) geo_logic->SetOptimisation(false);
   }
 
-  if (table->Has("drawstyle")) {
-    std::string drawstyle = table->GetS("drawstyle");
+  if (table.Has("drawstyle")) {
+    std::string drawstyle = table.GetS("drawstyle");
     if (drawstyle == "wireframe")
       vis->SetForceWireframe(true);
     else if (drawstyle == "solid")
@@ -89,32 +90,38 @@ G4LogicalVolume* GeoSolid::ConstructLogicalVolume(DBLink* table, G4VSolid* solid
     else throw;
   }
 
-  if (table->Has("force_auxedge")) {
-    int force_auxedge = table->GetI("force_auxedge");
+  if (table.Has("force_auxedge")) {
+    int force_auxedge = table.GetI("force_auxedge");
     vis->SetForceAuxEdgeVisible(force_auxedge == 1);
   }
 
   geo_logic->SetVisAttributes(vis);
 
   // Check for invisible flag last
-  if (table->Has("invisible")) {
-    int invisible = table->GetI("invisible");
+  if (table.Has("invisible")) {
+    int invisible = table.GetI("invisible");
     if (invisible == 1) {
       geo_logic->SetVisAttributes(G4VisAttributes::Invisible);
     }
   }
 
+  // If region then set to logical
+  if (table.Has("region")){
+    G4Region* reg = PhysicsFactory::LoadRegion(table);
+    reg->AddRootLogicalVolume(geo_logic);
+  }
+
   return geo_logic;
 }
 
-G4VPhysicalVolume* GeoSolid::ConstructPhysicalPlacement(DBLink* table, G4LogicalVolume* mother, G4LogicalVolume* logic) {
+G4VPhysicalVolume* GeoSolid::ConstructPhysicalPlacement(DBTable table, G4LogicalVolume* mother, G4LogicalVolume* logic) {
 
-  std::string name = table->GetIndexName();
+  std::string name = table.GetIndexName();
 
   // Setup orientation
   G4RotationMatrix *rotation = new G4RotationMatrix();
-  if (table->Has("orientation")) {
-    const std::vector<double> &orientvector = table->GetVecD("orientation");
+  if (table.Has("orientation")) {
+    const std::vector<double> &orientvector = table.GetVecD("orientation");
     G4ThreeVector soliddir;
     double angle_y = 0;
     double angle_x = 0;
@@ -128,8 +135,8 @@ G4VPhysicalVolume* GeoSolid::ConstructPhysicalPlacement(DBLink* table, G4Logical
     rotation->rotateX(angle_x);
     rotation->rotateZ(angle_z);
   }
-  if (table->Has("rotation")) {
-    const std::vector<double> &rotvector = table->GetVecD("rotation");
+  if (table.Has("rotation")) {
+    const std::vector<double> &rotvector = table.GetVecD("rotation");
     rotation->rotateX(rotvector[0] * CLHEP::deg);
     rotation->rotateY(rotvector[1] * CLHEP::deg);
     rotation->rotateZ(rotvector[2] * CLHEP::deg);
@@ -137,27 +144,28 @@ G4VPhysicalVolume* GeoSolid::ConstructPhysicalPlacement(DBLink* table, G4Logical
 
   // Setup positoin
   G4ThreeVector position(0.0, 0.0, 0.0);
-  if (table->Has("position")) {
-    const std::vector<double> &posvector = table->GetVecD("position");
-    position.setX(posvector[0] * CLHEP::m);
-    position.setY(posvector[1] * CLHEP::m);
-    position.setZ(posvector[2] * CLHEP::m);
+  if (table.Has("position")) {
+    const std::vector<double> &posvector = table.GetVecG4D("position");
+    position.setX(posvector[0]);
+    position.setY(posvector[1]);
+    position.setZ(posvector[2]);
   }
+
 
   // Create Physical
   return new G4PVPlacement(rotation, position, logic, name,
-                           mother, false /*?*/, 0 /*?*/);
+                           mother, true /*?*/, 0 /*?*/);
 
 }
 
-G4VPhysicalVolume* GeoSolid::ConstructPhysicalReplica(DBLink* table, G4LogicalVolume* mother, G4LogicalVolume* logic) {
+G4VPhysicalVolume* GeoSolid::ConstructPhysicalReplica(DBTable table, G4LogicalVolume* mother, G4LogicalVolume* logic) {
 
-  std::string volume_name = table->GetIndexName();
+  std::string volume_name = table.GetIndexName();
   G4VPhysicalVolume *pv;
 
 
-  // int replicas = table->GetI("replicas");
-  // string axis_str = table->GetS("replica_axis");
+  // int replicas = table.GetI("replicas");
+  // string axis_str = table.GetS("replica_axis");
   // EAxis axis = kXAxis;
 
   // if (axis_str == "x")
@@ -171,16 +179,16 @@ G4VPhysicalVolume* GeoSolid::ConstructPhysicalReplica(DBLink* table, G4LogicalVo
   // else if (axis_str == "phi")
   //   axis = kPhi;
 
-  // G4double replica_spacing = table->GetD("replica_spacing") * CLHEP::mm;
+  // G4double replica_spacing = table.GetD("replica_spacing") * CLHEP::mm;
   // pv = new G4PVReplica(volume_name, logic, mother, axis, replicas, replica_spacing);
 
   return pv;
 }
 
 
-G4VPhysicalVolume* GeoSolid::ConstructPhysicalParametrisation(DBLink* table, G4LogicalVolume* mother, G4LogicalVolume* logic) {
+G4VPhysicalVolume* GeoSolid::ConstructPhysicalParametrisation(DBTable table, G4LogicalVolume* mother, G4LogicalVolume* logic) {
 
-  std::string volume_name = table->GetIndexName();
+  std::string volume_name = table.GetIndexName();
   G4VPhysicalVolume *pv;
 
   // This is a bit harder to do nested parametrisation.
@@ -190,7 +198,7 @@ G4VPhysicalVolume* GeoSolid::ConstructPhysicalParametrisation(DBLink* table, G4L
 
   // 
 
-  // // std::string parametrisation = table->GetS("parametrisation");
+  // // std::string parametrisation = table.GetS("parametrisation");
   // // G4VPVParametrised* pr = GeoManager::GetParametrisation(parametrisation);
 
   // // new G4VPVParametrised(volume_name, logic, mother, axis, nch, )
@@ -201,14 +209,14 @@ G4VPhysicalVolume* GeoSolid::ConstructPhysicalParametrisation(DBLink* table, G4L
 
 
 
-G4VPhysicalVolume* GeoSolid::ConstructPhysicalVolume(DBLink* table, G4LogicalVolume* mother, G4LogicalVolume* logic) {
-  std::string name = table->GetIndexName();
+G4VPhysicalVolume* GeoSolid::ConstructPhysicalVolume(DBTable table, G4LogicalVolume* mother, G4LogicalVolume* logic) {
+  std::string name = table.GetIndexName();
 
   int replicas = 0;
-  if (table->Has("replicas")) replicas = table->GetI("replicas");
+  if (table.Has("replicas")) replicas = table.GetI("replicas");
 
   std::string parametrisation = "";
-  if (table->Has("parametrisation"))  parametrisation = table->GetS("parametrisation");
+  if (table.Has("parametrisation"))  parametrisation = table.GetS("parametrisation");
 
   // Check if its placement/replica/parametrised
   if (replicas > 0) {
@@ -235,16 +243,17 @@ G4VPhysicalVolume* GeoSolid::ConstructPhysicalVolume(DBLink* table, G4LogicalVol
 
 
 
-G4VSensitiveDetector* GeoSolid::ConstructSensitiveDetector(DBLink* table, G4LogicalVolume* logic, G4VPhysicalVolume* vol) {
+G4VSensitiveDetector* GeoSolid::ConstructSensitiveDetector(DBTable table, G4LogicalVolume* logic, G4VPhysicalVolume* vol) {
 
   // See if has sensitive detector
-  if (!table->Has("sensitive")) return 0;
+  if (!table.Has("sensitive")) return 0;
 
   // If it does then create a new SD object
-  std::string sensitive = table->GetS("sensitive");
+  std::string sensitive = table.GetS("sensitive");
 
   // look up table
-  DBLink* sdtbl = DB::Get()->CloneLink("DETECTOR", sensitive, table->GetIndexName() + "_" + sensitive);
+  DBTable sdtbl = DBNEW::Get()->GetTable("DETECTOR", sensitive);
+  sdtbl.SetIndexName(table.GetIndexName() + "_" + sensitive);
   VDetector* sd = DetectorObjectFactory::CreateSD(sdtbl);
 
   // Assign the logical volume

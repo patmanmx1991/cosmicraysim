@@ -13,14 +13,13 @@ G4Box* GetBoxFromStore(std::string name, bool verbose) {
   return box;
 }
 
-
 G4LogicalVolume* GetLogicalFromStore(std::string name, bool verbose) {
   return G4LogicalVolumeStore::GetInstance()->GetVolume(name, verbose);
 }
 
-G4LogicalVolume* GetMotherLogicalFromStore(DBLink* tb, bool verbose) {
-  if (!tb->Has("mother")) return 0;
-  else return GetLogicalFromStore(tb->GetS("mother"), verbose);
+G4LogicalVolume* GetMotherLogicalFromStore(DBTable tb, bool verbose) {
+  if (!tb.Has("mother")) return 0;
+  else return GetLogicalFromStore(tb.GetS("mother"), verbose);
 }
 
 } // - namespace GEO

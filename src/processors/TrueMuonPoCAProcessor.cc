@@ -1,16 +1,16 @@
 #include "TrueMuonPoCAProcessor.hh"
 
 #include "analysis/Analysis.hh"
-#include "db/DBLink.hh"
+#include "db/DBTable.hh"
 
 namespace COSMIC {
 
 //------------------------------------------------------------------
-TrueMuonPoCAProcessor::TrueMuonPoCAProcessor(DBLink* tbl) :
-  VProcessor(tbl->GetIndexName())
+TrueMuonPoCAProcessor::TrueMuonPoCAProcessor(DBTable tbl) :
+  VProcessor(tbl.GetIndexName())
 {
-  fTrackerA = static_cast<TrueMuonTracker*>(Analysis::Get()->GetDetector(tbl->GetS("trackerA")));
-  fTrackerB = static_cast<TrueMuonTracker*>(Analysis::Get()->GetDetector(tbl->GetS("trackerB")));
+  fTrackerA = static_cast<TrueMuonTracker*>(Analysis::Get()->GetDetector(tbl.GetS("trackerA")));
+  fTrackerB = static_cast<TrueMuonTracker*>(Analysis::Get()->GetDetector(tbl.GetS("trackerB")));
 }
 
 bool TrueMuonPoCAProcessor::BeginOfRunAction(const G4Run* /*run*/) {

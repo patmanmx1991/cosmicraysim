@@ -7,14 +7,14 @@
 namespace COSMIC {
 
 // Forward Declarations
-class DBLink;
+class DBTable;
 class VDetector;
 
 /// Detector Factory used to create SD from tables
 namespace ProcessorFactory {
 
 /// Function to create detector objects from tables
-VProcessor* Construct(DBLink* tbl);
+VProcessor* Construct(DBTable tbl);
 
 /// Function to generate all possible triggers loaded by the user tables
 void ConstructProcessors();
