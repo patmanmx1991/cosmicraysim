@@ -150,7 +150,6 @@ bool SimpleScintillatorProcessor::ProcessEvent(const G4Event* event) {
 
         // Fill muon vectors
         G4AnalysisManager* man = G4AnalysisManager::Instance();
-        std::cout << "Filling processor " << GetID() << std::endl;
         man->FillNtupleDColumn(fEdepIndex, fEdep);
         man->FillNtupleDColumn(fTimeIndex, fTime);
         man->FillNtupleDColumn(fPosXIndex, fPosX);
@@ -163,9 +162,7 @@ bool SimpleScintillatorProcessor::ProcessEvent(const G4Event* event) {
     } else {
 
         // Set default values
-        G4AnalysisManager* man = G4AnalysisManager::Instance();
-        std::cout << "Filling processor " << GetID() << std::endl;
-        
+        G4AnalysisManager* man = G4AnalysisManager::Instance();        
         man->FillNtupleDColumn(fEdepIndex, -999.);
         man->FillNtupleDColumn(fTimeIndex, -999.);
         man->FillNtupleDColumn(fPosXIndex, -999.);

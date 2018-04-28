@@ -82,8 +82,12 @@ G4int LongDriftSD::GetHCID() {
 
 G4bool LongDriftSD::ProcessHits(G4Step* step, G4TouchableHistory* /*touch*/)
 {
+
+    G4double edep = step->GetTotalEnergyDeposit();
+    if (edep == 0.) return false;
+
     G4double charge = step->GetTrack()->GetDefinition()->GetPDGCharge();
-    if (charge == 0.) return true;
+    if (charge == 0.) return false;
 
     G4StepPoint* preStepPoint = step->GetPreStepPoint();
 

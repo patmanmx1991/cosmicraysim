@@ -4,6 +4,8 @@
 #include "GeoSolid.hh"
 #include "G4CutTubs.hh"
 
+#include "db/DBTable.hh"
+
 namespace COSMIC {
 
 /// Simple solid cut tubs geometry object

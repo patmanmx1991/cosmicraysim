@@ -44,7 +44,6 @@
 #include "TVirtualFitter.h"
 #include "TStyle.h"
 #include "Minuit2/FCNBase.h"
-#include "TFitterMinuit.h"
 #include "TSystem.h"
 #include "TStopwatch.h"
 
@@ -74,39 +73,6 @@ protected:
 
 };
 
-
-//! Wrapper for JointFCN to make ROOT minimization behave sensibly.
-class TrackFitter  {
-public:
-
-  // Empty Construction
-  TrackFitter() {}
-  ~TrackFitter() {};
-  // double operator() (const std::vector<double> & x) const {
-  // return DoEval(&(x[0]));
-  // }
-  // Func Operator for vectors
-  // inline double operator() (const std::vector<double> & x) const
-  // {
-  // double* x_array = new double[x.size()];
-  // return this->DoEval(x_array);
-  // };
-
-  // Actual Fitter
-  double DoEvalS(const double *x) const;
-
-  // Func Operator for arrays
-  inline double operator() (const double *x) const
-  {
-    return this->DoEvalS(x);
-  };
-
-private:
-
-
-};
-
-
 /// True Muon Processor Object :
 /// By default this is created alongside the true muon
 /// tracker object, so the info is automatically added
@@ -127,29 +93,32 @@ public:
   bool ProcessEvent(const G4Event* event);
 
 
-  void GetMXC(G4double& m, G4double& c, std::vector<G4double>& x, std::vector<G4double>& y, std::vector<G4double>& yerr);
-
-
+  void GetMXC(G4double& m, G4double& me, G4double& c, G4double& ce, std::vector<G4double>& x, std::vector<G4double>& y, std::vector<G4double>& yerr);
 
 protected:
 
+  bool fSave; ///< Whether to auto save
+
   AWEMuonTomographyDetector* fAWEDetector; ///< Pointer to associated detector medium
-  std::vector<LongDriftProcessor*> fDriftChamberProcs;
-  SimpleScintillatorProcessor* fScintProc;
+  std::vector<LongDriftProcessor*> fDriftChamberProcs; ///< List of all drift processors
+  SimpleScintillatorProcessor* fScintProc; ///< Scintillator trigger processor
 
   int fMuonTimeIndex; ///< Time Ntuple Index
   int fMuonMomXIndex; ///< MomX Ntuple Index
   int fMuonMomYIndex; ///< MomY Ntuple Index
   int fMuonMomZIndex; ///< MomZ Ntuple Index
+  int fMuonMomErrXIndex; ///< MomX Ntuple Index
+  int fMuonMomErrYIndex; ///< MomY Ntuple Index
+  int fMuonMomErrZIndex; ///< MomZ Ntuple Index
   int fMuonPosXIndex; ///< PosX Ntuple Index
   int fMuonPosYIndex; ///< PosY Ntuple Index
   int fMuonPosZIndex; ///< PosZ Ntuple Index
+  int fMuonPosErrXIndex; ///< PosX Ntuple Index
+  int fMuonPosErrYIndex; ///< PosY Ntuple Index
+  int fMuonPosErrZIndex; ///< PosZ Ntuple Index
   int fMuonPDGIndex;  ///< MPDG Ntuple Index
 
-  // Create Fit Machinery
-  TrackFitter* fFitterFCN;
-  ROOT::Math::Functor* fCallFunctor;
-  ROOT::Math::Minimizer* fMinimizer;
+  // Outputs
   G4ThreeVector fMuonMom;
   G4ThreeVector fMuonMomErr;
   G4ThreeVector fMuonPos;

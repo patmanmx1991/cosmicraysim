@@ -39,12 +39,12 @@
   name: "DETECTOR",
   index: "longdrift",
   type:  "longdrift"
-  restrict_x: 0,
-  restrict_y: 1,
+  restrict_x: 1,
+  restrict_y: 0,
   restrict_z: 1,
   resolution_y: 0.01,
-  resolution_x: 0.1,
-  resolution_y: 0.1,
+  resolution_x: 0.01,
+  resolution_y: 0.01,
   processor: 0,
   save: 0,
 }

@@ -111,20 +111,20 @@ void AWEMuonTomographyDetector::Construct(DBTable table) {
 
   // Remove the temporary database.
   tdb->SelectDataBase("default");
-  std::cout << "GEO: --> Created DRY Storage Cask" << std::endl;
+  std::cout << "GEO: --> Created AWE Detector" << std::endl;
 }
 // --------------------------------------------------------------------------
 
 
 // --------------------------------------------------------------------------
 AWEMuonTomographyProcessor::AWEMuonTomographyProcessor(AWEMuonTomographyDetector* det) :
-  VProcessor(det->GetID())
+  VProcessor(det->GetID()), fSave(true)
 {
   fAWEDetector = det;
   // Get drift Geo Objects
   std::vector<GeoObject*> drifts = fAWEDetector->GetDriftObjects();
   G4VSensitiveDetector* sd = fAWEDetector->GetScintillatorObject()->GetSensitive();
-  fScintProc = new SimpleScintillatorProcessor(static_cast<SimpleScintillatorSD*>(sd));
+  fScintProc = new SimpleScintillatorProcessor(static_cast<SimpleScintillatorSD*>(sd), false);
 
   // From each one get the sensitive and manually create a processor.
   // This is super awkward. May need to rethink.
@@ -142,35 +142,27 @@ bool AWEMuonTomographyProcessor::BeginOfRunAction(const G4Run* /*run*/) {
   G4AnalysisManager* man = G4AnalysisManager::Instance();
 
   // Fill index energy
-  fMuonTimeIndex = man ->CreateNtupleDColumn(tableindex + "_t");
+  fMuonTimeIndex = man->CreateNtupleDColumn(tableindex + "_t");
 
-  fMuonPosXIndex = man ->CreateNtupleDColumn(tableindex + "_x");
-  fMuonPosYIndex = man ->CreateNtupleDColumn(tableindex + "_y");
-  fMuonPosZIndex = man ->CreateNtupleDColumn(tableindex + "_z");
+  fMuonPosXIndex = man->CreateNtupleDColumn(tableindex + "_x");
+  fMuonPosYIndex = man->CreateNtupleDColumn(tableindex + "_y");
+  fMuonPosZIndex = man->CreateNtupleDColumn(tableindex + "_z");
 
-  fMuonPosXIndex = man ->CreateNtupleDColumn(tableindex + "_ex");
-  fMuonPosYIndex = man ->CreateNtupleDColumn(tableindex + "_ey");
-  fMuonPosZIndex = man ->CreateNtupleDColumn(tableindex + "_ez");
+  fMuonPosErrXIndex = man->CreateNtupleDColumn(tableindex + "_ex");
+  fMuonPosErrYIndex = man->CreateNtupleDColumn(tableindex + "_ey");
+  fMuonPosErrZIndex = man->CreateNtupleDColumn(tableindex + "_ez");
+
+  fMuonMomXIndex = man->CreateNtupleDColumn(tableindex + "_px");
+  fMuonMomYIndex = man->CreateNtupleDColumn(tableindex + "_py");
+  fMuonMomZIndex = man->CreateNtupleDColumn(tableindex + "_pz");
+
+  fMuonMomErrXIndex = man->CreateNtupleDColumn(tableindex + "_pex");
+  fMuonMomErrYIndex = man->CreateNtupleDColumn(tableindex + "_pey");
+  fMuonMomErrZIndex = man->CreateNtupleDColumn(tableindex + "_pez");
 
   return true;
 }
 
-int fNHitPositions;
-std::vector<double> fTimes;
-std::vector<G4ThreeVector> fHitPositions;
-std::vector<G4ThreeVector> fHitErrors;
-
-std::vector<double> time;
-
-std::vector<double> xpos_x;
-std::vector<double> xpos_z;
-std::vector<double> xpos_xerr;
-std::vector<double> xpos_zerr;
-
-std::vector<double> ypos_y;
-std::vector<double> ypos_z;
-std::vector<double> ypos_yerr;
-std::vector<double> ypos_zerr;
 
 bool AWEMuonTomographyProcessor::ProcessEvent(const G4Event* event) {
 
@@ -185,6 +177,22 @@ bool AWEMuonTomographyProcessor::ProcessEvent(const G4Event* event) {
   // No processors have been automatically handled for the drift chamber objects
   // We have to manually get the HitPosition from each
 
+  int fNHitPositions;
+  std::vector<double> fTimes;
+  std::vector<G4ThreeVector> fHitPositions;
+  std::vector<G4ThreeVector> fHitErrors;
+
+  std::vector<double> time;
+
+  std::vector<double> xpos_x;
+  std::vector<double> xpos_z;
+  std::vector<double> xpos_xerr;
+  std::vector<double> xpos_zerr;
+
+  std::vector<double> ypos_y;
+  std::vector<double> ypos_z;
+  std::vector<double> ypos_yerr;
+  std::vector<double> ypos_zerr;
 
   G4double avgx = 0.0;
   G4double avgy = 0.0;
@@ -204,6 +212,7 @@ bool AWEMuonTomographyProcessor::ProcessEvent(const G4Event* event) {
   for (uint i = 0; i < fDriftChamberProcs.size(); i++) {
 
     // Run our processing
+    fDriftChamberProcs[i]->Reset();
     fDriftChamberProcs[i]->ProcessEvent(event);
 
     // Check if chamber had info
@@ -214,20 +223,18 @@ bool AWEMuonTomographyProcessor::ProcessEvent(const G4Event* event) {
     // X information
     if (i == 0 || i == 1 || i == 2 || i == 9 || i == 10
         || i == 11 || i == 12 || i == 13 || i == 14) {
-      // std::cout << "XHIT : " << i << fDriftChamberProcs[i]->GetID() << std::endl;
+      ypos_y.push_back(fDriftChamberProcs[i]->GetPosY());
+      ypos_z.push_back(fDriftChamberProcs[i]->GetPosZ());
+      ypos_yerr.push_back(fDriftChamberProcs[i]->GetErrY());
+      ypos_zerr.push_back(fDriftChamberProcs[i]->GetErrZ());
+      avgy += fDriftChamberProcs[i]->GetPosY();
+      avgz += fDriftChamberProcs[i]->GetErrZ();
+    } else {
       xpos_x.push_back(fDriftChamberProcs[i]->GetPosX());
       xpos_z.push_back(fDriftChamberProcs[i]->GetPosZ());
       xpos_xerr.push_back(fDriftChamberProcs[i]->GetErrX());
       xpos_zerr.push_back(fDriftChamberProcs[i]->GetErrZ());
       avgx += fDriftChamberProcs[i]->GetPosX();
-      avgz += fDriftChamberProcs[i]->GetErrZ();
-    } else {
-      // std::cout << "YHIT : " << i << " " << fDriftChamberProcs[i]->GetID() << std::endl;
-      ypos_y.push_back(fDriftChamberProcs[i]->GetPosY());
-      ypos_z.push_back(fDriftChamberProcs[i]->GetPosZ());
-      ypos_yerr.push_back(fDriftChamberProcs[i]->GetErrY());
-      ypos_zerr.push_back(fDriftChamberProcs[i]->GetErrZ());
-      avgy += fDriftChamberProcs[i]->GetPosX();
       avgz += fDriftChamberProcs[i]->GetErrZ();
     }
     averagetime += fDriftChamberProcs[i]->GetTime();
@@ -235,7 +242,6 @@ bool AWEMuonTomographyProcessor::ProcessEvent(const G4Event* event) {
   averagetime /= fDriftChamberProcs.size();
 
   // Check at least 6 hits
-  // std::cout << "NHITS = " << xpos_x.size() << " " <<  ypos_y.size() << std::endl;
   if (xpos_x.size() < 3) return false;
   if (ypos_y.size() < 3) return false;
 
@@ -247,295 +253,168 @@ bool AWEMuonTomographyProcessor::ProcessEvent(const G4Event* event) {
   fHasInfo = true;
   fTime    = averagetime;
 
-  G4double minx = *(std::min_element(xpos_x.begin(), xpos_x.end()));
-  G4double miny = *(std::min_element(ypos_y.begin(), ypos_y.end()));
-  G4double minz = *(std::min_element(ypos_z.begin(), ypos_z.end()));
-  G4double maxx = *(std::max_element(xpos_x.begin(), xpos_x.end()));
-  G4double maxy = *(std::max_element(ypos_y.begin(), ypos_y.end()));
-  G4double maxz = *(std::max_element(ypos_z.begin(), ypos_z.end()));
+  // Fit the gradients
+  G4double mx, mex, cx, cex, my, mey, cy, cey;
+  GetMXC(mx, mex, cx, cex, xpos_z, xpos_x, xpos_xerr );
+  GetMXC(my, mey, cy, cey, ypos_z, ypos_y, ypos_yerr );
 
-
-  // TFitterMinuit * minuit = new TFitterMinuit(6);
-  // fFitterFCN   = new TrackFitter();
-  // minuit->SetMinuitFCN(fFitterFCN);
-  // double fitvalues[6] = {avgx, avgy, avgz, 1.0, 1.0, 1.0};
-
-  // minuit->SetParameter(0, "posx", fitvalues[0], 0.1, 0,0);
-  // minuit->SetParameter(1, "posy", fitvalues[1], 0.1, 0,0);
-  // minuit->SetParameter(2, "posz", fitvalues[2], 0.1, 0,0);
-  // minuit->SetParameter(3, "momx", fitvalues[3], 0.1, 0,0);
-  // minuit->SetParameter(4, "momy", fitvalues[4], 0.1, 0,0);
-  // minuit->SetParameter(5, "momz", fitvalues[5], 0.1, 0,0);
-  // minuit->SetPrintLevel(3);
-  // minuit->CreateMinimizer();
-  // minuit->Minimize();
-
-
-  // double values[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-  // double errors[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-  // for (uint i = 0; i < 6; i++){
-  //   values[i] = minuit->GetParameter(i);
-  //   values[i] = minuit->GetParError(i);
-  // }
-
-
-  G4double mx, cx, my, cy;
-  GetMXC(mx, cx, xpos_z, xpos_x, xpos_xerr );
-  GetMXC(my, cy, ypos_z, ypos_y, ypos_yerr );
-
-
-
-
-  // // fMinimizer->FixVariable(0);
-  // fMinimizer->FixVariable(1);
-  // fMinimizer->FixVariable(2);
-  // fMinimizer->FixVariable(3);
-  // fMinimizer->FixVariable(4);
-  // fMinimizer->FixVariable(5);
-
-
-  // Update Functor Object with hit information
-  // fFitterFCN->SetNHits(time.size());
-
+  // std::cout << "cx mx : " << cx << " : " << mx << std::endl;
+  // std::cout << "cy my : " << cy << " : " << my << std::endl;
 
   double values [6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
   double errors [6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+  values[0] = -cx-mx*avgz;
+  values[1] = -cy-my*avgz;
+  values[2] = avgz;
+  values[3] = mx;
+  values[4] = my;
+  values[5] = 1.0;
 
-  values[0] = 0.0;
-  values[1] = 0.0;
-  values[2] = cx;
-  values[3] = 1.0;
-  values[4] = 0.0;
-  values[5] = mx;
+  errors[0] = 0.0;
+  errors[1] = 0.0;
+  errors[2] = 0.0;
+  errors[3] = mex;
+  errors[4] = mey;
+  errors[5] = 0.0;
 
   fMuonPos    = G4ThreeVector(values[0], values[1], values[2]);
   fMuonPosErr = G4ThreeVector(errors[0], errors[1], errors[2]);
   fMuonMom    = G4ThreeVector(values[3], values[4], values[5]);
-  fMuonMomErr = G4ThreeVector(0.0, 0.0, 0.0);
+  fMuonMomErr = G4ThreeVector(errors[3], errors[4], errors[5]);
 
+  // Draw Track if in interactive
   G4VVisManager* pVVisManager = G4VVisManager::GetConcreteInstance();
   if (pVVisManager)
   {
-
-    std::cout << "MuonPos = " << fMuonPos[0] << " " << fMuonPos[1] << " " << fMuonPos[2] << std::endl;
-    std::cout << "MuonDir = " << fMuonMom[0] << " " << fMuonMom[1] << " " << fMuonMom[2] << std::endl;
+    // std::cout << "MuonPos = " << fMuonPos[0] << " " << fMuonPos[1] << " " << fMuonPos[2] << std::endl;
+    // std::cout << "MuonDir = " << fMuonMom[0] << " " << fMuonMom[1] << " " << fMuonMom[2] << std::endl;
     G4Polyline polyline;
     polyline.push_back( fMuonPos + 4.0 * m * fMuonMom );
     polyline.push_back( fMuonPos - 4.0 * m * fMuonMom );
 
-    G4Colour colour(1., 1., 0.);
+    G4Colour colour(0., 1., 0.);
     G4VisAttributes attribs(colour);
     polyline.SetVisAttributes(attribs);
 
     pVVisManager->Draw(polyline);
   }
 
+  // Now fill
+  if (!fSave) return false;
+ 
+  // If Triggered then fill
+  if (fHasInfo) {
+
+      // Fill muon vectors
+      G4AnalysisManager* man = G4AnalysisManager::Instance();
+      man->FillNtupleDColumn(fMuonTimeIndex, fTime);
+
+      man->FillNtupleDColumn(fMuonPosXIndex, fMuonPos[0]);
+      man->FillNtupleDColumn(fMuonPosYIndex, fMuonPos[1]);
+      man->FillNtupleDColumn(fMuonPosZIndex, fMuonPos[2]);
+
+      man->FillNtupleDColumn(fMuonPosErrXIndex, fMuonPosErr[0]);
+      man->FillNtupleDColumn(fMuonPosErrYIndex, fMuonPosErr[1]);
+      man->FillNtupleDColumn(fMuonPosErrZIndex, fMuonPosErr[2]);
+
+      man->FillNtupleDColumn(fMuonMomXIndex, fMuonMom[0]);
+      man->FillNtupleDColumn(fMuonMomYIndex, fMuonMom[1]);
+      man->FillNtupleDColumn(fMuonMomZIndex, fMuonMom[2]);
+
+      man->FillNtupleDColumn(fMuonMomErrXIndex, fMuonMomErr[0]);
+      man->FillNtupleDColumn(fMuonMomErrYIndex, fMuonMomErr[1]);
+      man->FillNtupleDColumn(fMuonMomErrZIndex, fMuonMomErr[2]);
+
+      return true;
+
+  } else {
+
+      // Set default values
+      G4AnalysisManager* man = G4AnalysisManager::Instance();        
+      man->FillNtupleDColumn(fMuonTimeIndex, -999.9);
+
+      man->FillNtupleDColumn(fMuonPosXIndex, -999.9);
+      man->FillNtupleDColumn(fMuonPosYIndex, -999.9);
+      man->FillNtupleDColumn(fMuonPosZIndex, -999.9);
+
+      man->FillNtupleDColumn(fMuonPosErrXIndex, -999.9);
+      man->FillNtupleDColumn(fMuonPosErrYIndex, -999.9);
+      man->FillNtupleDColumn(fMuonPosErrZIndex, -999.9);
+
+      man->FillNtupleDColumn(fMuonMomXIndex, -999.9);
+      man->FillNtupleDColumn(fMuonMomYIndex, -999.9);
+      man->FillNtupleDColumn(fMuonMomZIndex, -999.9);
+
+      man->FillNtupleDColumn(fMuonMomErrXIndex, -999.9);
+      man->FillNtupleDColumn(fMuonMomErrYIndex, -999.9);
+      man->FillNtupleDColumn(fMuonMomErrZIndex, -999.9);
+
+      return false;
+  }
 
   return true;
 }
 
 
 // --------------------------------------------------------------------------
-std::vector<double> pointsx;
-std::vector<double> pointsy;
-std::vector<double> errsy;
+namespace GlobalFitTrack{
+int npoints;
+G4double* pointsx;
+G4double* pointsy;
+G4double* errsy;
+}
+
 
 double FitTrack(const double *x) {
   G4double m = x[0];
   G4double c = x[1];
   double totalres = 0.0;
-  for (uint i = 0; i < pointsy.size(); i++) {
-    std::cout << pointsy[i] << std::endl;
-    totalres += pow( (pointsy[i] - m * pointsx[i] + c ), 2);
+  for (uint i = 0; i < GlobalFitTrack::npoints; i++) {
+    totalres += pow( (GlobalFitTrack::pointsy[i] - m * GlobalFitTrack::pointsx[i] + c )/GlobalFitTrack::errsy[i], 2);
   }
   return totalres;
 }
 
 
-void AWEMuonTomographyProcessor::GetMXC(G4double& m, G4double& c, std::vector<G4double>& x, std::vector<G4double>& y, std::vector<G4double>& yerr) {
+void AWEMuonTomographyProcessor::GetMXC(G4double& m, G4double& me, G4double& c, G4double& ce, std::vector<G4double>& x, std::vector<G4double>& y, std::vector<G4double>& yerr) {
 
-  pointsx = x;
-  pointsy = y;
-  errsy = yerr;
-  double minx = *(std::min_element(pointsx.begin(),pointsx.end()));
-  double maxx = *(std::max_element(pointsx.begin(),pointsx.end()));
-  double miny = *(std::min_element(pointsy.begin(),pointsy.end()));
-  double maxy = *(std::max_element(pointsy.begin(),pointsy.end()));
+  GlobalFitTrack::npoints = 3; //x.size();
+  GlobalFitTrack::pointsx = &(x[0]);
+  GlobalFitTrack::pointsy = &(y[0]);
+  GlobalFitTrack::errsy = &(yerr[0]);
+  double minx = *(std::min_element(x.begin(),x.end()));
+  double maxx = *(std::max_element(x.begin(),x.end()));
+  double miny = *(std::min_element(y.begin(),y.end()));
+  double maxy = *(std::max_element(y.begin(),y.end()));
 
   // Create Fit Machinery
   ROOT::Math::Minimizer* min = 
             ROOT::Math::Factory::CreateMinimizer("Minuit2", "Migrad");
-  // ROOT::Minuit2::Minuit2Minimizer min (ROOT::Minuit2::kMigrad );
+  min->SetPrintLevel(-1);
+  min->SetStrategy(2);
+  min->SetTolerance(0.01);
   ROOT::Math::Functor f(&FitTrack, 2);
   double step[2] = {0.01,0.01};
-  double variable[2] = {(maxy-miny)/(maxx-minx), pointsy[0]};
+  double variable[2] = {(maxy-miny)/(maxx-minx), GlobalFitTrack::pointsy[0]};
   min->SetFunction(f);
 
-  min->SetVariable(0, "m", variable[0], step[0]);
-  min->SetVariable(1, "c", variable[1], step[1]);
+  double maxgrad = 5*(maxy-miny)/(maxx-minx);
+  double maxc = 2*(fabs(miny)+fabs(maxy));
+  min->SetLimitedVariable(0, "m", variable[0], step[0], -maxgrad, +maxgrad);
+  min->SetLimitedVariable(1, "c", variable[1], step[1], -maxc, +maxc);
 
   min->Minimize();
 
   const double *xs = min->X();
+  const double *es = min->Errors();
   m = xs[0];
   c = xs[1];
+  me = es[0];
+  ce = es[1];
 
-
-
-  // // Create Fit Machinery
-  // TrackFitter* newtracker = new TrackFitter();
-  // // ROOT::Math::Functor* fCallFunctor = new ROOT::Math::Functor(newtracker, 2);
-  // ROOT::Math::Minimizer* fMinimizer   = ROOT::Math::Factory::CreateMinimizer("Minuit2", "Migrad");
-  // fMinimizer->SetVariable(0, "m", 1.0, 100.0);
-  // fMinimizer->SetVariable(1, "c", 1.0, 100.0);
-  // // fMinimizer->SetFunction(*fCallFunctor);
-
-  // // Now perform a simple track fit to return a muon vector and error
-  // // Reset Minuit Instance
-
-  // // // Run the Fit
-  // fMinimizer->Minimize();
-
-  // // // Extract the fit parameters
-  // // // Get X and Err
-  // const double* values = fMinimizer->X();
-  // const double* errors = fMinimizer->Errors();
-
-  // m = values[0];
-  // c = values[1];
-
-  // delete fMinimizer;
-  // delete fCallFunctor;
-
+  delete min;
   return;
 }
-
-double TrackFitter::DoEvalS(const double *x) const {
-  return 0.0;
-}
-//   G4double m = x[0];
-//   G4double c = x[1];
-//   double totalres = 0.0;
-//   for (uint i = 0; i < pointsy.size(); i++){
-//     totalres += pow( (pointsy[i] - m*pointsx[i]+c ) / errsy[i],2);
-//   }
-//   return totalres;
-// }
-
-
-// G4double posx = x[0];
-// G4double posy = x[1];
-// G4double posz = x[2];
-// G4double momx = x[3];
-// G4double momy = x[4];
-// G4double momz = x[5];
-
-// std::cout << "pos : " << posx << " " << posy << " " << posz << std::endl;
-// std::cout << "mom : " << momx << " " << momy << " " << momz << std::endl;
-
-// G4double totalres = 0.0;
-// for (uint i = 0; i < xpos_x.size(); i++){
-//   G4double t = (xpos_z[i] - posz) / momz;
-//   G4double pointinxplane = posx + t*momx;
-//   totalres += pow( (xpos_x[i] - pointinxplane) / xpos_xerr[i], 2);
-// }
-//   for (uint i = 0; i < ypos_y.size(); i++){
-//   G4double t = (ypos_z[i] - posz) / momz;
-//   G4double pointinyplane = posy + t*momy;
-//   totalres += pow( (ypos_y[i] - pointinyplane) / ypos_yerr[i], 2);
-// }
-// std::cout << "Totalres : " << totalres << std::endl;
-// return totalres;
-
-
-
-
-
-
-
-
-
-
-
-
-// int ycount = 0;
-// int xcount = 0;
-// for (int i = 0; i < fHitPositions.size(); i++) {
-
-//   // Get X residual
-//   std::cout << "X ERROR : " << fHitErrors[i][0] << std::endl;
-//   if (fHitErrors[i][0] > 0.0) {
-//     xcount++;
-//     G4double pointinx = (fHitPositions[i][1] - posy) / momy;
-//     G4double resinx = (pointinx - fHitPositions[i][0]) / fHitErrors[i][0];
-//     totalres += resinx * resinx;
-//   }
-
-//   // Get X residual
-//   std::cout << "Y ERROR : " << fHitErrors[i][1] << std::endl;
-//   if (fHitErrors[i][1] > 0.0) {
-//     ycount++;
-//     G4double pointiny = (fHitPositions[i][0] - posx) / momx;
-//     G4double resiny = (pointiny - fHitPositions[i][1]) / fHitErrors[i][1];
-//     totalres += resiny * resiny;
-//   }
-
-// }
-// std::cout << " Total res : " << totalres << " : " << xcount << " : " << ycount << std::endl;
-// return totalres;
-
-
-
-
-
-
-
-
-//   G4ThreeVector Q = pos + 100.0 * dir;
-//   G4ThreeVector R = pos - 100.0 * dir;
-
-//   G4double totalres = 0.0;
-// // fNHitPositions = fHitPositions.size();
-// // if (!fNHitPositions){
-// //   std::cout << "CANT FIND HTIS" << std::endl;
-// //   throw;
-// // }
-//   for (uint i = 0; i < fHitPositions.size(); i++) {
-//     G4ThreeVector P = G4ThreeVector((fHitPositions[i]));
-//     G4ThreeVector E = G4ThreeVector((fHitErrors[i]));
-
-//     G4double t = (R - Q).dot(Q - P) / (R - Q).dot(R - Q);
-//     G4ThreeVector C = Q + t * (R - Q);
-
-//     G4double res = (C - P).dot(E);
-//     totalres += res * res;
-
-//   }
-//   std::cout << "Total res : " << totalres << std::endl;
-//   return totalres;
-
-
-// // // Iterate over hits and get residual of each one
-// // // based on its distance away from the track and its
-// // // associated errors.
-
-// // // Find the closest point on the line to a given point.
-
-// // // Then use point errors to calculate a residual.
-
-// // G4double totalres = 0.0;
-// // for (uint i = 0; i < fHitPositions->size(); i++) {
-
-// //   G4ThreeVector P = (*fHitPositions)[i];
-// //   G4ThreeVector E = (*fHitErrors)[i];
-// //   G4ThreeVector closest = pos + ((P-pos).dot(dir))/(dir.dot(dir)) * dir;
-
-// //   G4double res = (closest - P).dot((closest - P));
-// //   totalres += res * res;
-// // }
-// // totalres = pos.dot(mom);
-// // std::cout << "Total res = " << pos.dot(mom) << std::endl;
-// // return totalres;
 
 // --------------------------------------------------------------------------
 } // namespace COSMIC

@@ -4,7 +4,7 @@
 #include "GeoSolid.hh"
 #include "G4Para.hh"
 
-class COSMIC::DBTable;
+#include "db/DBTable.hh"
 
 namespace COSMIC {
 
