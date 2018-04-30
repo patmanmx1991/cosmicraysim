@@ -24,7 +24,9 @@ endif()
 list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
 find_package(ROOT)
 #find_package(ROOT REQUIRED COMPONENTS RIO Net Hist Graf Graf3d Gpad Tree Rint Postscript Matrix Physics MathCore Thread)
+if(EXISTS ${ROOT_USE_FILE})
 include(${ROOT_USE_FILE})
+endif()
 
 #----------------------------------------------------------------------------
 # Setup Geant4 include directories and compile definitions
