@@ -22,7 +22,7 @@ CosmicStackingAction::ClassifyNewTrack(const G4Track* track)
     return fKill;
   }
   //otherwise, return what Geant4 would have returned by itself
-  else 
-    return G4UserStackingAction::ClassifyNewTrack(track);
+  // else 
+  return G4UserStackingAction::ClassifyNewTrack(track);
 }
 

@@ -556,6 +556,9 @@ void Writer::writeValue(Value value) {
         break;
     case TBOOL:
         out << (value.data.boolean ? "true" : "false");
+    default:
+        break;
+    
     }
 }
 

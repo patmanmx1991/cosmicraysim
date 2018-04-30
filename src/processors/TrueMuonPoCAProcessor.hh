@@ -50,10 +50,18 @@ public:
   /// Process the information the tracker recieved for this event
   bool ProcessEvent(const G4Event* event);
 
+  /// Draw in geometry
+  void DrawEvent();
+
+
 protected:
 
   TrueMuonTracker* fTrackerA; ///< Pointer to associated tracker A SD
   TrueMuonTracker* fTrackerB; ///< Pointer to associated tracker B SD
+  G4double fDistance;
+  G4double fAngle;
+  G4ThreeVector fPoCA;
+  G4double fAngleThreshold; ///< Limit to avoid straight tracks.
 
   bool fSave; ///< Flag to save event info automatically
 

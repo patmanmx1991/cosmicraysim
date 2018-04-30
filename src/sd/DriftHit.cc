@@ -153,11 +153,11 @@ std::vector<G4AttValue>* DriftChamberHit::CreateAttValues() const
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void DriftChamberHit::Print() const
-{
-    G4cout << "  Layer[" << fLayerID << "] : time " << fTime / ns
-           << " (nsec) --- local (x,y) " << fLocalPos.x()
-           << ", " << fLocalPos.y() << G4endl;
-}
+// void DriftChamberHit::Print() const
+// {
+//     G4cout << "  Layer[" << fLayerID << "] : time " << fTime / ns
+//            << " (nsec) --- local (x,y) " << fLocalPos.x()
+//            << ", " << fLocalPos.y() << G4endl;
+// }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

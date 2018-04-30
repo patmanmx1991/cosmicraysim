@@ -1,0 +1,5 @@
+{
+  name: "DETECTOR",
+  index: "truemuon",
+  type: "truemuon",
+}

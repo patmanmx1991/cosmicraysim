@@ -16,6 +16,9 @@ namespace PhysicsFactory{
   G4VUserPhysicsList* LoadPhysicsList();
 
   G4Region* LoadRegion(DBTable tbl);
+    void SetPhysicsListCuts(std::string cutname, G4VUserPhysicsList* list);
+  
+  G4ProductionCuts* LoadProductionCuts(std::string cutname);
 
 } // - namespace PhysicsFactory
 } // - namespace COSMIC

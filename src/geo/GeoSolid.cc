@@ -55,7 +55,7 @@ void GeoSolid::Construct(DBTable table)
 
 
 G4LogicalVolume* GeoSolid::ConstructLogicalVolume(DBTable table, G4VSolid* solid) {
-  G4NistManager* nist = G4NistManager::Instance();
+  // G4NistManager* nist = G4NistManager::Instance();
   std::string name = table.GetIndexName();
 
   G4Material* geo_material = NULL;
@@ -106,8 +106,9 @@ G4LogicalVolume* GeoSolid::ConstructLogicalVolume(DBTable table, G4VSolid* solid
   }
 
   // If region then set to logical
-  if (table.Has("region")){
-    G4Region* reg = PhysicsFactory::LoadRegion(table);
+  if (table.Has("cuts")){
+    G4Region* reg = new G4Region(name + "_" + table.GetS("cuts"));
+    reg->SetProductionCuts( PhysicsFactory::LoadProductionCuts(table.GetS("cuts")) );
     reg->AddRootLogicalVolume(geo_logic);
   }
 
@@ -158,10 +159,10 @@ G4VPhysicalVolume* GeoSolid::ConstructPhysicalPlacement(DBTable table, G4Logical
 
 }
 
-G4VPhysicalVolume* GeoSolid::ConstructPhysicalReplica(DBTable table, G4LogicalVolume* mother, G4LogicalVolume* logic) {
+G4VPhysicalVolume* GeoSolid::ConstructPhysicalReplica(DBTable table, G4LogicalVolume* /*mother*/, G4LogicalVolume* /*logic*/) {
 
   std::string volume_name = table.GetIndexName();
-  G4VPhysicalVolume *pv;
+  G4VPhysicalVolume *pv = NULL;
 
 
   // int replicas = table.GetI("replicas");
@@ -186,10 +187,10 @@ G4VPhysicalVolume* GeoSolid::ConstructPhysicalReplica(DBTable table, G4LogicalVo
 }
 
 
-G4VPhysicalVolume* GeoSolid::ConstructPhysicalParametrisation(DBTable table, G4LogicalVolume* mother, G4LogicalVolume* logic) {
+G4VPhysicalVolume* GeoSolid::ConstructPhysicalParametrisation(DBTable table, G4LogicalVolume* /*mother*/, G4LogicalVolume* /*logic*/) {
 
   std::string volume_name = table.GetIndexName();
-  G4VPhysicalVolume *pv;
+  G4VPhysicalVolume *pv = NULL;
 
   // This is a bit harder to do nested parametrisation.
   // Could do it in composite but would be hard to assign sensitive detectors.
@@ -252,7 +253,7 @@ G4VSensitiveDetector* GeoSolid::ConstructSensitiveDetector(DBTable table, G4Logi
   std::string sensitive = table.GetS("sensitive");
 
   // look up table
-  DBTable sdtbl = DBNEW::Get()->GetTable("DETECTOR", sensitive);
+  DBTable sdtbl = DB::Get()->GetTable("DETECTOR", sensitive);
   sdtbl.SetIndexName(table.GetIndexName() + "_" + sensitive);
   VDetector* sd = DetectorObjectFactory::CreateSD(sdtbl);
 

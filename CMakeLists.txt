@@ -21,8 +21,10 @@ endif()
 #----------------------------------------------------------------------------
 # Find ROOT variables if the variable G4ANALYSIS_USE_ROOT is set
 #
-#find_package(ROOT QUIET)
-find_package(ROOT REQUIRED COMPONENTS RIO Net Hist Graf Graf3d Gpad Tree Rint Postscript Matrix Physics MathCore Thread)
+list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
+find_package(ROOT)
+#find_package(ROOT REQUIRED COMPONENTS RIO Net Hist Graf Graf3d Gpad Tree Rint Postscript Matrix Physics MathCore Thread)
+include(${ROOT_USE_FILE})
 
 #----------------------------------------------------------------------------
 # Setup Geant4 include directories and compile definitions

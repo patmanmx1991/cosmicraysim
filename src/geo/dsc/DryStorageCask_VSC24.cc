@@ -38,15 +38,15 @@ void DryStorageCask_VSC24::Construct(DBTable table)
 
 
   // Load the temporary DB from geo file
-  DBNEW* tdb = DBNEW::Get();
+  DB* tdb = DB::Get();
   tdb->CreateDataBase("vsc24");
   tdb->SelectDataBase("vsc24");
-  tdb->LoadFile(DBNEW::GetDataPath() + "/dsc/vsc24.geo");
+  tdb->LoadFile(DB::GetDataPath() + "/dsc/vsc24.geo");
 
 
   // Make the main logical volume (with mother and position/rotation overriden)
   // Have to create a table from template and edit with what we want.
-  DBTable voltable = DBNEW::Get()->GetTable("GEO", "volume");
+  DBTable voltable = DB::Get()->GetTable("GEO", "volume");
   
   voltable.SetIndexName(fName + "_volume");
   voltable.Set("mother",   fMotherName);
@@ -73,14 +73,14 @@ void DryStorageCask_VSC24::Construct(DBTable table)
   tubs.push_back("steel_bottom");
 
   for (uint i = 0; i < tubs.size(); i++) {
-    DBTable tbl = DBNEW::Get()->GetTable("GEO", tubs[i]);
+    DBTable tbl = DB::Get()->GetTable("GEO", tubs[i]);
     tbl.SetIndexName(fName + "_" + tubs[i]);
     tbl.Prefix("mother", fName + "_");
     fSubObjects.push_back(new GeoTubs(tbl));
   }
 
   // Now Make the uranium rod array
-  DBTable rodpositions = DBNEW::Get()->GetTable("GEO", "rod_positions");
+  DBTable rodpositions = DB::Get()->GetTable("GEO", "rod_positions");
 
   std::vector<int> rodmask;
   if (table.Has("storage_mask")) rodmask = table.GetVecI("storage_mask");
@@ -116,7 +116,7 @@ void DryStorageCask_VSC24::Construct(DBTable table)
     std::vector<G4double> position = rodpositions.GetVecG4D(rodname);
 
     // Create the target rod by overloading table
-    DBTable rodtemplate  = DBNEW::Get()->GetTable("GEO", rodtype);
+    DBTable rodtemplate  = DB::Get()->GetTable("GEO", rodtype);
     rodtemplate.SetIndexName(fName + "_" + rodname);
     rodtemplate.Prefix("mother", fName + "_");
     rodtemplate.Set("position", position);

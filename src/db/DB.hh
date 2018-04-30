@@ -27,17 +27,17 @@
 
 namespace COSMIC {
 
-class DBNEW {
+class DB {
 public:
 
   // Make a static way to access the DB
-  static inline DBNEW *Get()
-  { return fPrimary == 0 ? fPrimary = new DBNEW : fPrimary; };
-  static DBNEW *fPrimary;
+  static inline DB *Get()
+  { return fPrimary == 0 ? fPrimary = new DB : fPrimary; };
+  static DB *fPrimary;
 
-  DBNEW();
-  ~DBNEW();
-  DBNEW(std::string filename);
+  DB();
+  ~DB();
+  DB(std::string filename);
 
   static std::string GetDataPath();
   static void PrintSplashScreen();

@@ -339,7 +339,6 @@ std::vector<G4double> DBTable::GetVecG4D(std::string field) {
 
   if (GetType(field) == json::TSTRING_ARRAY) {
     std::vector<std::string> svec = GetVecS(field);
-    std::vector<G4double> dvec;
     G4double tunits = GetUnits(field);
     for (uint i = 0; i < svec.size(); i++) {
       dvec.push_back( Evaluate(svec[i]) * tunits );

@@ -8,30 +8,30 @@
 
 namespace COSMIC {
 
-DBNEW::DBNEW()
+DB::DB()
 {
   CreateDataBase("default");
   SelectDataBase("default");
   fDefaultTables = &(fAllTables["default"]);
 }
 
-DBNEW::~DBNEW()
+DB::~DB()
 {
 }
 
-void DBNEW::CreateDataBase(std::string dataid)
+void DB::CreateDataBase(std::string dataid)
 {
   std::cout << "DB : --> Creating Database : " << dataid << std::endl;
   fAllTables[dataid] = std::vector<DBTable>();
 }
 
-void DBNEW::SelectDataBase(std::string dataid)
+void DB::SelectDataBase(std::string dataid)
 {
   std::cout << "DB : --> Selecting Database : " << dataid << std::endl;
   fCurrentTables = &(fAllTables[dataid]);
 }
 
-int DBNEW::Load(std::string filename)
+int DB::Load(std::string filename)
 {
   // Try to get file info assuming the name is literal
   struct stat s;
@@ -52,7 +52,7 @@ int DBNEW::Load(std::string filename)
   return 0;
 }
 
-int DBNEW::LoadFile(std::string filename)
+int DB::LoadFile(std::string filename)
 {
   std::cout << "DB : --> Loading '" << filename << "'' ... ";
   // Try to read and parse it as databse or JSON file.
@@ -61,7 +61,8 @@ int DBNEW::LoadFile(std::string filename)
   std::vector<DBTable>::iterator itbl;
   for (itbl = contents.begin(); itbl != contents.end(); itbl++) {
     DBTable table = (*itbl);
-    (*fCurrentTables).push_back(table);
+    AddTable(table);
+    // (*fCurrentTables).push_back(table);
   }
 
   std::cout << " --> Complete. (Loaded " << contents.size() << " Tables)" << std::endl;
@@ -69,7 +70,7 @@ int DBNEW::LoadFile(std::string filename)
   return 1;
 }
 
-int DBNEW::LoadAll(std::string dirname, std::string pattern)
+int DB::LoadAll(std::string dirname, std::string pattern)
 {
   std::cout << "DB : Loading all DB files from " << dirname << pattern << std::endl;
   pattern = dirname + "/*"; //pattern;
@@ -78,7 +79,7 @@ int DBNEW::LoadAll(std::string dirname, std::string pattern)
   if (glob(pattern.c_str(), 0, 0, &g) == 0) {
     for (unsigned i = 0; i < g.gl_pathc; i++) {
       std::string path(g.gl_pathv[i]);
-      //std::cout << "DBNEW: Loading " << path << " ... ";
+      //std::cout << "DB: Loading " << path << " ... ";
       if (!Load(path)) {
         std::cout << "Load Failed!" << std::endl;
         globfree(&g);
@@ -90,7 +91,7 @@ int DBNEW::LoadAll(std::string dirname, std::string pattern)
   return 1;
 }
 
-void DBNEW::Finalise() {
+void DB::Finalise() {
 
   // To finalise the database we want to expand all databases
   // that have the entry "clone_table" in them.
@@ -113,7 +114,7 @@ void DBNEW::Finalise() {
   }
 }
 
-DBTable  DBNEW::GetTable (std::string tablename, std::string index) {
+DBTable  DB::GetTable (std::string tablename, std::string index) {
   for (uint i = 0; i < (*fCurrentTables).size(); i++) {
     if (tablename.compare((*fCurrentTables)[i].GetTableName()) != 0) continue;
     if (index.compare((*fCurrentTables)[i].GetIndexName()) != 0) continue;
@@ -130,7 +131,7 @@ DBTable  DBNEW::GetTable (std::string tablename, std::string index) {
   return fNullTable;
 }
 
-DBTable* DBNEW::GetLink  (std::string tablename, std::string index) {
+DBTable* DB::GetLink  (std::string tablename, std::string index) {
   for (uint i = 0; i < (*fCurrentTables).size(); i++) {
     if (tablename.compare((*fCurrentTables)[i].GetTableName()) != 0) continue;
     if (index.compare((*fCurrentTables)[i].GetIndexName()) != 0) continue;
@@ -147,7 +148,7 @@ DBTable* DBNEW::GetLink  (std::string tablename, std::string index) {
   return 0;
 }
 
-std::vector<DBTable>  DBNEW::GetTableGroup (std::string tablename) {
+std::vector<DBTable>  DB::GetTableGroup (std::string tablename) {
   std::vector<DBTable> tableset;
   for (uint i = 0; i < (*fCurrentTables).size(); i++) {
     if (tablename.compare((*fCurrentTables)[i].GetTableName()) != 0) continue;
@@ -164,7 +165,7 @@ std::vector<DBTable>  DBNEW::GetTableGroup (std::string tablename) {
   return tableset;
 }
 
-std::vector<DBTable*> DBNEW::GetLinkGroup  (std::string tablename) {
+std::vector<DBTable*> DB::GetLinkGroup  (std::string tablename) {
   std::vector<DBTable*> tableset;
   for (uint i = 0; i < (*fCurrentTables).size(); i++) {
     if (tablename.compare((*fCurrentTables)[i].GetTableName()) != 0) continue;
@@ -181,20 +182,28 @@ std::vector<DBTable*> DBNEW::GetLinkGroup  (std::string tablename) {
   return tableset;
 }
 
-void DBNEW::AddTable(DBTable tbl) {
+void DB::AddTable(DBTable tbl) {
+  std::string name = tbl.GetTableName();
+  std::string index = tbl.GetIndexName();
+  for (uint i = 0; i < (*fCurrentTables).size(); i++) {
+    if (name.compare((*fCurrentTables)[i].GetTableName()) != 0) continue;
+    if (index.compare((*fCurrentTables)[i].GetIndexName()) != 0) continue;
+    (*fCurrentTables)[i] = tbl;
+    return;
+  }
   fCurrentTables->push_back(tbl);
 }
 
-DBNEW *DBNEW::fPrimary(0);
+DB *DB::fPrimary(0);
 
-std::string DBNEW::GetDataPath() {
+std::string DB::GetDataPath() {
   std::string datadir = std::string(getenv("GLG4DATA"));
   return datadir;
 }
 
-void DBNEW::PrintSplashScreen() {
+void DB::PrintSplashScreen() {
   std::cout << "=========================================" << std::endl;
-  std::cout << "\n COSMIC RAY SIM : Cosmic Rays for Environmental Science and Technology Applications" << std::endl;
+  std::cout << "\n COSMIC RAY SIM : Cosmic Rays Simulation Code" << std::endl;
   std::cout << "\n\n Authors: Patrick Stowell, Lee Thompson" << std::endl;
   std::cout << " contact : p.stowell@sheffield.ac.uk" << std::endl;
   std::cout << "\n=========================================" << std::endl;

@@ -120,7 +120,7 @@ void PrintHelpScreen() {
 int main(int argc, char** argv) {
 
   // Print Splash Screen
-  DBNEW::PrintSplashScreen();
+  DB::PrintSplashScreen();
 
   // Get User Inputs
   std::cout << "========================================= " << std::endl;
@@ -211,7 +211,7 @@ int main(int argc, char** argv) {
 // Setup the Database
   std::cout << "========================================= " << std::endl;
   std::cout << "APP: Loading Default Database " << std::endl;
-  DBNEW *rdb = DBNEW::Get();
+  DB *rdb = DB::Get();
   if ( getenv("GLG4DATA") != NULL ) rdb->Load(string(getenv("GLG4DATA")));
   else rdb->Load(string("data"));
 
@@ -275,9 +275,9 @@ int main(int argc, char** argv) {
     G4UIExecutive* ui = new G4UIExecutive(argc, argv);
 
 #ifdef G4VIS_USE
-    UImanager->ApplyCommand("/control/execute " + DBNEW::GetDataPath() + "/init_vis.mac");
+    UImanager->ApplyCommand("/control/execute " + DB::GetDataPath() + "/init_vis.mac");
 #else
-    UImanager->ApplyCommand("/control/execute " + DBNEW::GetDataPath() + "/init.mac");
+    UImanager->ApplyCommand("/control/execute " + DB::GetDataPath() + "/init.mac");
 #endif
     // start the session here: make the Geant4 prompt Idle>
     // available to the user

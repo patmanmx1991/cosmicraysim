@@ -15,7 +15,7 @@ InputState(-1),
 fSourceBox(0)
 {
   std::cout << "FLX: Building CRY Generator" << std::endl;
-  DBTable table = DBNEW::Get()->GetTable("CRY", "config");
+  DBTable table = DB::Get()->GetTable("CRY", "config");
 
   // Setup Defaults
   fGenNeutrons  = true;
@@ -35,7 +35,7 @@ fSourceBox(0)
 
   fLateralBoxSize = -1; // This is tricker, define in GetSourceBox().
 
-  fDataDirectory = DBNEW::GetDataPath() + "/cry/";
+  fDataDirectory = DB::GetDataPath() + "/cry/";
 
   // Allow for overrides
   if (table.Has("gen_neutrons"))  fGenNeutrons = table.GetB("gen_neutrons");
@@ -135,7 +135,7 @@ G4Box* CRYPrimaryGenerator::GetSourceBox() {
   if (fSourceBox) return fSourceBox;
   std::cout << "FLX: --> Creating Source box" << std::endl;
 
-  std::vector<DBTable> targetlinks = DBNEW::Get()->GetTableGroup("FLUX");
+  std::vector<DBTable> targetlinks = DB::Get()->GetTableGroup("FLUX");
   for (uint i = 0; i < targetlinks.size(); i++) {
     DBTable tbl = (targetlinks[i]);
 
@@ -190,7 +190,7 @@ std::vector<G4Box*> CRYPrimaryGenerator::GetTargetBoxes() {
   std::cout << "FLX: --> Creating Target boxes" << std::endl;
 
   // If none set then make it
-  std::vector<DBTable> targetlinks = DBNEW::Get()->GetTableGroup("FLUX");
+  std::vector<DBTable> targetlinks = DB::Get()->GetTableGroup("FLUX");
   for (uint i = 0; i < targetlinks.size(); i++) {
     DBTable tbl = targetlinks[i];
 
@@ -253,6 +253,8 @@ void CRYPrimaryGenerator::GeneratePrimaries(G4Event* anEvent)
     gen->genEvent(vect);
     fExposureTime = gen->timeSimulated();
     fNthrows++;
+
+    // std::cout << " Throws : " << fNthrows << " Exposure : " << fExposureTime << std::endl;
 
     // Number of trajectories that intercept at least one targetbox
     stacksize = 0;

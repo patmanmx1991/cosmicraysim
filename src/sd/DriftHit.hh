@@ -66,7 +66,7 @@ public:
     void Draw();
     virtual const std::map<G4String,G4AttDef>* GetAttDefs() const;
     virtual std::vector<G4AttValue>* CreateAttValues() const;
-    virtual void Print() const;
+    // virtual void Print() const;
 
     void SetLayerID(G4int z) { fLayerID = z; }
     G4int GetLayerID() const { return fLayerID; }

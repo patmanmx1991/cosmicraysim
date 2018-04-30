@@ -8,7 +8,7 @@
 
 namespace COSMIC {
 G4VUserPhysicsList* PhysicsFactory::LoadPhysicsList() {
-  DBTable table = DBNEW::Get()->GetTable("GLOBAL", "config");
+  DBTable table = DB::Get()->GetTable("GLOBAL", "config");
   return LoadPhysicsList(table);
 }
 
@@ -26,6 +26,10 @@ G4VUserPhysicsList* PhysicsFactory::LoadPhysicsList(DBTable table) {
     physicsList = physListFactory->GetReferencePhysList(physics);
   }
 
+  if (table.Has("cuts")){
+    SetPhysicsListCuts(table.GetS("cuts"), physicsList);
+  }
+
   // If found just return good list
   if (physicsList) return physicsList;
 
@@ -34,13 +38,65 @@ G4VUserPhysicsList* PhysicsFactory::LoadPhysicsList(DBTable table) {
   throw;
 }
 
-G4Region* PhysicsFactory::LoadRegion(DBTable table) {
 
-  std::string indexname  = table.GetIndexName();
-  std::string regionname = table.GetS("region");
-  DBTable regtbl = DBNEW::Get()->GetTable("REGION", regionname);
+void PhysicsFactory::SetPhysicsListCuts(std::string cutname, G4VUserPhysicsList* list){
 
-  G4Region* reg = new G4Region(indexname + "_" + regionname);
+  std::cout << "PHY: --> Setting Custom Default Cuts : " << cutname << std::endl;
+  DBTable regtbl = DB::Get()->GetTable("CUTS", cutname);
+
+  // Get a default
+  G4double defaultcut = 0.1 * nm;
+  if (regtbl.Has("default_cut")) defaultcut = regtbl.GetG4D("default_cut");
+  list->SetCutValue( defaultcut, "gamma"   );
+  list->SetCutValue( defaultcut, "e-"      );
+  list->SetCutValue( defaultcut, "e+"      );
+  list->SetCutValue( defaultcut, "mu-"     );
+  list->SetCutValue( defaultcut, "mu+"     );
+  list->SetCutValue( defaultcut, "tau-"    );
+  list->SetCutValue( defaultcut, "tau+"    );
+  list->SetCutValue( defaultcut, "pi+"     );
+  list->SetCutValue( defaultcut, "pi-"     );
+  list->SetCutValue( defaultcut, "pi0"     );
+  list->SetCutValue( defaultcut, "proton"  );
+  list->SetCutValue( defaultcut, "neutron" );
+
+  // Get list of cuts/info for this region
+  if (regtbl.Has("gamma_cut"))
+    list->SetCutValue( regtbl.GetG4D("gamma_cut"), "gamma" );
+
+  if (regtbl.Has("electron_cut"))
+    list->SetCutValue( regtbl.GetG4D("electron_cut"), "e-" );
+  if (regtbl.Has("positron_cut"))
+    list->SetCutValue( regtbl.GetG4D("positron_cut"), "e+" );
+  if (regtbl.Has("muon_cut"))
+    list->SetCutValue( regtbl.GetG4D("muon_cut"), "mu-" );
+  if (regtbl.Has("antimuon_cut"))
+    list->SetCutValue( regtbl.GetG4D("antimuon_cut"), "mu+" );
+  if (regtbl.Has("tau_cut"))
+    list->SetCutValue( regtbl.GetG4D("tau_cut"), "tau-" );
+  if (regtbl.Has("antitau_cut"))
+    list->SetCutValue( regtbl.GetG4D("antitau_cut"), "tau+" );
+
+  if (regtbl.Has("piplus_cut"))
+    list->SetCutValue( regtbl.GetG4D("piplus_cut"), "pi+" );
+  if (regtbl.Has("piminus_cut"))
+    list->SetCutValue( regtbl.GetG4D("piminus_cut"), "pi-" );
+  if (regtbl.Has("pizero_cut"))
+    list->SetCutValue( regtbl.GetG4D("pizero_cut"), "pi0" );
+
+  if (regtbl.Has("proton_cut"))
+    list->SetCutValue( regtbl.GetG4D("proton_cut"), "proton" );
+  if (regtbl.Has("neutron_cut"))
+    list->SetCutValue( regtbl.GetG4D("neutron_cut"), "neutron" );
+
+  return;
+}
+
+G4ProductionCuts* PhysicsFactory::LoadProductionCuts(std::string cutname) {
+
+  std::cout << "PHY: --> Loading Custom Cuts : " << cutname << std::endl;
+  DBTable regtbl = DB::Get()->GetTable("CUTS", cutname);
+
   G4ProductionCuts* cuts = new G4ProductionCuts();
 
   // Get a default
@@ -89,9 +145,7 @@ G4Region* PhysicsFactory::LoadRegion(DBTable table) {
   if (regtbl.Has("neutron_cut"))
     cuts->SetProductionCut( regtbl.GetG4D("neutron_cut"), "neutron" );
 
-  reg->SetProductionCuts(cuts);
-
-  return reg;
+  return cuts;
 }
 
 

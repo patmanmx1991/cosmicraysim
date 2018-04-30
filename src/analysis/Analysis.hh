@@ -106,6 +106,8 @@ public:
   void SetOutputSubRun(int i){ fSubRunID = i; };
   void IncrementSubRun() { fSubRunID++; };
 
+  int GetNEvents(){ return fGeneratedEvents; };
+
   int GetNSavedEvents(){ return fSavedEvents; };
   
   void SetChunkSize(int i){ fChunkSize = i; };

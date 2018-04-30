@@ -27,7 +27,7 @@ void TriggerFactory::ConstructTriggers() {
   /// Get the DB Table Set
   std::cout << "===============================" << std::endl;
   std::cout << "TRG: Building Triggers " << std::endl;
-  std::vector<DBTable> tables_clone = DBNEW::Get()->GetTableGroup("TRIGGER");
+  std::vector<DBTable> tables_clone = DB::Get()->GetTableGroup("TRIGGER");
   std::vector<DBTable>::iterator trg_iter = tables_clone.begin();
 
   for (trg_iter = tables_clone.begin(); trg_iter != tables_clone.end(); trg_iter++) {

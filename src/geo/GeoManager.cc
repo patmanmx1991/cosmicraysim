@@ -64,7 +64,7 @@ GeoManager::GeoManager(){
 G4VPhysicalVolume* GeoManager::ConstructAll(){
   std::cout << "===============================" << std::endl;
   std::cout << "GEO: Building Geometry " << std::endl;
-  std::vector<DBTable> tables_clone = DBNEW::Get()->GetTableGroup("GEO");
+  std::vector<DBTable> tables_clone = DB::Get()->GetTableGroup("GEO");
   std::vector<DBTable>::iterator geo_iter = tables_clone.begin();
 
   int count = 0;

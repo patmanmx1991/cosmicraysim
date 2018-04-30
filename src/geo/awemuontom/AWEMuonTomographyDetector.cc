@@ -51,14 +51,14 @@ void AWEMuonTomographyDetector::Construct(DBTable table) {
   std::string fMotherName = table.GetS("mother");
 
   // Load the temporary DB from geo file
-  DBNEW* tdb = DBNEW::Get();
+  DB* tdb = DB::Get();
   tdb->CreateDataBase("vsc24");
   tdb->SelectDataBase("vsc24");
-  tdb->LoadFile(DBNEW::GetDataPath() + "/awe/muontomographydetector.geo");
+  tdb->LoadFile(DB::GetDataPath() + "/awe/muontomographydetector.geo");
 
 
   // Make the main logical volume (with mother and position/rotation overriden)
-  DBTable voltable = DBNEW::Get()->GetTable("GEO", "volume");
+  DBTable voltable = DB::Get()->GetTable("GEO", "volume");
   voltable.Set("name",   fName);
   voltable.Set("mother", fMotherName);
   if (table.Has("position"))
@@ -72,13 +72,13 @@ void AWEMuonTomographyDetector::Construct(DBTable table) {
   fPhysical = volume->GetPhysical();
 
   // Make the scintillator plane
-  DBTable tbl = DBNEW::Get()->GetTable("GEO", "scintillator_panel");
+  DBTable tbl = DB::Get()->GetTable("GEO", "scintillator_panel");
   tbl.SetIndexName(fName + "_scintillator_panel");
   fScintObject = new GeoBox(tbl);
   fSubObjects.push_back(fScintObject);
 
   // Make the drift chamber array
-  DBTable postable = DBNEW::Get()->GetTable("GEO", "chamber_positions");
+  DBTable postable = DB::Get()->GetTable("GEO", "chamber_positions");
   std::vector<std::string> fields = postable.GetFields();
 
   // Loop over all entries, look for chamber_${i}
@@ -94,7 +94,7 @@ void AWEMuonTomographyDetector::Construct(DBTable table) {
     std::vector<double> rotation = {posrot[3], posrot[4], posrot[5]};
 
     // Create the target by overloading table
-    DBTable chtemplate = DBNEW::Get()->GetTable("GEO", "drift_chamber");
+    DBTable chtemplate = DB::Get()->GetTable("GEO", "drift_chamber");
     chtemplate.SetIndexName(fName + "_" + chname);
     chtemplate.Set("position", position);
     chtemplate.Set("rotation", rotation);
@@ -228,22 +228,45 @@ bool AWEMuonTomographyProcessor::ProcessEvent(const G4Event* event) {
       ypos_yerr.push_back(fDriftChamberProcs[i]->GetErrY());
       ypos_zerr.push_back(fDriftChamberProcs[i]->GetErrZ());
       avgy += fDriftChamberProcs[i]->GetPosY();
-      avgz += fDriftChamberProcs[i]->GetErrZ();
+      avgz += fDriftChamberProcs[i]->GetPosZ();
     } else {
       xpos_x.push_back(fDriftChamberProcs[i]->GetPosX());
       xpos_z.push_back(fDriftChamberProcs[i]->GetPosZ());
       xpos_xerr.push_back(fDriftChamberProcs[i]->GetErrX());
       xpos_zerr.push_back(fDriftChamberProcs[i]->GetErrZ());
       avgx += fDriftChamberProcs[i]->GetPosX();
-      avgz += fDriftChamberProcs[i]->GetErrZ();
+      avgz += fDriftChamberProcs[i]->GetPosZ();
     }
     averagetime += fDriftChamberProcs[i]->GetTime();
   }
   averagetime /= fDriftChamberProcs.size();
 
   // Check at least 6 hits
-  if (xpos_x.size() < 3) return false;
-  if (ypos_y.size() < 3) return false;
+  if (xpos_x.size() < 3 || 
+      ypos_y.size() < 3) {
+
+    // Set default values
+    G4AnalysisManager* man = G4AnalysisManager::Instance();        
+    man->FillNtupleDColumn(fMuonTimeIndex, -999.9);
+
+    man->FillNtupleDColumn(fMuonPosXIndex, -999.9);
+    man->FillNtupleDColumn(fMuonPosYIndex, -999.9);
+    man->FillNtupleDColumn(fMuonPosZIndex, -999.9);
+
+    man->FillNtupleDColumn(fMuonPosErrXIndex, -999.9);
+    man->FillNtupleDColumn(fMuonPosErrYIndex, -999.9);
+    man->FillNtupleDColumn(fMuonPosErrZIndex, -999.9);
+
+    man->FillNtupleDColumn(fMuonMomXIndex, -999.9);
+    man->FillNtupleDColumn(fMuonMomYIndex, -999.9);
+    man->FillNtupleDColumn(fMuonMomZIndex, -999.9);
+
+    man->FillNtupleDColumn(fMuonMomErrXIndex, -999.9);
+    man->FillNtupleDColumn(fMuonMomErrYIndex, -999.9);
+    man->FillNtupleDColumn(fMuonMomErrZIndex, -999.9);
+
+    return false;
+  }
 
   avgx /= double(xpos_x.size());
   avgy /= double(ypos_y.size());
@@ -263,9 +286,16 @@ bool AWEMuonTomographyProcessor::ProcessEvent(const G4Event* event) {
 
   double values [6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
   double errors [6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-  values[0] = -cx-mx*avgz;
-  values[1] = -cy-my*avgz;
-  values[2] = avgz;
+  // values[0] = -cx-mx*avgz;
+  // values[1] = -cy-my*avgz;
+  // values[2] = avgz;
+  // values[3] = mx;
+  // values[4] = my;
+  // values[5] = 1.0;
+
+  values[0] = -cx;
+  values[1] = -cy;
+  values[2] = 0.0;
   values[3] = mx;
   values[4] = my;
   values[5] = 1.0;
@@ -282,6 +312,9 @@ bool AWEMuonTomographyProcessor::ProcessEvent(const G4Event* event) {
   fMuonMom    = G4ThreeVector(values[3], values[4], values[5]);
   fMuonMomErr = G4ThreeVector(errors[3], errors[4], errors[5]);
 
+  fMuonMomErr *= 1.0 / fMuonMom.mag();
+  fMuonMom    *= 1.0 / fMuonMom.mag();
+
   // Draw Track if in interactive
   G4VVisManager* pVVisManager = G4VVisManager::GetConcreteInstance();
   if (pVVisManager)
@@ -290,6 +323,7 @@ bool AWEMuonTomographyProcessor::ProcessEvent(const G4Event* event) {
     // std::cout << "MuonDir = " << fMuonMom[0] << " " << fMuonMom[1] << " " << fMuonMom[2] << std::endl;
     G4Polyline polyline;
     polyline.push_back( fMuonPos + 4.0 * m * fMuonMom );
+    polyline.push_back( fMuonPos );
     polyline.push_back( fMuonPos - 4.0 * m * fMuonMom );
 
     G4Colour colour(0., 1., 0.);
@@ -356,6 +390,8 @@ bool AWEMuonTomographyProcessor::ProcessEvent(const G4Event* event) {
 }
 
 
+
+
 // --------------------------------------------------------------------------
 namespace GlobalFitTrack{
 int npoints;
@@ -370,7 +406,10 @@ double FitTrack(const double *x) {
   G4double c = x[1];
   double totalres = 0.0;
   for (uint i = 0; i < GlobalFitTrack::npoints; i++) {
-    totalres += pow( (GlobalFitTrack::pointsy[i] - m * GlobalFitTrack::pointsx[i] + c )/GlobalFitTrack::errsy[i], 2);
+    totalres += pow( (GlobalFitTrack::pointsy[i] - m * GlobalFitTrack::pointsx[i] + c ),2);
+    // std::cout << "Track Error : " << GlobalFitTrack::errsy[i] << std::endl;
+     ///GlobalFitTrack::errsy[i], 2);
+    // totalres += pow( (GlobalFitTrack::pointsy[i] - m * GlobalFitTrack::pointsx[i] + c )/GlobalFitTrack::errsy[i], 2);
   }
   return totalres;
 }
@@ -395,13 +434,14 @@ void AWEMuonTomographyProcessor::GetMXC(G4double& m, G4double& me, G4double& c, 
   min->SetTolerance(0.01);
   ROOT::Math::Functor f(&FitTrack, 2);
   double step[2] = {0.01,0.01};
-  double variable[2] = {(maxy-miny)/(maxx-minx), GlobalFitTrack::pointsy[0]};
+  double variable[2] = {(maxy-miny)/(maxx-minx), (maxy+miny)/2.0 };
   min->SetFunction(f);
 
-  double maxgrad = 5*(maxy-miny)/(maxx-minx);
+  double maxgrad = 20*(maxy-miny)/(maxx-minx);
   double maxc = 2*(fabs(miny)+fabs(maxy));
-  min->SetLimitedVariable(0, "m", variable[0], step[0], -maxgrad, +maxgrad);
-  min->SetLimitedVariable(1, "c", variable[1], step[1], -maxc, +maxc);
+
+  min->SetVariable(0, "m", variable[0], step[0]); //, -maxgrad, +maxgrad);
+  min->SetVariable(1, "c", variable[1], step[1]); //, -maxc, +maxc);
 
   min->Minimize();
 

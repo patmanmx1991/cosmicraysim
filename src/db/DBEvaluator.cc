@@ -50,7 +50,7 @@ DBEvaluator::DBEvaluator()
   eval.setSystemOfUnits(meter, kilogram, second, ampere, kelvin, mole, candela);
 
   // Should register variables from inside the database here
-  std::vector<DBTable*> dtbls = DBNEW::Get()->GetLinkGroup("VARIABLE");
+  std::vector<DBTable*> dtbls = DB::Get()->GetLinkGroup("VARIABLE");
 
   for (uint i = 0; i < dtbls.size(); i++) {
     std::vector<std::string> fields = dtbls[i]->GetFields();

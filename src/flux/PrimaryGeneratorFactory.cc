@@ -9,7 +9,7 @@ namespace COSMIC{
 
 G4VUserPrimaryGeneratorAction* PrimaryGeneratorFactory::LoadGenerator(){
   // Get default config if requested
-  DBTable tbl = DBNEW::Get()->GetTable("GLOBAL","config");
+  DBTable tbl = DB::Get()->GetTable("GLOBAL","config");
   return LoadGenerator(tbl);
 }
 

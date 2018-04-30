@@ -13,7 +13,7 @@ ShuklaPrimaryGenerator::ShuklaPrimaryGenerator()
     std::cout << "FLX: Building Shukla Generator" << std::endl;
 
     // Setup Table
-    DBTable table = DBNEW::Get()->GetTable("SHUKLA", "config");
+    DBTable table = DB::Get()->GetTable("SHUKLA", "config");
 
     // Setup Defaults + Table Inputs
     fMinEnergy = 0.1;
@@ -185,7 +185,7 @@ void ShuklaPrimaryGenerator::GetSourceBox() {
     if (fSourceBox) return;
     std::cout << "FLX: --> Creating Source box" << std::endl;
 
-    std::vector<DBTable> targetlinks = DBNEW::Get()->GetTableGroup("FLUX");
+    std::vector<DBTable> targetlinks = DB::Get()->GetTableGroup("FLUX");
     for (uint i = 0; i < targetlinks.size(); i++) {
         DBTable tbl = targetlinks[i];
 
@@ -198,12 +198,11 @@ void ShuklaPrimaryGenerator::GetSourceBox() {
         fSourceBoxWidth    = G4ThreeVector(0.5 * size[0], 0.5 * size[1], 0.0);
         fSourceBoxPosition = G4ThreeVector(pos[0], pos[1], pos[2]);
 
-        fArea = size[0] * size[1];
+        fArea = size[0] * size[1] / m / m;
         break;
     }
     fSourceBox = true;
 
-    // fArea = fSourceBox->GetSurfaceArea() / 2. / m;
     if (fSourceBox) return;
 
     // Cant find
@@ -226,7 +225,7 @@ std::vector<G4Box*> ShuklaPrimaryGenerator::GetTargetBoxes() {
     std::cout << "FLX: --> Creating Target boxes" << std::endl;
 
     // If none set then make it
-    std::vector<DBTable> targetlinks = DBNEW::Get()->GetTableGroup("FLUX");
+    std::vector<DBTable> targetlinks = DB::Get()->GetTableGroup("FLUX");
     for (uint i = 0; i < targetlinks.size(); i++) {
         DBTable tbl = targetlinks[i];
 
@@ -336,7 +335,7 @@ void ShuklaPrimaryGenerator::GeneratePrimaries(G4Event* anEvent) {
     } while (!good_event and throws < 1E8);
 
     // Get exposure time
-    // std::cout << "Exposure Time = " << fNThrows << "," << fArea << " : " << fNThrows / fFluxIntegrated << " m^{2} s" << std::endl;
+    std::cout << "Exposure Time = " << fNThrows << "," << fArea << " : " << fNThrows / fFluxIntegrated << " m^{2} s" << std::endl;
     // std::cout << "Exposure Time : " << fNThrows / fFluxIntegrated / fArea << " s" << std::endl;
 
     // Generate Primary
@@ -346,6 +345,7 @@ void ShuklaPrimaryGenerator::GeneratePrimaries(G4Event* anEvent) {
     // std::cout << " --> Global Time " << global_time << G4endl;
 
 
+    /// This is incorrect. Need to incremenent the muon exposure time each throw using random stuff from Chris's code. 
     fMuonTime = fNThrows / fFluxIntegrated / fArea;
     fMuonDir = direction;
     fMuonPos = position;

@@ -27,7 +27,7 @@ void ProcessorFactory::ConstructProcessors() {
   /// Get the DB Table Set
   std::cout << "===============================" << std::endl;
   std::cout << "PRC: Building PROCESSORS " << std::endl;
-  std::vector<DBTable> tables_clone = DBNEW::Get()->GetTableGroup("PROCESSOR");
+  std::vector<DBTable> tables_clone = DB::Get()->GetTableGroup("PROCESSOR");
   std::vector<DBTable>::iterator trg_iter = tables_clone.begin();
   for (trg_iter = tables_clone.begin(); trg_iter != tables_clone.end(); trg_iter++) {
 

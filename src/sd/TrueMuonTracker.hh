@@ -57,15 +57,14 @@ public:
   inline G4double       GetTotEDep(){ return fTotEDep;  };
   inline int            GetMuonPDG(){ return fMuonPDG;  };
 
-
 protected:
   
   G4double      fMuonTime; ///< HM Muon Step Time
   G4ThreeVector fMuonMom;  ///< HM Muon Mom Vector
   G4ThreeVector fMuonPos;  ///< HM Muon Pos Vector
-  G4double      fMuonMomMag2; ///< HM Muon Mag (used for max check)
   G4double      fTotEDep;  ///< Total Energy Deposited this event
   int           fMuonPDG;  ///< Muon PDG Code
+  int           fNMuonHits; //< Number of deposits
 
 };
 
@@ -88,6 +87,9 @@ public:
   /// Process the information the tracker recieved for this event
   bool ProcessEvent(const G4Event* event);
 
+  /// Draw function
+  void DrawEvent();
+  
 protected:
 
   TrueMuonTracker* fTracker; ///< Pointer to associated tracker SD

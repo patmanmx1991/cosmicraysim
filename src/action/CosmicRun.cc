@@ -74,7 +74,7 @@ void CosmicRun::RecordEvent(const G4Event* event)
 
 void CosmicRun::Merge(const G4Run* aRun)
 {
-  const CosmicRun* localRun = static_cast<const CosmicRun*>(aRun);
+  // const CosmicRun* localRun = static_cast<const CosmicRun*>(aRun);
   G4Run::Merge(aRun);
 }
 

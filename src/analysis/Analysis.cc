@@ -15,13 +15,13 @@
 namespace COSMIC {
 
 Analysis::Analysis() :
-  fGeneratedEventsLimit(-1),
-  fSavedEventsLimit(-1),
-  fExposureTimeLimit(-1.0),
   fFluxProcessor(0),
-  fNTuplesSetup(0),
+  fSavedEventsLimit(-1),
+  fGeneratedEventsLimit(-1),
   fSavedEvents(0),
   fGeneratedEvents(0),
+  fExposureTimeLimit(-1.0),
+  fNTuplesSetup(0),
   fChunkSize(10000)
 {
 }
@@ -69,7 +69,7 @@ void Analysis::BeginOfRunAction(const G4Run* run) {
   fNTuplesSetup = true;
 }
 
-void Analysis::EndOfRunAction(const G4Run* run) {
+void Analysis::EndOfRunAction(const G4Run* /*run*/) {
   std::cout << "Writing" << std::endl;
   fG4Manager->Write();
   fG4Manager->CloseFile();
