@@ -212,6 +212,7 @@ The example below defines some variables, and then places GEO objects using the 
 }
 {
   name: "GEO",
+  index: "box1"
   type: "box",
   material: "G4_Ar",
   mother: "world",
@@ -221,6 +222,7 @@ The example below defines some variables, and then places GEO objects using the 
 }
 {
   name: "GEO",
+  index: "box2"
   type: "box",
   material: "G4_Ar",
   mother: "world",
@@ -233,7 +235,7 @@ The example below defines some variables, and then places GEO objects using the 
 
 ***CAUTION: All VARIABLE tables are loaded at once, regardless of whether they are kept in seperate tables. So bear that in mind when writing out a geometry file.***
 
-### Comments
+## Comments
 Comments can be added anywhere in a table by including non-JSON format '//' characters.
 
 ```
