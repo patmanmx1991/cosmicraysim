@@ -1,95 +1,95 @@
+// ---------------------------------------------------
+// World Geometry : 20 x 20 x 30 AIR
+// Then air and carbon base
+{
+  name: "GEO",
+  index: "world",
+  material: "G4_AIR",
+  size: ["3.*m", "3.0*m", "2.*m"],
+  type: "box",
+}
+
+// --------------------------------------------------
+// Detector
+{
+  name: "DETECTOR",
+  index: "scint",
+  type: "scintillator",
+}
+
+{
+  name: "DETECTOR",
+  index: "truemuon",
+  type: "truemuon",
+}
+
+{
+  name: "GEO",
+  index: "detector",
+  type: "box",
+  mother: "world",
+  material: "G4_AIR",
+  size: ["2.0*m","2.0*m","2.0*m"],
+  position: ["0.0*m","0.0","0.0"],
+  sensitive: "truemuon",	   
+}
+
+
+//--------------------------------------------
+// Main mother detector volume (for easy placement)
+{
+  name: "GEO",
+  index: "bar0",
+  type: "box",
+  mother: "detector",
+  material: "G4_PLASTIC_SC_VINYLTOLUENE",
+  size: ["4*cm","80*cm","10*cm"],
+  position: ["0.0","0.0","0.0"],
+  sensitive: "scint",
+}
+
+//----------------
+// Bar definitions
+{
+  name: "VARIABLE",
+  index: "detspacing",
+  offset: "-0.5*m",
+  spacing: "10*cm"
+  xsep: "80*cm",
+  lowbar: "5.0*cm"
+}
+{
+  name: "GEO",
+  index: "bar0",
+  type: "box",
+  mother: "detector",
+  material: "G4_PLASTIC_SC_VINYLTOLUENE",
+  size: ["4*cm","80*cm","10*cm"],
+  position: ["0.0","0.0","0.0*spacing+offset"],
+  sensitive: "scint",
+  color: [0.0,0.0,1.0],
+}
+{ name: "GEO", index: "bar1", clone: "bar0", position: ["0.0","0.0","1*spacing+offset"] }
+{ name: "GEO", index: "bar2", clone: "bar0", position: ["0.0","0.0","2*spacing+offset"] }
+{ name: "GEO", index: "bar3", clone: "bar0", position: ["0.0","0.0","3*spacing+offset"] }
+{ name: "GEO", index: "bar4", clone: "bar0", position: ["0.0","0.0","4*spacing+offset"] }
+
+{ name: "GEO", index: "bar5", clone: "bar0", position: ["xsep","0.0","offset+lowbar"] }
+{ name: "GEO", index: "bar6", clone: "bar0", position: ["-1.0*xsep","0.0","offset+lowbar"] }
+
+
+// ---------------------------------------------------
+// Flux Generator Source Location : Default is Shukla
+{
+  name: "FLUX",
+  index: "source_box",
+  size: ["3.0*m", "3.0*m", "0.5*m"],
+  position: ["0.0","0.0", "9.75*m"],
+}
+
 {
   name: "FLUX",
   index: "target_box_0",
-  position: [-2.0, 0.0, -1.8]
-  size: [0.78, 4.2, 4.2]
+  size: ["2.0*m","2.0*m","2.0*m"],
+  position: ["0.0*m","0.0","0.0"],
 }
-//{
-//  name: "GEO",
-//  index: "target_box_0",
-//  position: [-2.0, 0.0, -1.8]
-//  size: [0.78, 4.2, 4.2]
-//  mother: "world",
-//  type: "box",
-//}
-
-
-{
-  name: "FLUX",
-  index: "target_box_1",
-  position: [2.0, 0.0, -1.8]
-  size: [0.78, 4.2, 4.2]
-}
-//{
-//  name: "GEO",
-//  index: "target_box_1",
-//  position: [2.0, 0.0, -1.8]
-//  size: [0.78, 4.2, 4.2]
-//  mother: "world",
-//  type: "box",
-//  material: "G4_AIR",
-//}
-
-
-
-
-// ---------------------------------------------------
-// List of detector objects that could be created
-{
-	name: "DETECTOR",
-	index: "calo_0",
-	type:  "truemuon"
-}
-{ name: "DETECTOR", index: "calo_1", clone: "calo_0" }
-{ name: "DETECTOR", index: "calo_2", clone: "calo_0" }
-{ name: "DETECTOR", index: "calo_3", clone: "calo_0" }
-{ name: "DETECTOR", index: "calo_4", clone: "calo_0" }
-{ name: "DETECTOR", index: "calo_5", clone: "calo_0" }
-{ name: "DETECTOR", index: "calo_6", clone: "calo_0" }
-{ name: "DETECTOR", index: "calo_7", clone: "calo_0" }
-{ name: "DETECTOR", index: "calo_8", clone: "calo_0" }
-{ name: "DETECTOR", index: "calo_9", clone: "calo_0" }
-{ name: "DETECTOR", index: "calo_10", clone: "calo_0" }
-
-
-
-// ---------------------------------------------------
-// Detector Geometry : 3 2x2 argon trackers, one above, one either side
-{ 
-  name: "GEO",
-  index: "tracker_geom_R1"
-  mother: "world",
-  type: "box",
-  position: [-2.0, 0.0, -1.8]
-  rotation: [0.0, 0.0, 90.0]
-  size: [4.0, 0.75, 4.0]
-  material: "G4_AIR",
-}
-{ 
-  name: "GEO",
-  index: "tracker_geom_R1_0",
-  mother: "tracker_geom_R1",
-  type: "box"
-  position: [0.0,0.0,0.0],
-  rotation: [0.0,0.0,0.0],
-  sensitive: "calo_0",
-  size: [3.5,0.5,3.5],
-  material: "G4_Ar",
-  color: [0.2,0.2,1.0,0.5],
-}
-{ 
-  name: "GEO",
-  index: "tracker_geom_R2"
-  clone: "tracker_geom_R1"
-  position: [2.0, 0.0, -1.8]
-  rotation: [0.0, 0.0, 90.0]
-}
-{ 
-  name: "GEO",
-  index: "tracker_geom_R2_0",
-  clone: "tracker_geom_R1_0"
-  mother: "tracker_geom_R2",
-  sensitive: "calo_1",
-}
-
-
