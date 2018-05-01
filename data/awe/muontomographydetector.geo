@@ -45,6 +45,7 @@
   resolution_y: 0.01,
   resolution_x: 0.01,
   resolution_y: 0.01,
+//  wire_y: "3.0*cm",
   processor: 0,
   save: 0,
 }

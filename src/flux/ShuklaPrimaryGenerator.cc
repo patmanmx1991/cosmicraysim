@@ -335,7 +335,7 @@ void ShuklaPrimaryGenerator::GeneratePrimaries(G4Event* anEvent) {
     } while (!good_event and throws < 1E8);
 
     // Get exposure time
-    std::cout << "Exposure Time = " << fNThrows << "," << fArea << " : " << fNThrows / fFluxIntegrated << " m^{2} s" << std::endl;
+    // std::cout << "Exposure Time = " << fNThrows << "," << fArea << " : " << fNThrows / fFluxIntegrated << " m^{2} s" << std::endl;
     // std::cout << "Exposure Time : " << fNThrows / fFluxIntegrated / fArea << " s" << std::endl;
 
     // Generate Primary

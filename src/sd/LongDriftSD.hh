@@ -73,12 +73,18 @@ protected:
   G4double fResolutionX;
   G4double fResolutionY;
   G4double fResolutionZ;
+
   G4double fDetectorSizeX;
   G4double fDetectorSizeY;
   G4double fDetectorSizeZ;
+
   bool fRestrictX;
   bool fRestrictY;
   bool fRestrictZ;
+
+  G4double fWirePositionX;
+  G4double fWirePositionY;
+  G4double fWirePositionZ;
 
 };
 

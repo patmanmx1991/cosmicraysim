@@ -87,7 +87,8 @@ public:
     G4ThreeVector GetPos() const { return fWorldPos; }
     G4ThreeVector GetPosErr() const { return fWorldPosErr; }
 
-    
+  void SetGhost(bool g){ fGhost = g; };
+
 private:
     G4int fLayerID;
     G4double fTime;
@@ -95,6 +96,7 @@ private:
     G4ThreeVector fLocalPosErr;
     G4ThreeVector fWorldPos;
     G4ThreeVector fWorldPosErr;
+    bool fGhost;
 
 };
 

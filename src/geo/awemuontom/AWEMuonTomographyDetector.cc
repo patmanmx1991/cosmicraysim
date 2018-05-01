@@ -38,7 +38,7 @@
 #include "db/ROOTHeaders.hh"
 #include "G4Polyline.hh"
 
-#include "Minuit2/Minuit2Minimizer.h"
+// #include "Minuit2/Minuit2Minimizer.h"
 #include "Math/Functor.h"
 
 namespace COSMIC {

@@ -33,6 +33,10 @@ LongDriftSD::LongDriftSD(DBTable tbl):
     fDetectorSizeZ = 0.0;
     fHCID = -1;
 
+    fWirePositionX = tbl.Has("wire_x") ? tbl.GetG4D("wire_x") : -999.9;
+    fWirePositionY = tbl.Has("wire_y") ? tbl.GetG4D("wire_y") : -999.9;
+    fWirePositionZ = tbl.Has("wire_z") ? tbl.GetG4D("wire_z") : -999.9;
+    
     collectionName.push_back(GetID());
 }
 
@@ -63,6 +67,10 @@ LongDriftSD::LongDriftSD(std::string name, std::string id,
     fDetectorSizeY = 0.0;
     fDetectorSizeZ = 0.0;
     fHCID = -1;
+
+    fWirePositionX = -999.9;
+    fWirePositionY = -999.9;
+    fWirePositionZ = -999.9;
 
     collectionName.push_back(GetID());
 }
@@ -148,7 +156,27 @@ G4bool LongDriftSD::ProcessHits(G4Step* step, G4TouchableHistory* /*touch*/)
     hit->SetLocalPos(localPosP);
     hit->SetLocalPosErr(localPosE);
     hit->SetTime(preStepPoint->GetGlobalTime());
+    fHitsCollection->insert(hit);
 
+    /// Drift chambers only get a distance from the wire.
+    /// If a wire position in X/Y/Z is given, then make sure we place another one the other side.
+    if (fWirePositionX != -999.9){
+      localPosP[0] = fWirePositionX  - (localPosP[0]-fWirePositionX);
+    }
+    if (fWirePositionY != -999.9){
+      localPosP[1] = fWirePositionY  - (localPosP[1]-fWirePositionY);
+    }
+    if (fWirePositionZ != -999.9){
+      localPosP[2] = fWirePositionZ  - (localPosP[2]-fWirePositionZ);
+    }
+    worldPosP = trans_localtoworld.TransformPoint(localPosP);
+    hit = new DriftChamberHit(copyNo);
+    hit->SetWorldPos(worldPosP);
+    hit->SetWorldPosErr(worldPosE);
+    hit->SetLocalPos(localPosP);
+    hit->SetLocalPosErr(localPosE);
+    hit->SetTime(preStepPoint->GetGlobalTime());
+    hit->SetGhost(true);
     fHitsCollection->insert(hit);
 
     return true;

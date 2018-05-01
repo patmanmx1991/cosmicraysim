@@ -51,13 +51,13 @@ G4ThreadLocal G4Allocator<DriftChamberHit>* DriftChamberHitAllocator = 0;
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 DriftChamberHit::DriftChamberHit()
-    : G4VHit(), fLayerID(-1), fTime(0.), fLocalPos(0), fWorldPos(0)
+  : G4VHit(), fLayerID(-1), fTime(0.), fLocalPos(0), fWorldPos(0), fGhost(0)
 {}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 DriftChamberHit::DriftChamberHit(G4int z)
-    : G4VHit(), fLayerID(z), fTime(0.), fLocalPos(0), fWorldPos(0)
+  : G4VHit(), fLayerID(z), fTime(0.), fLocalPos(0), fWorldPos(0), fGhost(0)
 {}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -104,6 +104,9 @@ void DriftChamberHit::Draw()
         G4Box hitbox =  G4Box("hitbox", fabs(fWorldPosErr[0]), fabs(fWorldPosErr[1]), fabs(fWorldPosErr[2]));
         G4Transform3D tr = G4Transform3D(G4RotationMatrix(), fWorldPos);
         G4Colour colour(0., 1., 0.);
+	if (fGhost){
+	  colour = G4Colour(0.5, 1., 0.);
+	}
         G4VisAttributes attribs(colour);
         pVVisManager->Draw(hitbox, attribs, tr);
     }
