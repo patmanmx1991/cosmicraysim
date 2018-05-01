@@ -1,6 +1,6 @@
 # Choosing a Cosmic Flux Generator
 
-Cosmic Ray Sim is setup to easily include multiple flux generators. The type of generator is loaded at runtime by specifying its name in the "data/global.db" configuration table.
+Cosmic Ray Sim is setup to easily include multiple flux generators. The type of generator is loaded at runtime by specifying its name in the "GLOBAL"  configuration table.
 ```
 {
   name: "GLOBAL",
@@ -26,19 +26,19 @@ If loaded the generator itself will look for some further tables in the DB. Thes
 {
   name: "SHUKLA",
   index: "config",
-  // parameters: "nottingham",
-  // min_energy: 0.1,
-  // max_energy: 5000.,
-  // I0: 88.5,
-  // n: 3.0,
-  // E0: 4.28,
-  // epsilon: 854.,
-  // radius: 6371.,
-  // distance: 36.61,
+  parameters: "nottingham",
+  min_energy: 0.1,
+  max_energy: 5000.,
+  I0: 88.5,
+  n: 3.0,
+  E0: 4.28,
+  epsilon: 854.,
+  radius: 6371.,
+  distance: 36.61,
 }
 ```
 
-The commented out fields show the defaults which are loaded inside the generator. This table is usually kept in the database itself so the user doesn't have to provide it. If you want to edit any of these uncomment the line and change the value. Their descriptions are below.
+The commented out fields show the defaults which are loaded inside the generator. This table is usually kept in the database itself so the user doesn't have to provide it. If you want to edit any of these uncomment the line and change the value. Their descriptions are below. Each field assumes a unit to match the shukla paper, so its best not to use your own units in the entries.
 
 - **parameters**: Use a hard coded parameter set, each of the ones shown in the energy fit table in the Shukla paper are shown. 
 Options are : "nottingham", "princealbert", "hamburg", "proton", "helium". 
@@ -55,14 +55,16 @@ It is also possible to load the parameter set, then change one parameter by incl
 
 ### FLUX : source_box (required)
 
-So that CosmicRaySim knows where to generate the particles in your custom geometry the user needs to specify a source box. Particles will then be generated on the surface of this box. An example box and the options required are below
+So that CosmicRaySim knows where to generate the particles in your custom geometry the user needs to specify a source box. Particles will then be generated on by randomly throwing in X and Y in this box. An example box and the options required are below
 
 ```
 {
   name: "FLUX",
   index: "source_box",
   size: [30.0,30.0, 0.5],
+  size_units: "m",
   position: [0.0,0.0, 4.75],
+  position_units: "m",
 }
 ```
 
@@ -82,6 +84,7 @@ The Shukla generator also lets you skip over trajectories that are pointing away
   index: "target_box_0",
   position: [-2.0, 0.0, -1.8]
   size: [0.78, 4.2, 4.2]
+  units: "m",
 }
 ```
 
@@ -100,12 +103,14 @@ The generator looks for any FLUX tables which have "target_box_" in them. So mul
   index: "target_box_0",
   position: [-2.0, 0.0, -1.8]
   size: [0.78, 4.2, 4.2]
+  units: "m",
 }
 {
   name: "FLUX",
   index: "target_box_1",
   position: [2.0, 0.0, -1.8]
   size: [0.78, 4.2, 4.2]
+  units: "m",
 }
 ```
 
@@ -127,17 +132,17 @@ The CRY config table just provides the standard settings that the CRY libraries 
 {
   name: "CRY",
   index: "config",
-  //min_particles: -1,
-  //max_particles: -1,
-  //gen_neutrons: 1,
-  //gen_protons: 1,
-  //gen_gammas: 1,
-  //gen_electrons: 1,
-  //gen_muons: 1,
-  //gen_pions: 1,
-  //latitude: 0.0,
-  //altitude: 0.0,
-  //date: "1-1-2007",
+  min_particles: -1,
+  max_particles: -1,
+  gen_neutrons: 1,
+  gen_protons: 1,
+  gen_gammas: 1,
+  gen_electrons: 1,
+  gen_muons: 1,
+  gen_pions: 1,
+  latitude: 0.0,
+  altitude: 0.0,
+  date: "1-1-2007",
 }
 ```
 
@@ -164,6 +169,7 @@ So that CosmicRaySim knows where to generate the particles in your custom geomet
   index: "source_box",
   size: [30.0,30.0, 0.5],
   position: [0.0,0.0, 4.75],
+  units: "m",
 }
 ```
 
@@ -186,6 +192,7 @@ Since the CRY generator can produce multiple primaries (unlike the Shukla genera
   index: "target_box_0",
   position: [-2.0, 0.0, -1.8]
   size: [0.78, 4.2, 4.2]
+  units: "m",
 }
 ```
 
@@ -204,11 +211,13 @@ The generator looks for any FLUX tables which have "target_box_" in them. So mul
   index: "target_box_0",
   position: [-2.0, 0.0, -1.8]
   size: [0.78, 4.2, 4.2]
+  units: "m",
 }
 {
   name: "FLUX",
   index: "target_box_1",
   position: [2.0, 0.0, -1.8]
   size: [0.78, 4.2, 4.2]
+  units: "m",
 }
 ```

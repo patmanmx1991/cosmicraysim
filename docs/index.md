@@ -21,8 +21,10 @@ It includes options for different cosmic ray generators and physics lists which 
 - [Editing DB Tables](user-guide/editingtables.md)
 - [Making a Geometry](user-guide/makinggeometry.md)
 - [Choosing a Flux](user-guide/choosingflux.md)
-- [Choosing a Physics List](user-guide/choosingphysics.md)
-- [Adding Detectors](user-guide/addingdetectors.md)
+- [Defining Physics List](user-guide/choosingphysics.md)
+- [Defining Detectors](user-guide/addingdetectors.md)
+- [Loading Triggers](user-guide/addingtriggers.md)
+- [Defining Processors](user-guide/addingprocessors.md)
 
 ## Developers Guide
 - [Accessing Database](developers-guide/databaseaccess.md)
