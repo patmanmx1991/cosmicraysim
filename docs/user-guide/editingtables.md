@@ -61,7 +61,6 @@ The JSON reader can load many different data types, but gets a bit upset when th
   integer_value_1: 1,
   integer_value_2: -1,
 ```
-- Make sure it has no trailing decimel.
 
 #### Real
 ```
@@ -69,7 +68,6 @@ The JSON reader can load many different data types, but gets a bit upset when th
   real_value_2: -1.0,
   real_value_3:  2.,
 ```
-- Make sure it has a trailing decimal
 
 #### String
 ```
@@ -82,6 +80,99 @@ The JSON reader can load many different data types, but gets a bit upset when th
   vector_real: [1.6, 2.8, 9.2, 4.5],
   vector_string: ["first_string", "second_string"],
 ```
+
+## Duplicate Tables
+When the run database is loaded at program start each of the tables found in the JSON files is loaded a vector. When this happens, for each new table the vector is checked to see if the name/index combination already exists. If it does, then the existing table is replaced. This means any table given in the default database can simply be overriden by duplicating it in the users geometry file and editing the values in it.
+
+E.g. if you want to use the CRY generator instead of the default Shukla generator, then it can simply be chosen by making a new global config table in the users custom geometry file.
+```
+{
+  name: "GLOBAL",
+  index: "config",
+  flux: "shukla",
+  physics: "shielding",
+}
+```
+
+## DBEvaluator
+The JSON database uses a copy of the G4GDMLEvaluator to expand string inputs and convert them to G4Double's. Many entries in the code will require a double with associated units, and its a bit awkward covering all user specified cases of what those units may need to be. If a integer or double value is requested by the code but it ends up finding a string in the database, then it will automatically evaluate that string to get a double/int.
+
+### Evaluations
+For example, the following tables are equivalent
+```
+{
+  ...
+  myvalue: 1.0
+  ...
+}
+{
+  ...
+  myvalue: "1.0"
+  ...
+}
+{
+  ...
+  myvalue: "0.5*2.0"
+  ...
+}
+```
+
+
+### Entry Units
+In addition, standard GEANT4 units can be given inside these strings, allowing them to be used in geometry definitions.
+```
+{
+  ...
+  mydistance: "2.0*cm",
+  myposition: ["5.0*m","2.0*cm","1.0*mm"],
+  ...
+}
+```
+
+In some cases it is awkward to explicitly write out the units in a vector, so extra uniform units can be given by specifying "value_units".
+The following tables are equivalent
+```
+{
+  ...
+  mydistance: "2.0*m",
+  myposition: ["5.0*m","2.0*m","1.0*m"],
+  ...
+}
+{
+  ...
+  mydistance: 2.0,
+  mydistance_units: "m",
+  myposition: [5.0, 2.0, 1.0],
+  myposition_units: "m",
+  ...
+}
+{
+  ...
+  mydistance: 1.0,
+  mydistance_units: "2*m",
+  myposition: [2.5, 1.0, 0.5],
+  myposition_units: "2*m",
+  ...
+}
+```
+
+
+### Default Units
+If a table contains values of only a single type, you can cheat and set the units for all entries evaluated in that table by adding a field called "units". For example, say I have a table containing 12 positions, but I don't want to have to write out what the units are for each one because I know they should all be in meters.
+```
+{
+  ...
+  pos1: [0.0, 0.5, 0.5],
+  pos2: [0.0, 0.6, 0.5],
+  ...
+  pos24: [0.5, 0.2, 0.1],
+  units: "m",
+  ...
+}
+```
+
+CAUTION: If your table contains more than one type of unit then this is risky, as the scaling is applied to all. E.g. If you use this in a TUBS geometry object, then it will apply the units "m" to the length, but also to any angular values that may be read. Only use for tables you definitely know are in common units.
+
 
 
 ## Comments

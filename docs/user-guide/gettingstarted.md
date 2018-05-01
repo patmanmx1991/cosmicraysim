@@ -7,14 +7,20 @@ This application is used to load geometry databases and produce outputs. The str
 
 The options for the application are:
 ```
-cosmicraysim -n NEvents -o outputfile [-h] [-i] [-m] [-g tablefile] [-g tablefile2] ...
+cosmicraysim -n NEvents -g tablefile [-h] [-i] [-n nevents] [-j ntriggs] [-t exposur] [-c chunksz] [-o outtag] [-g tablefile2] 
+             [--run runnumber] [--subrun subrunnumber]
 
-     -n NEvents     : Specify how many events to generate in batch mode
-     -o outputfile  : Specifiy name of the output file
-   [ -h ]           : Print this help message
-   [ -i ]           : Open the Geant4 Visualisation Manager
-   [ -m ]           : Run a Geant4 Macro
-   [ -g tablefile ] : Load a JSON table file, can be used multiple times
+ -n nevents : Events to generate
+ -j ntriggs : Triggers to generate
+ -t exposur : Exposure to generate
+ -c chunksz : Event chunk size for exposure/trigger mode
+ -s seed    : Seed. Default is -1, meaning get from time+pid
+ -o outtag  : Output File Tag. Will create file : outtag.run.subrun.root 
+ -i         : Flag. Run in interactive mode.
+ -g geofile : Load a geometry JSON file. Can use multiple times.
+ --run    r : Set Run ID Manually
+ --subrun r : Set Sub Run ID Manually
+
 
 ```
 
