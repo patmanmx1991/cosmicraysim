@@ -59,12 +59,12 @@ public:
 
     const DriftChamberHit& operator=(const DriftChamberHit &right);
     int operator==(const DriftChamberHit &right) const;
-    
+
     inline void *operator new(size_t);
     inline void operator delete(void *aHit);
-    
+
     void Draw();
-    virtual const std::map<G4String,G4AttDef>* GetAttDefs() const;
+    virtual const std::map<G4String, G4AttDef>* GetAttDefs() const;
     virtual std::vector<G4AttValue>* CreateAttValues() const;
     // virtual void Print() const;
 
@@ -83,12 +83,12 @@ public:
     void SetWorldPosErr(G4ThreeVector xyz) { fWorldPosErr = xyz; }
     G4ThreeVector GetWorldPos() const { return fWorldPos; }
     G4ThreeVector GetWorldPosErr() const { return fWorldPosErr; }
-    
+
     G4ThreeVector GetPos() const { return fWorldPos; }
     G4ThreeVector GetPosErr() const { return fWorldPosErr; }
 
-  void SetGhost(bool g){ fGhost = g; };
-
+    void SetGhost(bool g) { fGhost = g; };
+    bool IsGhost() { return fGhost; };
 private:
     G4int fLayerID;
     G4double fTime;

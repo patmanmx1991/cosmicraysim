@@ -1,7 +1,7 @@
 {
   name: "GLOBAL",
   index: "config",
-  flux: "shukla",
+  flux: "cry",
   physics: "shielding",
   batchcommands: "",
 }

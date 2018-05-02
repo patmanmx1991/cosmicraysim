@@ -3,6 +3,19 @@
 #include "db/DBTable.hh"
 #include "DriftHit.hh"
 
+#include "G4VVisManager.hh"
+#include "G4VisAttributes.hh"
+#include "G4Circle.hh"
+#include "G4Colour.hh"
+#include "G4Square.hh"
+#include "G4AttDefStore.hh"
+#include "G4AttDef.hh"
+#include "G4AttValue.hh"
+#include "G4UIcommand.hh"
+#include "G4UnitsTable.hh"
+#include "G4SystemOfUnits.hh"
+#include "G4ios.hh"
+#include "G4Box.hh"
 namespace COSMIC {
 
 //------------------------------------------------------------------
@@ -36,8 +49,10 @@ LongDriftSD::LongDriftSD(DBTable tbl):
     fWirePositionX = tbl.Has("wire_x") ? tbl.GetG4D("wire_x") : -999.9;
     fWirePositionY = tbl.Has("wire_y") ? tbl.GetG4D("wire_y") : -999.9;
     fWirePositionZ = tbl.Has("wire_z") ? tbl.GetG4D("wire_z") : -999.9;
-    
+
     collectionName.push_back(GetID());
+    collectionName.push_back(GetID() + "_ghost");
+
 }
 
 LongDriftSD::LongDriftSD(std::string name, std::string id,
@@ -87,6 +102,10 @@ G4int LongDriftSD::GetHCID() {
     return fHCID;
 }
 
+G4int LongDriftSD::GetGhostHCID() {
+    if (fHCID < 0) fHCID = G4SDManager::GetSDMpointer()->GetCollectionID(GetID());
+    return fGhostHCID;
+}
 
 G4bool LongDriftSD::ProcessHits(G4Step* step, G4TouchableHistory* /*touch*/)
 {
@@ -160,24 +179,34 @@ G4bool LongDriftSD::ProcessHits(G4Step* step, G4TouchableHistory* /*touch*/)
 
     /// Drift chambers only get a distance from the wire.
     /// If a wire position in X/Y/Z is given, then make sure we place another one the other side.
-    if (fWirePositionX != -999.9){
-      localPosP[0] = fWirePositionX  - (localPosP[0]-fWirePositionX);
+    if (fWirePositionX != -999.9 ||
+            fWirePositionY != -999.9 ||
+            fWirePositionZ != -999.9) {
+
+        G4double updateX = fWirePositionX  - (localPosP[0] - fWirePositionX);
+        if (fWirePositionX != -999.9 && fabs(updateX) < fDetectorSizeX) {
+            localPosP[0] = updateX;
+        }
+        G4double updateY = fWirePositionY  - (localPosP[1] - fWirePositionY);
+        if (fWirePositionY != -999.9 && fabs(updateY) < fDetectorSizeY) {
+            localPosP[1] = updateY;
+        }
+        G4double updateZ = fWirePositionZ  - (localPosP[0] - fWirePositionZ);
+        if (fWirePositionZ != -999.9 && fabs(updateZ) < fDetectorSizeZ) {
+            localPosP[2] = updateZ;
+        }
+
+        worldPosP = trans_localtoworld.TransformPoint(localPosP);
+        hit = new DriftChamberHit(copyNo);
+        hit->SetWorldPos(worldPosP);
+        hit->SetWorldPosErr(worldPosE);
+        hit->SetLocalPos(localPosP);
+        hit->SetLocalPosErr(localPosE);
+        hit->SetTime(preStepPoint->GetGlobalTime());
+        hit->SetGhost(true);
+        fHitsCollection->insert(hit);
     }
-    if (fWirePositionY != -999.9){
-      localPosP[1] = fWirePositionY  - (localPosP[1]-fWirePositionY);
-    }
-    if (fWirePositionZ != -999.9){
-      localPosP[2] = fWirePositionZ  - (localPosP[2]-fWirePositionZ);
-    }
-    worldPosP = trans_localtoworld.TransformPoint(localPosP);
-    hit = new DriftChamberHit(copyNo);
-    hit->SetWorldPos(worldPosP);
-    hit->SetWorldPosErr(worldPosE);
-    hit->SetLocalPos(localPosP);
-    hit->SetLocalPosErr(localPosE);
-    hit->SetTime(preStepPoint->GetGlobalTime());
-    hit->SetGhost(true);
-    fHitsCollection->insert(hit);
+
 
     return true;
 }
@@ -189,7 +218,10 @@ void LongDriftSD::DrawAll() {
     for (int ihit = 0; ihit < nhits; ihit++) {
         ( *(fHitsCollection) )[ihit]->Draw();
     }
-
+    // nhits = (int) fGhostCollection->GetSize();
+    // for (int ihit = 0; ihit < nhits; ihit++) {
+    //     ( *(fGhostCollection) )[ihit]->Draw();
+    // }
 }
 
 void LongDriftSD::SetLogicalVolume(G4LogicalVolume* logic, G4VPhysicalVolume* physical) {
@@ -248,35 +280,76 @@ bool LongDriftProcessor::ProcessEvent(const G4Event* event) {
     if (nhits < 1) {
         return false;
     }
-
     G4double T = (event->GetPrimaryVertex())->GetT0();
+    int ngoodhits = 0;
+    int nghosthits = 0;
+    if (nhits > 0) {
+        for (int ihit = 0; ihit < nhits; ihit++) {
 
-    for (int ihit = 0; ihit < nhits; ihit++) {
+            fTime += (( ( *(hc) )[ihit]->GetTime() / ns) - T / ns);
 
-        fTime += (( ( *(hc) )[ihit]->GetTime() / ns) - T / ns);
+            G4ThreeVector pos = ( *(hc) )[ihit]->GetPos();
+            if (!(*(hc))[ihit]->IsGhost()) {
+                fPosX += pos[0];
+                fPosY += pos[1];
+                fPosZ += pos[2];
 
-        G4ThreeVector pos = ( *(hc) )[ihit]->GetPos();
-        fPosX += pos[0];
-        fPosY += pos[1];
-        fPosZ += pos[2];
+                G4ThreeVector err = ( *(hc) )[ihit]->GetPosErr();
+                fErrX += err[0];
+                fErrY += err[1];
+                fErrZ += err[2];
+                ngoodhits++;
+            } else {
+                G4ThreeVector pos = ( *(hc) )[ihit]->GetPos();
+                fGhostPosX += pos[0];
+                fGhostPosY += pos[1];
+                fGhostPosZ += pos[2];
 
-        G4ThreeVector err = ( *(hc) )[ihit]->GetPosErr();
-        fErrX += err[0];
-        fErrY += err[1];
-        fErrZ += err[2];
-
+                G4ThreeVector err = ( *(hc) )[ihit]->GetPosErr();
+                fGhostErrX += err[0];
+                fGhostErrY += err[1];
+                fGhostErrZ += err[2];
+                nghosthits++;
+            }
+        }
     }
+    fPosX /= double(ngoodhits);
+    fPosY /= double(ngoodhits);
+    fPosZ /= double(ngoodhits);
+    fErrX /= double(ngoodhits);
+    fErrY /= double(ngoodhits);
+    fErrZ /= double(ngoodhits);
 
-    // Now average
-    fTime /= nhits + 0.;
+    fGhostPosX /= double(nghosthits);
+    fGhostPosY /= double(nghosthits);
+    fGhostPosZ /= double(nghosthits);
+    fGhostErrX /= double(nghosthits);
+    fGhostErrY /= double(nghosthits);
+    fGhostErrZ /= double(nghosthits);
 
-    fPosX /= nhits + 0.;
-    fPosY /= nhits + 0.;
-    fPosZ /= nhits + 0.;
 
-    fErrX /= nhits + 0.;
-    fErrY /= nhits + 0.;
-    fErrZ /= nhits + 0.;
+
+    // G4VVisManager* pVVisManager = G4VVisManager::GetConcreteInstance();
+    // if (pVVisManager)
+    // {
+    //     G4Square square(G4ThreeVector(fPosX, fPosY, fPosZ));
+    //     square.SetScreenSize(6);
+    //     square.SetFillStyle(G4Square::filled);
+    //     G4Colour colour(1., 0., 0.);
+    //     G4VisAttributes attribs(colour);
+    //     square.SetVisAttributes(attribs);
+    //     pVVisManager->Draw(square);
+
+    //     G4Square square2(G4ThreeVector(fGhostPosX, fGhostPosY, fGhostPosZ));
+    //     square2.SetScreenSize(6);
+    //     square2.SetFillStyle(G4Square::filled);
+    //     G4Colour colour2(1., 0., 0.);
+    //     G4VisAttributes attribs2(colour2);
+    //     square2.SetVisAttributes(attribs2);
+    //     pVVisManager->Draw(square2);
+    // }
+
+
 
     // Register Trigger State
     fHasInfo = nhits > 0.0;
@@ -289,7 +362,6 @@ bool LongDriftProcessor::ProcessEvent(const G4Event* event) {
 
         // Fill muon vectors
         G4AnalysisManager* man = G4AnalysisManager::Instance();
-        std::cout << "Filling processor " << GetID() << std::endl;
 
         man->FillNtupleDColumn(fTimeIndex, fTime);
         man->FillNtupleDColumn(fPosXIndex, fPosX);
@@ -304,7 +376,6 @@ bool LongDriftProcessor::ProcessEvent(const G4Event* event) {
 
         // Set default values
         G4AnalysisManager* man = G4AnalysisManager::Instance();
-        std::cout << "Filling processor " << GetID() << std::endl;
 
         man->FillNtupleDColumn(fEdepIndex, -999.);
         man->FillNtupleDColumn(fTimeIndex, -999.);
@@ -329,6 +400,12 @@ void LongDriftProcessor::Reset() {
     fErrX = 0.0;
     fErrY = 0.0;
     fErrZ = 0.0;
+    fGhostPosX = 0.0;
+    fGhostPosY = 0.0;
+    fGhostPosZ = 0.0;
+    fGhostErrX = 0.0;
+    fGhostErrY = 0.0;
+    fGhostErrZ = 0.0;
 }
 
 

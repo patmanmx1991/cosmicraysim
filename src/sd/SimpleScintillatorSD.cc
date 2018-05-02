@@ -52,8 +52,9 @@ void SimpleScintillatorSD::Initialize(G4HCofThisEvent* hce)
 G4bool SimpleScintillatorSD::ProcessHits(G4Step* step, G4TouchableHistory* touch) {
 
     G4double edep = step->GetTotalEnergyDeposit();
-    if (edep == 0.) return false;
-
+    if (edep <= 0.) {
+        return false;
+    }
     G4Track* track = step->GetTrack();
     int pdg = track->GetParticleDefinition()->GetPDGEncoding();
 

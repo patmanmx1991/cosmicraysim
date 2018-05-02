@@ -70,6 +70,7 @@ void AWEMuonTomographyDetector::Construct(DBTable table) {
   fPhysical = volume->GetPhysical();
 
   // Make the scintillator plane
+  std::cout << "GEO: --> Making scintillator panel" << std::endl;
   DBTable tbl = DB::Get()->GetTable("GEO", "scintillator_panel");
   tbl.SetIndexName(fName + "_scintillator_panel");
   fScintObject = new GeoBox(tbl);
@@ -79,6 +80,7 @@ void AWEMuonTomographyDetector::Construct(DBTable table) {
   DBTable postable = DB::Get()->GetTable("GEO", "chamber_positions");
   std::vector<std::string> fields = postable.GetFields();
 
+  std::cout << "GEO: --> Making chambers" << std::endl;
   // Loop over all entries, look for chamber_${i}
   for (uint i = 0; i < 18; i++) {
     std::string chname = "chamber_" + std::to_string(i);
@@ -87,23 +89,32 @@ void AWEMuonTomographyDetector::Construct(DBTable table) {
     // if (chname.find("chamber_") == std::string::npos) continue;
 
     // Get position
+    std::cout << "Getting vec d "<< chname << std::endl;
     std::vector<double> posrot = postable.GetVecD(chname);
     std::vector<double> position = {posrot[0], posrot[1], posrot[2]};
     std::vector<double> rotation = {posrot[3], posrot[4], posrot[5]};
 
     // Create the target by overloading table
+    std::cout << "Getting vec d "<< chname << std::endl;
+
     DBTable chtemplate = DB::Get()->GetTable("GEO", "drift_chamber");
+    
     chtemplate.SetIndexName(fName + "_" + chname);
+    std::cout << "Getting vec d "<< chname << std::endl;
+    
     chtemplate.Set("position", position);
+    
+    std::cout << "Getting vec d "<< chname << std::endl;
     chtemplate.Set("rotation", rotation);
 
+    std::cout << "Getting vec d "<< chname << std::endl;
     GeoBox* obj = new GeoBox(chtemplate);
     fSubObjects.push_back(obj);
     fDriftObjects.push_back(obj);
   }
-
   // Register an AWEMuonTomographyProcessor to combine hits and return trigger
   if (!table.Has("processor") or table.GetB("processor")) {
+    std::cout << "GEO: --> Making processor" << std::endl;
     Analysis::Get()->RegisterProcessor(new AWEMuonTomographyProcessor(this));
   }
 
@@ -166,15 +177,18 @@ bool AWEMuonTomographyProcessor::ProcessEvent(const G4Event* event) {
 
   // Get the processor from the scintillator
   fScintProc->ProcessEvent(event);
-  if (!fScintProc->HasInfo()) return false;
+  bool hasvalue = fScintProc->HasInfo();
+  if (!fScintProc->HasInfo()) {
+    return false;
+  }
 
   // Threshold cut
-  G4double scintenergy = fScintProc->GetEnergy();
-  if (scintenergy < 1.0 * eV) return false;
+  // G4double scintenergy = fScintProc->GetEnergy();
+  // std::cout << "Cint energy : " << fScintProc->GetEnergy() << std::endl;
+  // if (scintenergy < 1.0 * eV) return false;
 
   // No processors have been automatically handled for the drift chamber objects
   // We have to manually get the HitPosition from each
-
   int fNHitPositions;
   std::vector<double> fTimes;
   std::vector<G4ThreeVector> fHitPositions;
@@ -225,26 +239,34 @@ bool AWEMuonTomographyProcessor::ProcessEvent(const G4Event* event) {
       ypos_z.push_back(fDriftChamberProcs[i]->GetPosZ());
       ypos_yerr.push_back(fDriftChamberProcs[i]->GetErrY());
       ypos_zerr.push_back(fDriftChamberProcs[i]->GetErrZ());
-      avgy += fDriftChamberProcs[i]->GetPosY();
-      avgz += fDriftChamberProcs[i]->GetPosZ();
+
+      ypos_y.push_back(fDriftChamberProcs[i]->GetGhostPosY());
+      ypos_z.push_back(fDriftChamberProcs[i]->GetGhostPosZ());
+      ypos_yerr.push_back(fDriftChamberProcs[i]->GetGhostErrY());
+      ypos_zerr.push_back(fDriftChamberProcs[i]->GetGhostErrZ());
     } else {
       xpos_x.push_back(fDriftChamberProcs[i]->GetPosX());
       xpos_z.push_back(fDriftChamberProcs[i]->GetPosZ());
       xpos_xerr.push_back(fDriftChamberProcs[i]->GetErrX());
       xpos_zerr.push_back(fDriftChamberProcs[i]->GetErrZ());
-      avgx += fDriftChamberProcs[i]->GetPosX();
-      avgz += fDriftChamberProcs[i]->GetPosZ();
+
+      xpos_x.push_back(fDriftChamberProcs[i]->GetGhostPosX());
+      xpos_z.push_back(fDriftChamberProcs[i]->GetGhostPosZ());
+      xpos_xerr.push_back(fDriftChamberProcs[i]->GetGhostErrX());
+      xpos_zerr.push_back(fDriftChamberProcs[i]->GetGhostErrZ());
     }
     averagetime += fDriftChamberProcs[i]->GetTime();
   }
   averagetime /= fDriftChamberProcs.size();
 
   // Check at least 6 hits
-  if (xpos_x.size() < 3 || 
-      ypos_y.size() < 3) {
+  if ((xpos_x.size() != 3 ||
+       ypos_y.size() != 3) and
+      (xpos_x.size() != 6 ||
+       ypos_y.size() != 6)) {
 
     // Set default values
-    G4AnalysisManager* man = G4AnalysisManager::Instance();        
+    G4AnalysisManager* man = G4AnalysisManager::Instance();
     man->FillNtupleDColumn(fMuonTimeIndex, -999.9);
 
     man->FillNtupleDColumn(fMuonPosXIndex, -999.9);
@@ -270,26 +292,25 @@ bool AWEMuonTomographyProcessor::ProcessEvent(const G4Event* event) {
   avgy /= double(ypos_y.size());
   avgz /= double(xpos_x.size() + ypos_y.size());
 
-  // Set information
+// Set information
   fHasInfo = true;
   fTime    = averagetime;
 
-  // Fit the gradients
+// Fit the gradients
   G4double mx, mex, cx, cex, my, mey, cy, cey;
   GetMXC(mx, mex, cx, cex, xpos_z, xpos_x, xpos_xerr );
   GetMXC(my, mey, cy, cey, ypos_z, ypos_y, ypos_yerr );
 
-  // std::cout << "cx mx : " << cx << " : " << mx << std::endl;
-  // std::cout << "cy my : " << cy << " : " << my << std::endl;
-
+// std::cout << "cx mx : " << cx << " : " << mx << std::endl;
+// std::cout << "cy my : " << cy << " : " << my << std::endl;
   double values [6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
   double errors [6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-  // values[0] = -cx-mx*avgz;
-  // values[1] = -cy-my*avgz;
-  // values[2] = avgz;
-  // values[3] = mx;
-  // values[4] = my;
-  // values[5] = 1.0;
+// values[0] = -cx-mx*avgz;
+// values[1] = -cy-my*avgz;
+// values[2] = avgz;
+// values[3] = mx;
+// values[4] = my;
+// values[5] = 1.0;
 
   values[0] = -cx;
   values[1] = -cy;
@@ -313,7 +334,7 @@ bool AWEMuonTomographyProcessor::ProcessEvent(const G4Event* event) {
   fMuonMomErr *= 1.0 / fMuonMom.mag();
   fMuonMom    *= 1.0 / fMuonMom.mag();
 
-  // Draw Track if in interactive
+// Draw Track if in interactive
   G4VVisManager* pVVisManager = G4VVisManager::GetConcreteInstance();
   if (pVVisManager)
   {
@@ -331,57 +352,57 @@ bool AWEMuonTomographyProcessor::ProcessEvent(const G4Event* event) {
     pVVisManager->Draw(polyline);
   }
 
-  // Now fill
+// Now fill
   if (!fSave) return false;
- 
-  // If Triggered then fill
+
+// If Triggered then fill
   if (fHasInfo) {
 
-      // Fill muon vectors
-      G4AnalysisManager* man = G4AnalysisManager::Instance();
-      man->FillNtupleDColumn(fMuonTimeIndex, fTime);
+    // Fill muon vectors
+    G4AnalysisManager* man = G4AnalysisManager::Instance();
+    man->FillNtupleDColumn(fMuonTimeIndex, fTime);
 
-      man->FillNtupleDColumn(fMuonPosXIndex, fMuonPos[0]);
-      man->FillNtupleDColumn(fMuonPosYIndex, fMuonPos[1]);
-      man->FillNtupleDColumn(fMuonPosZIndex, fMuonPos[2]);
+    man->FillNtupleDColumn(fMuonPosXIndex, fMuonPos[0]);
+    man->FillNtupleDColumn(fMuonPosYIndex, fMuonPos[1]);
+    man->FillNtupleDColumn(fMuonPosZIndex, fMuonPos[2]);
 
-      man->FillNtupleDColumn(fMuonPosErrXIndex, fMuonPosErr[0]);
-      man->FillNtupleDColumn(fMuonPosErrYIndex, fMuonPosErr[1]);
-      man->FillNtupleDColumn(fMuonPosErrZIndex, fMuonPosErr[2]);
+    man->FillNtupleDColumn(fMuonPosErrXIndex, fMuonPosErr[0]);
+    man->FillNtupleDColumn(fMuonPosErrYIndex, fMuonPosErr[1]);
+    man->FillNtupleDColumn(fMuonPosErrZIndex, fMuonPosErr[2]);
 
-      man->FillNtupleDColumn(fMuonMomXIndex, fMuonMom[0]);
-      man->FillNtupleDColumn(fMuonMomYIndex, fMuonMom[1]);
-      man->FillNtupleDColumn(fMuonMomZIndex, fMuonMom[2]);
+    man->FillNtupleDColumn(fMuonMomXIndex, fMuonMom[0]);
+    man->FillNtupleDColumn(fMuonMomYIndex, fMuonMom[1]);
+    man->FillNtupleDColumn(fMuonMomZIndex, fMuonMom[2]);
 
-      man->FillNtupleDColumn(fMuonMomErrXIndex, fMuonMomErr[0]);
-      man->FillNtupleDColumn(fMuonMomErrYIndex, fMuonMomErr[1]);
-      man->FillNtupleDColumn(fMuonMomErrZIndex, fMuonMomErr[2]);
+    man->FillNtupleDColumn(fMuonMomErrXIndex, fMuonMomErr[0]);
+    man->FillNtupleDColumn(fMuonMomErrYIndex, fMuonMomErr[1]);
+    man->FillNtupleDColumn(fMuonMomErrZIndex, fMuonMomErr[2]);
 
-      return true;
+    return true;
 
   } else {
 
-      // Set default values
-      G4AnalysisManager* man = G4AnalysisManager::Instance();        
-      man->FillNtupleDColumn(fMuonTimeIndex, -999.9);
+    // Set default values
+    G4AnalysisManager* man = G4AnalysisManager::Instance();
+    man->FillNtupleDColumn(fMuonTimeIndex, -999.9);
 
-      man->FillNtupleDColumn(fMuonPosXIndex, -999.9);
-      man->FillNtupleDColumn(fMuonPosYIndex, -999.9);
-      man->FillNtupleDColumn(fMuonPosZIndex, -999.9);
+    man->FillNtupleDColumn(fMuonPosXIndex, -999.9);
+    man->FillNtupleDColumn(fMuonPosYIndex, -999.9);
+    man->FillNtupleDColumn(fMuonPosZIndex, -999.9);
 
-      man->FillNtupleDColumn(fMuonPosErrXIndex, -999.9);
-      man->FillNtupleDColumn(fMuonPosErrYIndex, -999.9);
-      man->FillNtupleDColumn(fMuonPosErrZIndex, -999.9);
+    man->FillNtupleDColumn(fMuonPosErrXIndex, -999.9);
+    man->FillNtupleDColumn(fMuonPosErrYIndex, -999.9);
+    man->FillNtupleDColumn(fMuonPosErrZIndex, -999.9);
 
-      man->FillNtupleDColumn(fMuonMomXIndex, -999.9);
-      man->FillNtupleDColumn(fMuonMomYIndex, -999.9);
-      man->FillNtupleDColumn(fMuonMomZIndex, -999.9);
+    man->FillNtupleDColumn(fMuonMomXIndex, -999.9);
+    man->FillNtupleDColumn(fMuonMomYIndex, -999.9);
+    man->FillNtupleDColumn(fMuonMomZIndex, -999.9);
 
-      man->FillNtupleDColumn(fMuonMomErrXIndex, -999.9);
-      man->FillNtupleDColumn(fMuonMomErrYIndex, -999.9);
-      man->FillNtupleDColumn(fMuonMomErrZIndex, -999.9);
+    man->FillNtupleDColumn(fMuonMomErrXIndex, -999.9);
+    man->FillNtupleDColumn(fMuonMomErrYIndex, -999.9);
+    man->FillNtupleDColumn(fMuonMomErrZIndex, -999.9);
 
-      return false;
+    return false;
   }
 
   return true;
@@ -391,11 +412,12 @@ bool AWEMuonTomographyProcessor::ProcessEvent(const G4Event* event) {
 
 
 // --------------------------------------------------------------------------
-namespace GlobalFitTrack{
+namespace GlobalFitTrack {
 int npoints;
 G4double* pointsx;
 G4double* pointsy;
 G4double* errsy;
+int* indices;
 }
 
 
@@ -404,51 +426,80 @@ double FitTrack(const double *x) {
   G4double c = x[1];
   double totalres = 0.0;
   for (uint i = 0; i < GlobalFitTrack::npoints; i++) {
-    totalres += pow( (GlobalFitTrack::pointsy[i] - m * GlobalFitTrack::pointsx[i] + c ),2);
-    // std::cout << "Track Error : " << GlobalFitTrack::errsy[i] << std::endl;
-     ///GlobalFitTrack::errsy[i], 2);
-    // totalres += pow( (GlobalFitTrack::pointsy[i] - m * GlobalFitTrack::pointsx[i] + c )/GlobalFitTrack::errsy[i], 2);
+    int iter = GlobalFitTrack::indices[i];
+    totalres += pow( (GlobalFitTrack::pointsy[iter] - m * GlobalFitTrack::pointsx[iter] + c ) / GlobalFitTrack::errsy[iter], 2);
   }
   return totalres;
 }
 
 
-void AWEMuonTomographyProcessor::GetMXC(G4double& m, G4double& me, G4double& c, G4double& ce, std::vector<G4double>& x, std::vector<G4double>& y, std::vector<G4double>& yerr) {
+void AWEMuonTomographyProcessor::GetMXC(G4double& m, G4double& me,
+                                        G4double& c, G4double& ce,
+                                        std::vector<G4double>& x,
+                                        std::vector<G4double>& y,
+                                        std::vector<G4double>& yerr) {
 
   GlobalFitTrack::npoints = 3; //x.size();
   GlobalFitTrack::pointsx = &(x[0]);
   GlobalFitTrack::pointsy = &(y[0]);
   GlobalFitTrack::errsy = &(yerr[0]);
-  double minx = *(std::min_element(x.begin(),x.end()));
-  double maxx = *(std::max_element(x.begin(),x.end()));
-  double miny = *(std::min_element(y.begin(),y.end()));
-  double maxy = *(std::max_element(y.begin(),y.end()));
+  double minx = *(std::min_element(x.begin(), x.end()));
+  double maxx = *(std::max_element(x.begin(), x.end()));
+  double miny = *(std::min_element(y.begin(), y.end()));
+  double maxy = *(std::max_element(y.begin(), y.end()));
 
   // Create Fit Machinery
-  ROOT::Math::Minimizer* min = 
-            ROOT::Math::Factory::CreateMinimizer("Minuit2", "Migrad");
+  ROOT::Math::Minimizer* min =
+    ROOT::Math::Factory::CreateMinimizer("Minuit2", "Migrad");
   min->SetPrintLevel(-1);
   min->SetStrategy(2);
   min->SetTolerance(0.01);
   ROOT::Math::Functor f(&FitTrack, 2);
-  double step[2] = {0.01,0.01};
-  double variable[2] = {(maxy-miny)/(maxx-minx), (maxy+miny)/2.0 };
+  double step[2] = {0.01, 0.01};
+  double variable[2] = {(maxy - miny) / (maxx - minx), (maxy + miny) / 2.0 };
   min->SetFunction(f);
 
-  double maxgrad = 20*(maxy-miny)/(maxx-minx);
-  double maxc = 2*(fabs(miny)+fabs(maxy));
+  double maxgrad = 20 * (maxy - miny) / (maxx - minx);
+  double maxc = 2 * (fabs(miny) + fabs(maxy));
 
-  min->SetVariable(0, "m", variable[0], step[0]); //, -maxgrad, +maxgrad);
-  min->SetVariable(1, "c", variable[1], step[1]); //, -maxc, +maxc);
+  std::vector<std::vector<int>> pairwise;
+  if (x.size() == 6) {
+    pairwise.push_back(std::vector<int> {0, 2, 4}); // 000
+    pairwise.push_back(std::vector<int> {0, 2, 5}); // 001
+    pairwise.push_back(std::vector<int> {0, 3, 4}); // 010
+    pairwise.push_back(std::vector<int> {1, 2, 4}); // 100
+    pairwise.push_back(std::vector<int> {0, 3, 5}); // 011
+    pairwise.push_back(std::vector<int> {1, 2, 5}); // 101
+    pairwise.push_back(std::vector<int> {1, 3, 4}); // 110
+    pairwise.push_back(std::vector<int> {1, 3, 5}); // 111
 
-  min->Minimize();
+  } else {
+    pairwise.push_back(std::vector<int> {0, 1, 2});
+  }
 
-  const double *xs = min->X();
-  const double *es = min->Errors();
-  m = xs[0];
-  c = xs[1];
-  me = es[0];
-  ce = es[1];
+  double bestfit = -1.0;
+  for (int i = 0; i < pairwise.size(); i++) {
+
+    // std::cout << "INDICES " << pairwise[i][0] << " " << x.size() << std::endl;
+    GlobalFitTrack::indices = &(pairwise[i][0]);
+
+    min->SetVariable(0, "m", variable[0], step[0]);
+    min->SetVariable(1, "c", variable[1], step[1]);
+    min->Minimize();
+
+
+    const double *xs = min->X();
+    const double *es = min->Errors();
+    double chi2 = FitTrack(xs);
+    if (bestfit < 0 or chi2 < bestfit) {
+      m = xs[0];
+      c = xs[1];
+      me = es[0];
+      ce = es[1];
+      bestfit = chi2;
+    }
+  }
+
 
   delete min;
   return;

@@ -37,7 +37,7 @@ G4Element* MaterialFactory::GetElement(std::string name) {
   // If not available we have to build the element
   DBTable mattbl = DB::Get()->GetTable("ELEMENT", name);
   double atomicmass  = mattbl.GetG4D("atomic_mass");
-  int atomicnumber   = mattbl.GetI("atomic_number");
+  int atomicnumber   = mattbl.GetD("atomic_number");
   std::string symbol = mattbl.GetS("symbol");
 
   // Create material
@@ -58,7 +58,7 @@ G4Material* MaterialFactory::GetMaterial(std::string name) {
   DBTable mattbl = DB::Get()->GetTable("MATERIAL", name);
 
   std::vector<std::string> elements = mattbl.GetVecS("element_names");
-  std::vector<int>         counts   = mattbl.GetVecI("element_counts");
+  std::vector<double>         counts   = mattbl.GetVecD("element_counts");
   G4double density = mattbl.GetG4D("density");
 
   // Create the material
