@@ -246,8 +246,8 @@ std::string DB::GetDataPath() {
 
 void DB::PrintSplashScreen() {
   std::cout << "=========================================" << std::endl;
-  std::cout << "\n COSMIC RAY SIM : Cosmic Rays Simulation Code" << std::endl;
-  std::cout << "\n\n Authors: Patrick Stowell, Lee Thompson" << std::endl;
+  std::cout << "\n CRESTA : Cosmic Rays Simulation Package" << std::endl;
+  std::cout << "\n\n Authors: Chris Steer, Patrick Stowell, Lee Thompson" << std::endl;
   std::cout << " contact : p.stowell@sheffield.ac.uk" << std::endl;
   std::cout << "\n=========================================" << std::endl;
 }
