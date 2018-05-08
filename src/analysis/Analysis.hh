@@ -73,7 +73,9 @@ public:
   /// Set all trigger states back to default values
   void ResetTriggers();
   /// Get Trigger by ID
-  VTrigger* GetTrigger(std::string id);
+  VTrigger* GetTrigger(std::string id, bool silentfail = false);
+  /// Destroy Triggers
+  void DestroyTriggers();
 
 
   /// Add a new processor to vector of processors
@@ -81,7 +83,9 @@ public:
   /// Reset the state of all processors
   void ResetProcessors();
   /// Get Processor by ID
-  VProcessor* GetProcessor(std::string id);
+  VProcessor* GetProcessor(std::string id, bool silentfail = false);
+  /// Remove all existing processors
+  void DestroyProcessors();
 
 
   /// Add a new detector to vector
@@ -89,30 +93,35 @@ public:
   /// Reset the state of all detectors
   void ResetDetectors();
   /// Get the detector by its own ID
-  VDetector* GetDetector(std::string id);
+  VDetector* GetDetector(std::string id, bool silentfail = false);
+  /// Remove all existing detectors
+  void DestroyDetectors();
 
 
   /// Set the flux processor (special case)
   void SetFluxProcessor(VFluxProcessor* p);
   /// Get the flux processor
-  inline VFluxProcessor* GetFluxProcessor(){return fFluxProcessor;};
+  inline VFluxProcessor* GetFluxProcessor() {return fFluxProcessor;};
   /// Set the exposure time
-  void SetExposureTimeLimit(G4double d){ fExposureTimeLimit = d; };
+  inline void SetExposureTimeLimit(G4double d) { fExposureTimeLimit = d; };
+  /// Return current exposure from flux processor
+  inline G4double GetExposureTime() { return fFluxProcessor->GetExposureTime(); };
 
-  G4double GetExposureTime(){ return fFluxProcessor->GetExposureTime(); };
 
-  void SetOutputTag(std::string s){ fOutputTag = s; };
-  void SetOutputRun(int i){ fRunID = i; };
-  void SetOutputSubRun(int i){ fSubRunID = i; };
+  /// Set the id for output files
+  void SetOutputTag(std::string s) { fOutputTag = s; };
+  void SetOutputRun(int i) { fRunID = i; };
+  void SetOutputSubRun(int i) { fSubRunID = i; };
   void IncrementSubRun() { fSubRunID++; };
 
-  int GetNEvents(){ return fGeneratedEvents; };
 
-  int GetNSavedEvents(){ return fSavedEvents; };
-  
-  void SetChunkSize(int i){ fChunkSize = i; };
-  int GetChunkSize(){ return fChunkSize; };
-  
+  int GetNEvents() { return fGeneratedEvents; };
+  int GetNSavedEvents() { return fSavedEvents; };
+
+
+  void SetChunkSize(int i) { fChunkSize = i; };
+  int GetChunkSize() { return fChunkSize; };
+
 protected:
 
   static Analysis *fPrimary; ///< Singleton Object

@@ -106,7 +106,7 @@ G4LogicalVolume* GeoSolid::ConstructLogicalVolume(DBTable table, G4VSolid* solid
   }
 
   // If region then set to logical
-  if (table.Has("cuts")){
+  if (table.Has("cuts")) {
     G4Region* reg = new G4Region(name + "_" + table.GetS("cuts"));
     reg->SetProductionCuts( PhysicsFactory::LoadProductionCuts(table.GetS("cuts")) );
     reg->AddRootLogicalVolume(geo_logic);
@@ -197,7 +197,7 @@ G4VPhysicalVolume* GeoSolid::ConstructPhysicalParametrisation(DBTable table, G4L
   // Maybe thats fine? Need to make sensitive detectors record copyNo so that they account for a layer.
   // Also need to make the Drift Chamber positions do the same really....
 
-  // 
+  //
 
   // // std::string parametrisation = table.GetS("parametrisation");
   // // G4VPVParametrised* pr = GeoManager::GetParametrisation(parametrisation);
@@ -252,16 +252,18 @@ G4VSensitiveDetector* GeoSolid::ConstructSensitiveDetector(DBTable table, G4Logi
   // If it does then create a new SD object
   std::string sensitive = table.GetS("sensitive");
 
-  // look up table
-  DBTable sdtbl = DB::Get()->GetTable("DETECTOR", sensitive);
-  sdtbl.SetIndexName(table.GetIndexName() + "_" + sensitive);
-  VDetector* sd = DetectorObjectFactory::CreateSD(sdtbl);
+  // First check detector not already loaded
+  std::string sdname = table.GetIndexName() + "_" + sensitive;
+  VDetector* sd = Analysis::Get()->GetDetector(sdname, true);
+  if (!sd){
+    DBTable sdtbl = DB::Get()->GetTable("DETECTOR", sensitive);
+    sdtbl.SetIndexName(sdname);
+    sd = DetectorObjectFactory::CreateSD(sdtbl);
+    Analysis::Get()->RegisterDetector(sd);
+  }
 
   // Assign the logical volume
   sd->SetLogicalVolume(logic, vol);
-
-  // Register with analysis manager
-  Analysis::Get()->RegisterDetector(sd);
 
   // Return the sensitive detector for this volume
   return sd;

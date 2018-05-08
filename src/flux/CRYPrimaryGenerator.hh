@@ -105,6 +105,9 @@ private:
   G4int fNParticlesMin; ///< Particle multiplicity truncation
   G4int fNParticlesMax; ///< Particle multiplicity truncation
 
+  G4double fMinEnergy; ///< Minimimum energy cut
+  G4double fMaxEnergy; ///< Maximum energy cut
+
   std::string fDataDirectory; ///< Default directory of CRY data files
 
 

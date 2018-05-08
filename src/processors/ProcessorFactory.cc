@@ -17,7 +17,7 @@ VProcessor* ProcessorFactory::Construct(DBTable tbl) {
 
   // Check we didn't get to here
   std::cout << "Failed to Create Processor : " << type << " NOW" << std::endl;
-  throw;  
+  throw;
   return 0;
 }
 
@@ -34,9 +34,12 @@ void ProcessorFactory::ConstructProcessors() {
     DBTable trg_tab = (*trg_iter);
     std::string trg_id = trg_tab.GetIndexName();
 
-    // Create and register to analysis manager
-    VProcessor* trg_obj = ProcessorFactory::Construct(trg_tab);
-    Analysis::Get()->RegisterProcessor(trg_obj);
+    VProcessor* trg_obj = Analysis::Get()->GetProcessor(trg_id);
+    if (!trg_obj) {
+      // Create and register to analysis manager
+      VProcessor* trg_obj = ProcessorFactory::Construct(trg_tab);
+      Analysis::Get()->RegisterProcessor(trg_obj);
+    }
   }
 
   return;

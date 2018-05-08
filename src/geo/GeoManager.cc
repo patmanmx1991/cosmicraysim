@@ -26,6 +26,7 @@
 #include "simple/GeoEllipticalTube.hh"
 #include "dsc/DryStorageCask_VSC24.hh"
 #include "awemuontom/AWEMuonTomographyDetector.hh"
+#include "awemuontom/AWEMuonTomographyDetectorSecond.hh"
 
 #include "db/DB.hh"
 #include "db/DBTable.hh"
@@ -45,6 +46,8 @@ GeoObject* GeoObjectFactory::Construct(DBTable table){
   else if (type.compare("eliptube")==0) return new GeoEllipticalTube(table);
   else if (type.compare("DSC_VSC24") == 0) return new DryStorageCask_VSC24(table);
   else if (type.compare("awe_muontom") == 0) return new AWEMuonTomographyDetector(table);
+  else if (type.compare("awe_muontom2") == 0) return new AWEMuonTomographyDetectorSecond(table);
+
 
   std::cout << "Failed to Construct Geometry" << std::endl;
   throw;
@@ -62,6 +65,11 @@ GeoManager::GeoManager(){
 }
 
 G4VPhysicalVolume* GeoManager::ConstructAll(){
+
+
+  fGeoObjects.clear();
+
+
   std::cout << "===============================" << std::endl;
   std::cout << "GEO: Building Geometry " << std::endl;
   std::vector<DBTable> tables_clone = DB::Get()->GetTableGroup("GEO");

@@ -47,6 +47,7 @@ public:
   void SelectDataBase(std::string dataid);
 
   bool HasTables(std::string name);
+  bool HasTable(std::string name, std::string index);
 
   int Load(std::string filename);
   int LoadAll(std::string dirname, std::string pattern = "/*");

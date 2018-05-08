@@ -143,14 +143,22 @@ void Analysis::ResetTriggers() {
   }
 }
 
-VTrigger* Analysis::GetTrigger(std::string id) {
+void Analysis::DestroyTriggers() {
+  for (uint i = 0; i < fTriggers.size(); i++) {
+    delete (fTriggers[i]);
+  }
+}
+
+VTrigger* Analysis::GetTrigger(std::string id, bool silentfail) {
   std::vector<VTrigger*>::iterator iter;
   for (iter = fTriggers.begin(); iter != fTriggers.end(); iter++) {
     std::string trigid = (*iter)->GetID();
     if (id.compare(trigid) == 0) return (*iter);
   }
-  std::cout << "Cannot find Trigger : " << id << std::endl;
-  throw;
+  if (!silentfail) {
+    std::cout << "Cannot find Trigger : " << id << std::endl;
+    throw;
+  }
   return 0;
 }
 
@@ -165,14 +173,22 @@ void Analysis::ResetProcessors() {
   }
 }
 
-VProcessor* Analysis::GetProcessor(std::string id) {
+void Analysis::DestroyProcessors() {
+  for (uint i = 0; i < fProcessors.size(); i++) {
+    delete fProcessors[i];
+  }
+}
+
+VProcessor* Analysis::GetProcessor(std::string id, bool silentfail) {
   std::vector<VProcessor*>::iterator iter;
   for (iter = fProcessors.begin(); iter != fProcessors.end(); iter++) {
     std::string procid = (*iter)->GetID();
     if (id.compare(procid) == 0) return (*iter);
   }
-  std::cout << "Cannot find Processor : " << id << std::endl;
-  throw;
+  if (!silentfail) {
+    std::cout << "Cannot find Processor : " << id << std::endl;
+    throw;
+  }
   return 0;
 }
 
@@ -188,14 +204,22 @@ void Analysis::ResetDetectors() {
   }
 }
 
-VDetector* Analysis::GetDetector(std::string id) {
+void Analysis::DestroyDetectors() {
+  for (uint i = 0; i < fDetectors.size(); i++) {
+    delete fDetectors[i];
+  }
+}
+
+VDetector* Analysis::GetDetector(std::string id, bool silentfail) {
   std::vector<VDetector*>::iterator iter;
   for (iter = fDetectors.begin(); iter != fDetectors.end(); iter++) {
     std::string detid = (*iter)->GetID();
     if (id.compare(detid) == 0) return (*iter);
   }
-  std::cout << "Cannot find Detector : " << id << std::endl;
-  throw;
+  if (!silentfail) {
+    std::cout << "Cannot find Detector : " << id << std::endl;
+    throw;
+  }
   return 0;
 }
 

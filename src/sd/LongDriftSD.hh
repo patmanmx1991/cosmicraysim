@@ -58,8 +58,12 @@ public:
 
   void SetLogicalVolume(G4LogicalVolume* logic, G4VPhysicalVolume* physical);
 
+  double GetEfficiency() { return fEfficiency; };
+
   /// Draw the hits
   void DrawAll();
+
+  void ResetState();
 
 protected:
 
@@ -92,6 +96,8 @@ protected:
   G4double fWirePositionY;
   G4double fWirePositionZ;
 
+  G4double fEfficiency;
+  G4double fEfficiencyThrow;
 };
 
 /// LongDrift Processor Object :

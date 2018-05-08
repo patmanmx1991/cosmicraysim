@@ -217,6 +217,7 @@ int main(int argc, char** argv) {
 
   if (gGeomtryFiles.size() > 0) {
     for (uint i = 0; i < gGeomtryFiles.size(); i++) {
+      std::cout << "APP: Loading Geometry file : " << gGeomtryFiles[i] << std::endl;
       rdb->LoadFile(gGeomtryFiles[i]);
     }
   }

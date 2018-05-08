@@ -36,6 +36,7 @@
 
 #include "db/DB.hh"
 #include "db/DBTable.hh"
+#include "sd/DetectorMessenger.hh"
 
 class G4VPhysicalVolume;
 class G4LogicalVolume;
@@ -44,23 +45,23 @@ using namespace COSMIC;
 
 class DetectorConstruction : public G4VUserDetectorConstruction
 {
-  public:
-    /// constructor
-    DetectorConstruction();
-    /// destructor
-    virtual ~DetectorConstruction();
+public:
+  /// constructor
+  DetectorConstruction();
+  /// destructor
+  virtual ~DetectorConstruction();
 
-  public:
-    /// Defines the detector geometry and returns a pointer to the physical World Volume
-    virtual G4VPhysicalVolume* Construct();
-    /// Register some of the detector's volumes as "sensitive"
-    virtual void ConstructSDandField();
-               
-  private:
-    /// Defines all the materials the detector is made of.
-    void DefineMaterials();
+public:
+  /// Defines the detector geometry and returns a pointer to the physical World Volume
+  virtual G4VPhysicalVolume* Construct();
+  /// Register some of the detector's volumes as "sensitive"
+  virtual void ConstructSDandField();
 
-    // G4bool  fCheckOverlaps;
+private:
+  /// Defines all the materials the detector is made of.
+  void DefineMaterials();
+  DetectorMessenger* fMessenger;
+  // G4bool  fCheckOverlaps;
 };
 #endif
 

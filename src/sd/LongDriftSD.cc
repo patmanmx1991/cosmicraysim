@@ -28,10 +28,7 @@ LongDriftSD::LongDriftSD(DBTable tbl):
     // Set initial state
     ResetState();
 
-    // By default also include the auto processor
-    if (!tbl.Has("processor") or tbl.GetI("processor") > 0) {
-        Analysis::Get()->RegisterProcessor(new LongDriftProcessor(this));
-    }
+    fEfficiency = tbl.Has("efficiency") ? tbl.GetD("efficiency") : 1.0;
 
     fResolutionX = tbl.Has("resolution_x") ? tbl.GetG4D("resolution_x") : 0.1 * mm;
     fResolutionY = tbl.Has("resolution_y") ? tbl.GetG4D("resolution_y") : 0.1 * mm;
@@ -52,6 +49,11 @@ LongDriftSD::LongDriftSD(DBTable tbl):
 
     collectionName.push_back(GetID());
     collectionName.push_back(GetID() + "_ghost");
+
+    // By default also include the auto processor
+    if (!tbl.Has("processor") or tbl.GetI("processor") > 0) {
+        Analysis::Get()->RegisterProcessor(new LongDriftProcessor(this));
+    }
 
 }
 
@@ -107,6 +109,11 @@ G4int LongDriftSD::GetGhostHCID() {
     return fGhostHCID;
 }
 
+void LongDriftSD::ResetState() {
+  VDetector::ResetState();
+  fEfficiencyThrow = G4UniformRand();
+}
+
 G4bool LongDriftSD::ProcessHits(G4Step* step, G4TouchableHistory* /*touch*/)
 {
 
@@ -115,6 +122,8 @@ G4bool LongDriftSD::ProcessHits(G4Step* step, G4TouchableHistory* /*touch*/)
 
     G4double charge = step->GetTrack()->GetDefinition()->GetPDGCharge();
     if (charge == 0.) return false;
+
+    if (fEfficiency < fEfficiencyThrow) return false;
 
     G4StepPoint* preStepPoint = step->GetPreStepPoint();
 
@@ -129,6 +138,11 @@ G4bool LongDriftSD::ProcessHits(G4Step* step, G4TouchableHistory* /*touch*/)
     // Get Local and world positions
     G4ThreeVector worldPos = preStepPoint->GetPosition();
     G4ThreeVector localPos = trans_worldtolocal.TransformPoint(worldPos);
+
+    // Apply local smearing
+    localPos[0] = G4RandGauss::shoot(localPos[0],fResolutionX);
+    localPos[1] = G4RandGauss::shoot(localPos[1],fResolutionY);
+    localPos[2] = G4RandGauss::shoot(localPos[2],fResolutionZ);
 
     // Depending on the detector, we must restrict location in the local geometry
     G4ThreeVector localPosP = localPos;
@@ -271,12 +285,14 @@ bool LongDriftProcessor::BeginOfRunAction(const G4Run* /*run*/) {
 
 bool LongDriftProcessor::ProcessEvent(const G4Event* event) {
 
+
     // Average over hits
     fHCID = fDetector->GetHCID();
 
     DriftChamberHitsCollection* hc =
         static_cast<DriftChamberHitsCollection*> (event->GetHCofThisEvent()->GetHC(fHCID));
     int nhits = (int)  (hc)->GetSize();
+
     if (nhits < 1) {
         return false;
     }

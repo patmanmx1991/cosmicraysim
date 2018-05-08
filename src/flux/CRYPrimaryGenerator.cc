@@ -32,6 +32,9 @@ fSourceBox(0)
 
   fNParticlesMin = -1; // No Truncation
   fNParticlesMax = -1; // No Truncation
+  
+  fMinEnergy = -1.0; // No energy cut
+  fMaxEnergy = -1.0; // No energy cut
 
   fLateralBoxSize = -1; // This is tricker, define in GetSourceBox().
 
@@ -52,6 +55,9 @@ fSourceBox(0)
 
   if (table.Has("min_particles")) fNParticlesMin = table.GetI("min_particles");
   if (table.Has("max_particles")) fNParticlesMax = table.GetI("max_particles");
+
+  if (table.Has("min_energy")) fMinEnergy = table.GetG4D("min_energy");
+  if (table.Has("max_energy")) fMaxEnergy = table.GetG4D("max_energy");
 
   // Lateral box size is defined from the source box
   GetSourceBox();
@@ -254,8 +260,6 @@ void CRYPrimaryGenerator::GeneratePrimaries(G4Event* anEvent)
     fExposureTime = gen->timeSimulated();
     fNthrows++;
 
-    // std::cout << " Throws : " << fNthrows << " Exposure : " << fExposureTime << std::endl;
-
     // Number of trajectories that intercept at least one targetbox
     stacksize = 0;
     // Loop over all vectors and change their y values to match our box position
@@ -271,6 +275,13 @@ void CRYPrimaryGenerator::GeneratePrimaries(G4Event* anEvent)
       // Get Direction for trjacetory pre-selection
       G4ThreeVector direction = G4ThreeVector((*vect)[j]->u(), (*vect)[j]->v(), (*vect)[j]->w());
       bool good_traj = (fTargetBoxes.size() == 0);
+
+      // If its outside our energy cut its a bad trajectory
+      if ((fMaxEnergy > 0 && (*vect)[j]->ke()*MeV > fMaxEnergy) ||
+          (fMinEnergy > 0 && (*vect)[j]->ke()*MeV < fMinEnergy)) {
+        good_traj = false;
+        continue;
+      }
 
       // Make sure trajectory falls inside our target box if we have one.
       for (uint i = 0; i < fTargetBoxes.size(); i++) {

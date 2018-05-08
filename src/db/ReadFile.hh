@@ -21,6 +21,18 @@
 #include <glob.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <math.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <cstring>
+#include <fstream>
+#include <iostream>
+#include <iostream>
+#include <numeric>
+#include <limits>
+#include <sstream>
+#include <string>
+#include <vector>
 
 namespace COSMIC {
 
@@ -32,6 +44,9 @@ int ReadFile(const std::string &filename, std::string &filecontents);
 
 /// Uses glob to expand wildcards in files and return vector of strings
 std::vector<std::string> Expand(std::string);
+
+/// Parse space seperated string into values
+std::vector<std::string> ParseToStr(std::string input, const char* del=" ");
 
 } // - namespace DBUtils
 } // - namespace COSMIC

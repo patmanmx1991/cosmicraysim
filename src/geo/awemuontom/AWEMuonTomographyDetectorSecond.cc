@@ -1,4 +1,4 @@
-#include "AWEMuonTomographyDetector.hh"
+#include "AWEMuonTomographyDetectorSecond.hh"
 
 #include "GeoObject.hh"
 #include "G4NistManager.hh"
@@ -42,7 +42,7 @@
 namespace COSMIC {
 
 // --------------------------------------------------------------------------
-void AWEMuonTomographyDetector::Construct(DBTable table) {
+void AWEMuonTomographyDetectorSecond::Construct(DBTable table) {
   SetID(table.GetIndexName());
   SetType(table.GetS("type"));
   std::string fName = table.GetIndexName();
@@ -50,9 +50,9 @@ void AWEMuonTomographyDetector::Construct(DBTable table) {
 
   // Load the temporary DB from geo file
   DB* tdb = DB::Get();
-  tdb->CreateDataBase("awedet1");
-  tdb->SelectDataBase("awedet1");
-  tdb->LoadFile(DB::GetDataPath() + "/awe/muontomographydetector.geo");
+  tdb->CreateDataBase("awedet2");
+  tdb->SelectDataBase("awedet2");
+  tdb->LoadFile(DB::GetDataPath() + "/awe/muontomographydetector_second.geo");
 
 
   // Make the main logical volume (with mother and position/rotation overriden)
@@ -70,11 +70,16 @@ void AWEMuonTomographyDetector::Construct(DBTable table) {
   fPhysical = volume->GetPhysical();
 
   // Make the scintillator plane
-  std::cout << "GEO: --> Making scintillator panel" << std::endl;
-  DBTable tbl = DB::Get()->GetTable("GEO", "scintillator_panel");
-  tbl.SetIndexName(fName + "_scintillator_panel");
-  fScintObject = new GeoBox(tbl);
-  fSubObjects.push_back(fScintObject);
+  std::cout << "GEO: --> Making scintillator panels" << std::endl;
+  DBTable tbl = DB::Get()->GetTable("GEO", "scintillator_top");
+  tbl.SetIndexName(fName + "_scintillator_top");
+  fScintObjectTop = new GeoBox(tbl);
+  fSubObjects.push_back(fScintObjectTop);
+
+  tbl = DB::Get()->GetTable("GEO", "scintillator_bottom");
+  tbl.SetIndexName(fName + "_scintillator_bottom");
+  fScintObjectBottom = new GeoBox(tbl);
+  fSubObjects.push_back(fScintObjectBottom);
 
   // Make the drift chamber array
   DBTable postable = DB::Get()->GetTable("GEO", "chamber_positions");
@@ -103,10 +108,10 @@ void AWEMuonTomographyDetector::Construct(DBTable table) {
     fSubObjects.push_back(obj);
     fDriftObjects.push_back(obj);
   }
-  // Register an AWEMuonTomographyProcessor to combine hits and return trigger
+  // Register an AWEMuonTomographyProcessorSecond to combine hits and return trigger
   if (!table.Has("processor") or table.GetB("processor")) {
     std::cout << "GEO: --> Making processor" << std::endl;
-    Analysis::Get()->RegisterProcessor(new AWEMuonTomographyProcessor(this));
+    Analysis::Get()->RegisterProcessor(new AWEMuonTomographyProcessorSecond(this));
   }
 
   // Remove the temporary database.
@@ -117,14 +122,16 @@ void AWEMuonTomographyDetector::Construct(DBTable table) {
 
 
 // --------------------------------------------------------------------------
-AWEMuonTomographyProcessor::AWEMuonTomographyProcessor(AWEMuonTomographyDetector* det) :
+AWEMuonTomographyProcessorSecond::AWEMuonTomographyProcessorSecond(AWEMuonTomographyDetectorSecond* det) :
   VProcessor(det->GetID()), fSave(true)
 {
   fAWEDetector = det;
   // Get drift Geo Objects
   std::vector<GeoObject*> drifts = fAWEDetector->GetDriftObjects();
-  G4VSensitiveDetector* sd = fAWEDetector->GetScintillatorObject()->GetSensitive();
-  fScintProc = new SimpleScintillatorProcessor(static_cast<SimpleScintillatorSD*>(sd), false);
+  G4VSensitiveDetector* sd = fAWEDetector->GetScintillatorTop()->GetSensitive();
+  fScintProcTop = new SimpleScintillatorProcessor(static_cast<SimpleScintillatorSD*>(sd), false);
+  sd = fAWEDetector->GetScintillatorBottom()->GetSensitive();
+  fScintProcBottom = new SimpleScintillatorProcessor(static_cast<SimpleScintillatorSD*>(sd), false);
 
   // From each one get the sensitive and manually create a processor.
   // This is super awkward. May need to rethink.
@@ -135,9 +142,9 @@ AWEMuonTomographyProcessor::AWEMuonTomographyProcessor(AWEMuonTomographyDetector
 
 }
 
-bool AWEMuonTomographyProcessor::BeginOfRunAction(const G4Run* /*run*/) {
+bool AWEMuonTomographyProcessorSecond::BeginOfRunAction(const G4Run* /*run*/) {
   std::string tableindex = GetID();
-  std::cout << "Registering AWEMuonTomographyProcessor NTuples " << tableindex << std::endl;
+  std::cout << "Registering AWEMuonTomographyProcessorSecond NTuples " << tableindex << std::endl;
 
   G4AnalysisManager* man = G4AnalysisManager::Instance();
 
@@ -164,12 +171,13 @@ bool AWEMuonTomographyProcessor::BeginOfRunAction(const G4Run* /*run*/) {
 }
 
 
-bool AWEMuonTomographyProcessor::ProcessEvent(const G4Event* event) {
+bool AWEMuonTomographyProcessorSecond::ProcessEvent(const G4Event* event) {
 
   // Get the processor from the scintillator
-  fScintProc->ProcessEvent(event);
-  bool hasvalue = fScintProc->HasInfo();
-  if (!fScintProc->HasInfo()) {
+  fScintProcTop->ProcessEvent(event);
+  fScintProcBottom->ProcessEvent(event);
+  bool hasvalue = fScintProcTop->HasInfo() && fScintProcBottom->HasInfo();
+  if (!hasvalue) {
     return false;
   }
 
@@ -224,8 +232,8 @@ bool AWEMuonTomographyProcessor::ProcessEvent(const G4Event* event) {
     /// BAD HARD CODED LIST OF X/Y points. Fix in future.
 
     // X information
-    if (i == 0 || i == 1 || i == 2 || i == 9 || i == 10
-        || i == 11 || i == 12 || i == 13 || i == 14) {
+    if (i == 0 || i == 1 || i == 2 || i == 6 || i == 7
+        || i == 8 || i == 12 || i == 13 || i == 14) {
       ypos_y.push_back(fDriftChamberProcs[i]->GetPosY());
       ypos_z.push_back(fDriftChamberProcs[i]->GetPosZ());
       ypos_yerr.push_back(fDriftChamberProcs[i]->GetErrY());
@@ -403,7 +411,7 @@ bool AWEMuonTomographyProcessor::ProcessEvent(const G4Event* event) {
 
 
 // --------------------------------------------------------------------------
-namespace GlobalFitTrack {
+namespace GlobalFitTrackSecond {
 int npoints;
 G4double* pointsx;
 G4double* pointsy;
@@ -412,28 +420,28 @@ int* indices;
 }
 
 
-double FitTrack(const double *x) {
+double FitTrackSecond(const double *x) {
   G4double m = x[0];
   G4double c = x[1];
   double totalres = 0.0;
-  for (uint i = 0; i < GlobalFitTrack::npoints; i++) {
-    int iter = GlobalFitTrack::indices[i];
-    totalres += pow( (GlobalFitTrack::pointsy[iter] - m * GlobalFitTrack::pointsx[iter] + c ) / GlobalFitTrack::errsy[iter], 2);
+  for (uint i = 0; i < GlobalFitTrackSecond::npoints; i++) {
+    int iter = GlobalFitTrackSecond::indices[i];
+    totalres += pow( (GlobalFitTrackSecond::pointsy[iter] - m * GlobalFitTrackSecond::pointsx[iter] + c ) / GlobalFitTrackSecond::errsy[iter], 2);
   }
   return totalres;
 }
 
 
-void AWEMuonTomographyProcessor::GetMXC(G4double& m, G4double& me,
+void AWEMuonTomographyProcessorSecond::GetMXC(G4double& m, G4double& me,
                                         G4double& c, G4double& ce,
                                         std::vector<G4double>& x,
                                         std::vector<G4double>& y,
                                         std::vector<G4double>& yerr) {
 
-  GlobalFitTrack::npoints = 3; //x.size();
-  GlobalFitTrack::pointsx = &(x[0]);
-  GlobalFitTrack::pointsy = &(y[0]);
-  GlobalFitTrack::errsy = &(yerr[0]);
+  GlobalFitTrackSecond::npoints = 3; //x.size();
+  GlobalFitTrackSecond::pointsx = &(x[0]);
+  GlobalFitTrackSecond::pointsy = &(y[0]);
+  GlobalFitTrackSecond::errsy = &(yerr[0]);
   double minx = *(std::min_element(x.begin(), x.end()));
   double maxx = *(std::max_element(x.begin(), x.end()));
   double miny = *(std::min_element(y.begin(), y.end()));
@@ -445,7 +453,7 @@ void AWEMuonTomographyProcessor::GetMXC(G4double& m, G4double& me,
   min->SetPrintLevel(-1);
   min->SetStrategy(2);
   min->SetTolerance(0.01);
-  ROOT::Math::Functor f(&FitTrack, 2);
+  ROOT::Math::Functor f(&FitTrackSecond, 2);
   double step[2] = {0.01, 0.01};
   double variable[2] = {(maxy - miny) / (maxx - minx), (maxy + miny) / 2.0 };
   min->SetFunction(f);
@@ -472,7 +480,7 @@ void AWEMuonTomographyProcessor::GetMXC(G4double& m, G4double& me,
   for (int i = 0; i < pairwise.size(); i++) {
 
     // std::cout << "INDICES " << pairwise[i][0] << " " << x.size() << std::endl;
-    GlobalFitTrack::indices = &(pairwise[i][0]);
+    GlobalFitTrackSecond::indices = &(pairwise[i][0]);
 
     min->SetVariable(0, "m", variable[0], step[0]);
     min->SetVariable(1, "c", variable[1], step[1]);
@@ -481,7 +489,7 @@ void AWEMuonTomographyProcessor::GetMXC(G4double& m, G4double& me,
 
     const double *xs = min->X();
     const double *es = min->Errors();
-    double chi2 = FitTrack(xs);
+    double chi2 = FitTrackSecond(xs);
     if (bestfit < 0 or chi2 < bestfit) {
       m = xs[0];
       c = xs[1];
