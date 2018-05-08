@@ -87,16 +87,16 @@ private:
 
     G4double fFluxIntegrated; ///< Integral of flux for norm.
 
-    G4double fPar_I0;  ///< IO  Par from Shukla Paper 
-    G4double fPar_n;   ///< n   Par from Shukla Paper 
-    G4double fPar_E0;  ///< E0  Par from Shukla Paper 
-    G4double fPar_eps; ///< eps Par from Shukla Paper 
+    G4double fPar_I0;  ///< IO  Par from Shukla Paper
+    G4double fPar_n;   ///< n   Par from Shukla Paper
+    G4double fPar_E0;  ///< E0  Par from Shukla Paper
+    G4double fPar_eps; ///< eps Par from Shukla Paper
 
-    G4double fPar_rad; ///< radius Par from Shukla Paper 
-    G4double fPar_dis; ///< distance Par from Shukla Paper 
+    G4double fPar_rad; ///< radius Par from Shukla Paper
+    G4double fPar_dis; ///< distance Par from Shukla Paper
 
     /// Definitions for particle gun to avoid string comparisons
-    std::vector<G4ParticleDefinition*> fParticleDefs; 
+    std::vector<G4ParticleDefinition*> fParticleDefs;
     G4ParticleGun* fParticleGun; ///< Main particle gun
 
     // Source box setup originally used geometries from the main GEO
@@ -105,6 +105,7 @@ private:
     bool fSourceBox; ///< FLAG : Whether source box been created/checked
     G4ThreeVector fSourceBoxWidth; ///< Length/Width of box.
     G4ThreeVector fSourceBoxPosition; ///< Position of box in world volume
+    G4int fSourceBoxRequireN; ///< Requires at least this number of hits in different target boxes
 
     G4double fArea; ///< Area of box. Used for normalisation.
 
@@ -112,11 +113,13 @@ private:
     bool fCheckTargetBoxes; ///< FLAG : Whether target boxes okay.
     std::vector<G4Box*> fTargetBoxes; ///< Geant4 Box Object for each target
     std::vector<G4ThreeVector> fTargetBoxPositions; ///< Position in world volume for each target
+    G4int fTargetBoxesRequireN; ///< Requires at least this number of hits in different target boxes
 
     // Throws are tracked regardless of acceptance, so integrated time always correct.
     /// Current Integrated Exposure time. Derivide from NThrows and Integrated flux.
-    G4double fExposureTime; 
+    G4double fExposureTime;
     int fNThrows; ///< Number of throws ran so far.
+
 
 
     G4double fMuonTime;     ///< MuonTime   Info for auto flux processor

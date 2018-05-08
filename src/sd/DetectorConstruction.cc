@@ -42,7 +42,7 @@ DetectorConstruction::DetectorConstruction()
   : G4VUserDetectorConstruction()
 {
   DefineMaterials();
-  fMessenger = new DetectorMessenger(this);
+  //fMessenger = new DetectorMessenger(this);
 }
 
 DetectorConstruction::~DetectorConstruction()
@@ -54,18 +54,18 @@ void DetectorConstruction::DefineMaterials()
 G4VPhysicalVolume* DetectorConstruction::Construct()
 {
   // Clear any old processors/triggers 
-  G4GeometryManager::GetInstance()->OpenGeometry();
-  G4PhysicalVolumeStore::GetInstance()->Clean();
-  G4LogicalVolumeStore::GetInstance()->Clean();
-  G4SolidStore::GetInstance()->Clean();
-  Analysis::Get()->DestroyTriggers();
+  //  G4GeometryManager::GetInstance()->OpenGeometry();
+  //  G4PhysicalVolumeStore::GetInstance()->Clean();
+  //  G4LogicalVolumeStore::GetInstance()->Clean();
+  //  G4SolidStore::GetInstance()->Clean();
+  //  Analysis::Get()->DestroyTriggers();
   
   // Build entire geometry
   G4VPhysicalVolume* world = GeoManager::Get()->ConstructAll();
 
   // Create the triggers/processors
-  ProcessorFactory::ConstructProcessors();
-  TriggerFactory::ConstructTriggers();
+  //  ProcessorFactory::ConstructProcessors();
+  //  TriggerFactory::ConstructTriggers();
   G4RunManager::GetRunManager()->GeometryHasBeenModified();
   
   // Return pointer to physical world volume

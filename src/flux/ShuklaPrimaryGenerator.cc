@@ -7,7 +7,8 @@ namespace COSMIC {
 ShuklaPrimaryGenerator::ShuklaPrimaryGenerator()
     : G4VUserPrimaryGeneratorAction(),
       fParticleGun(0),
-      fNThrows(0)
+      fNThrows(0),
+      fMuonTime(0)
 {
     G4AutoLock lock(&myMutex);
     std::cout << "FLX: Building Shukla Generator" << std::endl;
@@ -198,6 +199,12 @@ void ShuklaPrimaryGenerator::GetSourceBox() {
         fSourceBoxWidth    = G4ThreeVector(0.5 * size[0], 0.5 * size[1], 0.0);
         fSourceBoxPosition = G4ThreeVector(pos[0], pos[1], pos[2]);
 
+        if (tbl.Has("require_n")) {
+          fSourceBoxRequireN  = tbl.GetI("require_n");
+        } else{
+          fSourceBoxRequireN  = 1;
+        }
+
         fArea = size[0] * size[1] / m / m;
         break;
     }
@@ -249,6 +256,7 @@ std::vector<G4Box*> ShuklaPrimaryGenerator::GetTargetBoxes() {
         // Save Box
         fTargetBoxes.push_back(box_sol);
         fTargetBoxPositions.push_back(box_pos);
+
     }
 
     // Set flag and return
@@ -287,7 +295,8 @@ void ShuklaPrimaryGenerator::GeneratePrimaries(G4Event* anEvent) {
     // i.e. for a geometry involving a thick layer of rock, you could ignore
     // the energies that will definitely range out before the detector.
     // These muons with energy<fMinEnergy will be generated but rejected here.
-    G4double global_time = 0;
+
+    // G4double global_time = 0;//< Not needed as we have fMuonTime?
 
     // Sample the energy and particle type
     G4double E = 0.0;
@@ -299,6 +308,12 @@ void ShuklaPrimaryGenerator::GeneratePrimaries(G4Event* anEvent) {
     uint throws = 0;
     G4ThreeVector direction = G4ThreeVector();
     G4ThreeVector position = G4ThreeVector();
+
+    G4int num_target_boxes_hit=0;
+    // The muon rate
+    //  - fArea is in mm (internal G4 units) so need to convert to m
+    G4double adjusted_rate = fFluxIntegrated*fArea;//< Adjust this rate if we are only sampling a smaller portion of the energy-angle PDF
+    // G4cout << "Adj. Rate : " << adjusted_rate << G4endl;
 
     do {
         throws++;
@@ -315,17 +330,31 @@ void ShuklaPrimaryGenerator::GeneratePrimaries(G4Event* anEvent) {
         // If no target boxes defined all events are good
         if (fTargetBoxes.empty()) break;
 
-        // If target boxes defined only save trajectories that hit at least one
-        for (uint i = 0; i < fTargetBoxes.size(); i++) {
+            // If target boxes defined only save trajectories that hit at least one
+            for (uint i = 0; i < fTargetBoxes.size(); i++) {
 
             G4double d = (fTargetBoxes.at(i))->DistanceToIn(
                              position - fTargetBoxPositions.at(i), direction);
 
-            if (d != kInfinity) {
+
+            if (d != kInfinity){
+              // Increment the counter for the number of target boxes hit
+              num_target_boxes_hit++;
+
+              // Check whether we have the required number of hits
+              if (num_target_boxes_hit>=fSourceBoxRequireN ) {
                 good_event = true;
                 break;
+              }
             }
-        }
+
+            // Regardless of whether the event is accepted increment the time
+            fMuonTime -= std::log(1 - G4UniformRand())*(1.0/adjusted_rate);
+
+
+        }// End for
+
+
 
         if (throws >= 1E8) {
             std::cout << "Failed to find any good events in 1E6 tries!" << std::endl;
@@ -345,16 +374,16 @@ void ShuklaPrimaryGenerator::GeneratePrimaries(G4Event* anEvent) {
     // std::cout << " --> Global Time " << global_time << G4endl;
 
 
-    /// This is incorrect. Need to incremenent the muon exposure time each throw using random stuff from Chris's code. 
-    fMuonTime = fNThrows / fFluxIntegrated / fArea;
+    /// This is incorrect. Need to incremenent the muon exposure time each throw using random stuff from Chris's code.
+    // fMuonTime = fNThrows / fFluxIntegrated / fArea;
     fMuonDir = direction;
     fMuonPos = position;
     fMuonEnergy = E;
 
-    fParticleGun->SetParticleEnergy(E);
-    fParticleGun->SetParticleTime(global_time);
-    fParticleGun->SetParticleMomentumDirection(direction);
-    fParticleGun->SetParticlePosition(position);
+    fParticleGun->SetParticleEnergy(fMuonEnergy);
+    fParticleGun->SetParticleTime(fMuonTime);
+    fParticleGun->SetParticleMomentumDirection(fMuonDir);
+    fParticleGun->SetParticlePosition(fMuonPos);
     fParticleGun->GeneratePrimaryVertex(anEvent);
 
     return;
