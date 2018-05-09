@@ -24,6 +24,7 @@
 #include "simple/GeoTubs.hh"
 #include "simple/GeoCone.hh"
 #include "simple/GeoEllipticalTube.hh"
+#include "simple/GeoEllipticalTunnel.hh"
 #include "dsc/DryStorageCask_VSC24.hh"
 #include "awemuontom/AWEMuonTomographyDetector.hh"
 
@@ -43,6 +44,7 @@ GeoObject* GeoObjectFactory::Construct(DBTable table){
   else if (type.compare("tubs")==0) return new GeoTubs(table);
   else if (type.compare("cons")==0) return new GeoCone(table);
   else if (type.compare("eliptube")==0) return new GeoEllipticalTube(table);
+  else if (type.compare("eliptunnel")==0) return new GeoEllipticalTunnel(table);
   else if (type.compare("DSC_VSC24") == 0) return new DryStorageCask_VSC24(table);
   else if (type.compare("awe_muontom") == 0) return new AWEMuonTomographyDetector(table);
 

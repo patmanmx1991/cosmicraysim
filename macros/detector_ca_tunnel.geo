@@ -3,15 +3,20 @@
 {
   name: "VARIABLE",
   index: "simconstants",
+  world_box_width: "20.0*m",
+  world_box_length: "800.0*m",
   det_system_offset: "-0.5*m",
   det_system_spacing: "10*cm",
   det_system_xsep: "20*cm",
   det_system_lowbar: "0.0*cm",
-  det_tunnel_depth: "25*m",
-  target_tunnel_dist: "10.0*m",
-  target_tunnel_size: "1*m",
+  det_tunnel_depth: "75*m",
+  target_tunnel_dist: "8.0*m",
+  target_tunnel_size: "0.5*m",
+  target_tunnel_length: "80.0*m",
   sampling_target_box_size: "2*m"
 }
+
+
 // ---------------------------------------------------
 // World Geometry : 20 x 20 x 30 AIR
 // Then air and carbon base
@@ -19,7 +24,7 @@
   name: "GEO",
   index: "world",
   material: "Standard_Rock",
-  size: ["400.*m", "20.0*m", "2*det_tunnel_depth"],
+  size: ["world_box_length", "world_box_width", "2*det_tunnel_depth"],
   type: "box"
 }
 
@@ -29,7 +34,7 @@
   index: "target_tunnel_15",
   material: "G4_AIR",
   mother: "world",
-  size: ["target_tunnel_size", "20.0*m", "target_tunnel_size"],
+  size: ["target_tunnel_size", "target_tunnel_length", "target_tunnel_size"],
   position: ["0.0","0.0","target_tunnel_dist"],
   rotation_mother: [0.0,15.0,0.0],
   type: "box"
@@ -41,7 +46,7 @@
   index: "target_tunnel_15w",
   material: "G4_WATER",
   mother: "world",
-  size: ["target_tunnel_size", "20.0*m", "target_tunnel_size"],
+  size: ["target_tunnel_size", "target_tunnel_length", "target_tunnel_size"],
   position: ["0.0","0.0","target_tunnel_dist"],
   rotation_mother: [0.0,-15.0,0.0],
   type: "box"
@@ -53,7 +58,7 @@
   index: "target_tunnel_30",
   material: "G4_AIR",
   mother: "world",
-  size: ["target_tunnel_size", "20.0*m", "target_tunnel_size"],
+  size: ["target_tunnel_size", "target_tunnel_length", "target_tunnel_size"],
   position: ["0.0","0.0","target_tunnel_dist"],
   rotation_mother: [0.0,30.0,0.0],
   type: "box"
@@ -65,7 +70,7 @@
   index: "target_tunnel_30w",
   material: "G4_WATER",
   mother: "world",
-  size: ["target_tunnel_size", "20.0*m", "target_tunnel_size"],
+  size: ["target_tunnel_size", "target_tunnel_length", "target_tunnel_size"],
   position: ["0.0","0.0","target_tunnel_dist"],
   rotation_mother: [0.0,-30.0,0.0],
   type: "box"
@@ -77,7 +82,7 @@
   index: "target_tunnel_45",
   material: "G4_AIR",
   mother: "world",
-  size: ["target_tunnel_size", "20.0*m", "target_tunnel_size"],
+  size: ["target_tunnel_size", "target_tunnel_length", "target_tunnel_size"],
   position: ["0.0","0.0","target_tunnel_dist"],
   rotation_mother: [0.0,45.0,0.0],
   type: "box"
@@ -89,7 +94,7 @@
   index: "target_tunnel_45w",
   material: "G4_WATER",
   mother: "world",
-  size: ["target_tunnel_size", "20.0*m", "target_tunnel_size"],
+  size: ["target_tunnel_size", "target_tunnel_length", "target_tunnel_size"],
   position: ["0.0","0.0","target_tunnel_dist"],
   rotation_mother: [0.0,-45.0,0.0],
   type: "box"
@@ -101,7 +106,7 @@
   index: "target_tunnel_60",
   material: "G4_AIR",
   mother: "world",
-  size: ["target_tunnel_size", "20.0*m", "target_tunnel_size"],
+  size: ["target_tunnel_size", "target_tunnel_length", "target_tunnel_size"],
   position: ["0.0","0.0","target_tunnel_dist"],
   rotation_mother: [0.0,60.0,0.0],
   type: "box"
@@ -113,7 +118,7 @@
   index: "target_tunnel_60w",
   material: "G4_WATER",
   mother: "world",
-  size: ["target_tunnel_size", "20.0*m", "target_tunnel_size"],
+  size: ["target_tunnel_size", "target_tunnel_length", "target_tunnel_size"],
   position: ["0.0","0.0","target_tunnel_dist"],
   rotation_mother: [0.0,-60.0,0.0],
   type: "box"
@@ -125,7 +130,7 @@
   index: "target_tunnel_75",
   material: "G4_AIR",
   mother: "world",
-  size: ["target_tunnel_size", "20.0*m", "target_tunnel_size"],
+  size: ["target_tunnel_size", "target_tunnel_length", "target_tunnel_size"],
   position: ["0.0","0.0","target_tunnel_dist"],
   rotation_mother: [0.0,75.0,0.0],
   type: "box"
@@ -137,11 +142,13 @@
   index: "target_tunnel_75w",
   material: "G4_WATER",
   mother: "world",
-  size: ["target_tunnel_size", "20.0*m", "target_tunnel_size"],
+  size: ["target_tunnel_size", "target_tunnel_length", "target_tunnel_size"],
   position: ["0.0","0.0","target_tunnel_dist"],
   rotation_mother: [0.0,-75.0,0.0],
   type: "box"
 }
+
+
 
 
 
@@ -156,29 +163,28 @@
 }
 
 //--------------------------------------------
-// Main mother detector volume (for easy placement)
-//{
-//  name: "GEO",
-//  index: "detector",
-//  type: "eliptube",
-//  mother: "world",
-//  material: "G4_AIR",
-//  size: ["11.630*m", "7.740*m", "30.0*m"],
-//  position: ["0.0*m","0.0","0.0"],
-//  rotation: [90.0,0.0,90.0],
-//  // sensitive: "truemuon",
-//}
-
-
+// Main mother tunnel and detector volume (for easy placement)
+//
+{
+  name: "GEO",
+  index: "tunnel",
+  type: "eliptunnel",
+  mother: "world",
+  material: "G4_AIR",
+  size: ["11.630*m", "7.740*m", "world_box_width"],
+  position: ["0.0","0.0","0.0"],
+  rotation: [90.0,0.0,90.0],
+}
 
 {
   name: "GEO",
   index: "detector",
   type: "box",
-  mother: "world",
+  mother: "tunnel",
   material: "G4_AIR",
-  size: ["5.0*m","20.0*m","5.0*m"],
-  position: ["0.0*m","0.0","0.0"],
+  size: ["sampling_target_box_size", "sampling_target_box_size", "sampling_target_box_size"],
+  position: ["0.0","0.5*sampling_target_box_size","0.0"],
+  rotation_mother: [0.0,-90.0,90.0],
   sensitive: "truemuon"
 }
 
@@ -224,7 +230,7 @@
 {
   name: "FLUX",
   index: "source_box",
-  size: ["400.*m", "20.0*m", "1.*mm"],
+  size: ["world_box_length", "world_box_width", "1.*mm"],
   position: ["0.0","0.0", "det_tunnel_depth - 2*mm"],
 }
 
