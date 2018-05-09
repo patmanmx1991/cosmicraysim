@@ -37,7 +37,7 @@ namespace COSMIC{
 GeoObject* GeoObjectFactory::Construct(DBTable table){
 
   std::string type = table.GetS("type");
-  
+
   std::cout << "GEO: Constructing " << type << " : " << table.GetIndexName() <<  std::endl;
   if (type.compare("box")==0) return new GeoBox(table);
   else if (type.compare("tubs")==0) return new GeoTubs(table);
@@ -67,6 +67,7 @@ G4VPhysicalVolume* GeoManager::ConstructAll(){
   std::vector<DBTable> tables_clone = DB::Get()->GetTableGroup("GEO");
   std::vector<DBTable>::iterator geo_iter = tables_clone.begin();
 
+
   int count = 0;
   while (tables_clone.size() > 0){
 
@@ -77,27 +78,29 @@ G4VPhysicalVolume* GeoManager::ConstructAll(){
 
       // Check doesn't already exist
       if (HasGeoObject(geo_id)){
-        std::cout << "Trying to add duplicate GEOM! " 
+        std::cout << "Trying to add duplicate GEOM! "
                   << "INDEX : " << geo_id << std::endl;
         geo_tab.Print();
         throw;
       }
-        
+
       // Check if mother already created
+      std::cout << "GEO: Building Geometry " << std::endl;
       int mother_status = MotherStatus(geo_tab);
+      std::cout << "GEO: Building Geometry " << std::endl;
       if (mother_status == 2){
         count++;
         ++geo_iter;
         continue; // If it hasn't skip for now
       }
 
+      std::cout << "GEO: Building Geometry " << std::endl;
       GeoObject* geo_obj = GeoObjectFactory::Construct(geo_tab);
       fGeoObjects[geo_id] = geo_obj;
       fGeoIDs.push_back(geo_id);
 
       // Remove tabs
       geo_iter = tables_clone.erase(geo_iter);
-
 
     }
     if (count > 10000){

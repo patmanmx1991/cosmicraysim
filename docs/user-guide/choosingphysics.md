@@ -23,3 +23,4 @@ Available options for the global physics list at this time are
 
 - **default** : A simple list from the Geant4 examples. Only really has EM physics.
 - **shielding** : Shielding physics list contains many more processors than the default. Recommended one to use for full runs, but is slower to use during debugging, etc, so is not yet the default.
+- **OTHER** : Any one that can be defined inside the GEANT4 UserPhysicsListFactory can also be used if you know its string.

@@ -32,11 +32,11 @@
 #include "G4UImanager.hh"
 
 #include "Randomize.hh"
-#ifdef G4MULTITHREADED
-#include "G4MTRunManager.hh"
-#else
+//#ifdef G4MULTITHREADED
+//#include "G4MTRunManager.hh"
+//#else
 #include "G4RunManager.hh"
-#endif
+//#endif
 
 #ifdef G4VIS_USE
 #include "G4VisExecutive.hh"
@@ -227,11 +227,11 @@ int main(int argc, char** argv) {
 // Construct the default run manager. Pick the proper run
 // manager depending if the multi-threading option is
 // active or not.
-#ifdef G4MULTITHREADED
-  G4MTRunManager* runManager = new G4MTRunManager;
-#else
+//#ifdef G4MULTITHREADED
+//  G4MTRunManager* runManager = new G4MTRunManager;
+//#else
   G4RunManager* runManager = new G4RunManager;
-#endif
+  //#endif
 
 
   std::cout << "========================================= " << std::endl;
@@ -432,4 +432,3 @@ int main(int argc, char** argv) {
 
   return 0;
 }
-

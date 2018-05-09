@@ -106,11 +106,13 @@ protected:
   G4double fEdep;
   G4double fPosX;
   G4double fPosY;
+  G4double fPDG;
   G4double fPosZ;
   G4double fThetaXZ;
   G4double fThetaYZ;
 
   int fTimeIndex;
+  int fPDGIndex;
   int fPosXIndex;
   int fPosYIndex;
   int fPosZIndex;
@@ -123,8 +125,3 @@ protected:
 
 }
 #endif
-
-
-
-
-

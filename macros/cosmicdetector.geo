@@ -31,7 +31,7 @@
   material: "G4_AIR",
   size: ["2.0*m","2.0*m","2.0*m"],
   position: ["0.0*m","0.0","0.0"],
-  sensitive: "truemuon",
+  sensitive: "truemuon",	   
 }
 
 
@@ -78,6 +78,13 @@
 { name: "GEO", index: "bar6", clone: "bar0", position: ["-1.0*xsep","0.0","offset+lowbar"] }
 
 
+
+
+
+
+
+
+
 // ---------------------------------------------------
 // Flux Generator Source Location : Default is Shukla
 {
@@ -85,11 +92,4 @@
   index: "source_box",
   size: ["3.0*m", "3.0*m", "0.5*m"],
   position: ["0.0","0.0", "9.75*m"],
-}
-
-{
-  name: "FLUX",
-  index: "target_box_0",
-  size: ["0.2*m","0.2*m","0.2*m"],
-  position: ["0.0*m","0.0","0.0"],
 }

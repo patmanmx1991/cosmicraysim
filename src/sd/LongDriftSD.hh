@@ -54,6 +54,8 @@ public:
   /// Getter functions
   inline DriftChamberHitsCollection* GetHC() { return fHitsCollection; };
   G4int GetHCID();
+  G4int GetGhostHCID();
+
   void SetLogicalVolume(G4LogicalVolume* logic, G4VPhysicalVolume* physical);
 
   /// Draw the hits
@@ -62,7 +64,11 @@ public:
 protected:
 
   DriftChamberHitsCollection* fHitsCollection;
+  DriftChamberHitsCollection* fGhostCollection;
+
   G4int fHCID;
+  G4int fGhostHCID;
+
   G4LogicalVolume* fLogical;
   G4VPhysicalVolume* fPhysical;
   int fDriftChamberType;
@@ -120,6 +126,13 @@ public:
   inline G4double       GetErrZ() { return fErrZ;  };
   inline G4double       GetEDep() { return fEdep;  };
 
+  inline G4double       GetGhostPosX() { return fGhostPosX;  };
+  inline G4double       GetGhostPosY() { return fGhostPosY;  };
+  inline G4double       GetGhostPosZ() { return fGhostPosZ;  };
+  inline G4double       GetGhostErrX() { return fGhostErrX;  };
+  inline G4double       GetGhostErrY() { return fGhostErrY;  };
+  inline G4double       GetGhostErrZ() { return fGhostErrZ;  };
+
   // Enums for determining what variables to save in GLOBAL
   enum DriftChamberDOF {
     kDOF_X = 0,
@@ -139,6 +152,7 @@ protected:
 
   LongDriftSD* fDetector; ///< Pointer to associated to SD
   G4int fHCID;
+  G4int fGhostHCID;
   G4LogicalVolume* fLogical;
   G4VPhysicalVolume* fPhysical;
   bool fSave; ///< Flag to save event info automatically
@@ -151,6 +165,14 @@ protected:
   G4double fErrX;
   G4double fErrY;
   G4double fErrZ;
+
+  G4double fGhostEdep;
+  G4double fGhostPosX;
+  G4double fGhostPosY;
+  G4double fGhostPosZ;
+  G4double fGhostErrX;
+  G4double fGhostErrY;
+  G4double fGhostErrZ;
 
   int fEdepIndex;
   int fTimeIndex;

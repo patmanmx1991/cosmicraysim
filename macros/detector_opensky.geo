@@ -5,7 +5,7 @@
   name: "GEO",
   index: "world",
   material: "G4_AIR",
-  size: ["3.*m", "3.0*m", "2.*m"],
+  size: ["100.*m", "20.0*m", "20.*m"],
   type: "box",
 }
 
@@ -55,8 +55,8 @@
   index: "detspacing",
   offset: "-0.5*m",
   spacing: "10*cm"
-  xsep: "80*cm",
-  lowbar: "5.0*cm"
+  xsep: "20*cm",
+  lowbar: "0.0*cm"
 }
 {
   name: "GEO",
@@ -69,13 +69,17 @@
   sensitive: "scint",
   color: [0.0,0.0,1.0],
 }
+
+// - The main stack of scintillator detectors
 { name: "GEO", index: "bar1", clone: "bar0", position: ["0.0","0.0","1*spacing+offset"] }
 { name: "GEO", index: "bar2", clone: "bar0", position: ["0.0","0.0","2*spacing+offset"] }
 { name: "GEO", index: "bar3", clone: "bar0", position: ["0.0","0.0","3*spacing+offset"] }
 { name: "GEO", index: "bar4", clone: "bar0", position: ["0.0","0.0","4*spacing+offset"] }
+{ name: "GEO", index: "bar5", clone: "bar0", position: ["0.0","0.0","4*spacing+offset"] }
 
-{ name: "GEO", index: "bar5", clone: "bar0", position: ["xsep","0.0","offset+lowbar"] }
-{ name: "GEO", index: "bar6", clone: "bar0", position: ["-1.0*xsep","0.0","offset+lowbar"] }
+// - The lower two scintillator detectors
+{ name: "GEO", index: "bar6", clone: "bar0", position: ["xsep","0.0","offset+lowbar"] }
+{ name: "GEO", index: "bar7", clone: "bar0", position: ["-1.0*xsep","0.0","offset+lowbar"] }
 
 
 // ---------------------------------------------------
@@ -83,13 +87,30 @@
 {
   name: "FLUX",
   index: "source_box",
-  size: ["3.0*m", "3.0*m", "0.5*m"],
+  size: ["100.*m", "20.0*m", "20.*m"],
   position: ["0.0","0.0", "9.75*m"],
 }
 
+// Target for the main detector stack
 {
   name: "FLUX",
   index: "target_box_0",
-  size: ["0.2*m","0.2*m","0.2*m"],
-  position: ["0.0*m","0.0","0.0"],
+  size: ["4*cm","80*cm","6.0*10.0*cm"],
+  position: ["0.0","0.0","0.0"],
+}
+
+// Target for one lower detector
+{
+  name: "FLUX",
+  index: "target_box_1",
+  size: ["4*cm","80*cm","10*cm"],
+  position: ["xsep","0.0","offset+lowbar"],
+}
+
+// Target for the other lower detector
+{
+  name: "FLUX",
+  index: "target_box_2",
+  size: ["4*cm","80*cm","10*cm"],
+  position: ["-xsep","0.0","offset+lowbar"],
 }

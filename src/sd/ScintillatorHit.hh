@@ -74,8 +74,8 @@ public:
 
 
     G4int GetID() const { return fId; }
-    G4int GetType() const { return fType; }// type=0, muon ; type=1 neutron; type=2 gamma
-    void SetType(G4int val){fType=val; }// type=0, muon ; type=1 neutron; type=2 gamma
+    G4int GetType() const { return fType; }
+    void SetType(G4int val){fType=val; }
 
     void SetTime(G4double val) { fTime = val; }
     G4double GetTime() const { return fTime; }

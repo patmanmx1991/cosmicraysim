@@ -52,10 +52,10 @@ void SimpleScintillatorSD::Initialize(G4HCofThisEvent* hce)
 G4bool SimpleScintillatorSD::ProcessHits(G4Step* step, G4TouchableHistory* touch) {
 
     G4double edep = step->GetTotalEnergyDeposit();
-    if (edep == 0.) return false;
-
+    if (edep <= 0.) {
+        return false;
+    }
     G4Track* track = step->GetTrack();
-    int pdg = track->GetParticleDefinition()->GetPDGEncoding();
 
     // Get the step inside the detector
     G4StepPoint* preStepPoint = step->GetPreStepPoint();
@@ -66,7 +66,7 @@ G4bool SimpleScintillatorSD::ProcessHits(G4Step* step, G4TouchableHistory* touch
     G4double hitTime = preStepPoint->GetGlobalTime();
 
     ScintillatorHit* hit = new ScintillatorHit();
-    hit->SetParticleType(pdg);
+    hit->SetParticleType((int) track->GetParticleDefinition()->GetPDGEncoding());
     hit->SetEdep(edep);
     hit->SetTime(hitTime);
     hit->SetPos(preStepPoint->GetPosition());
@@ -96,6 +96,7 @@ bool SimpleScintillatorProcessor::BeginOfRunAction(const G4Run* /*run*/) {
         fPosXIndex = man ->CreateNtupleDColumn(tableindex + "_x");
         fPosYIndex = man ->CreateNtupleDColumn(tableindex + "_y");
         fPosZIndex = man ->CreateNtupleDColumn(tableindex + "_z");
+        fPDGIndex = man ->CreateNtupleDColumn(tableindex + "_pdg");
         fThXZIndex = man ->CreateNtupleDColumn(tableindex + "_thXZ");
         fThYZIndex = man ->CreateNtupleDColumn(tableindex + "_thYZ");
     }
@@ -139,6 +140,9 @@ bool SimpleScintillatorProcessor::ProcessEvent(const G4Event* event) {
     fThetaXZ /= nhits + 0.;
     fThetaYZ /= nhits + 0.;
 
+    fPDG = (double) ( *(hc) )[0]->GetType();
+
+
     // Register Trigger State
     fHasInfo = fEdep > 0.0;
     fEnergy  = fEdep;
@@ -152,6 +156,7 @@ bool SimpleScintillatorProcessor::ProcessEvent(const G4Event* event) {
         G4AnalysisManager* man = G4AnalysisManager::Instance();
         man->FillNtupleDColumn(fEdepIndex, fEdep);
         man->FillNtupleDColumn(fTimeIndex, fTime);
+        man->FillNtupleDColumn(fPDGIndex, fPDG);
         man->FillNtupleDColumn(fPosXIndex, fPosX);
         man->FillNtupleDColumn(fPosYIndex, fPosY);
         man->FillNtupleDColumn(fPosZIndex, fPosZ);
@@ -162,9 +167,10 @@ bool SimpleScintillatorProcessor::ProcessEvent(const G4Event* event) {
     } else {
 
         // Set default values
-        G4AnalysisManager* man = G4AnalysisManager::Instance();        
+        G4AnalysisManager* man = G4AnalysisManager::Instance();
         man->FillNtupleDColumn(fEdepIndex, -999.);
         man->FillNtupleDColumn(fTimeIndex, -999.);
+        man->FillNtupleDColumn(fPDGIndex, -999.);
         man->FillNtupleDColumn(fPosXIndex, -999.);
         man->FillNtupleDColumn(fPosYIndex, -999.);
         man->FillNtupleDColumn(fPosZIndex, -999.);
@@ -182,6 +188,7 @@ void SimpleScintillatorProcessor::Reset() {
     fPosX = 0.0;
     fPosY = 0.0;
     fPosZ = 0.0;
+    fPDG = 0.0;
     fThetaXZ = 0.0;
     fThetaYZ = 0.0;
 }
