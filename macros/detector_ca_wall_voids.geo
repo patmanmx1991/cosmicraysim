@@ -24,6 +24,8 @@
   material: "Standard_Rock",
   size: ["world_box_length", "world_box_width", "2*det_tunnel_depth"],
   type: "box"
+  color: [0.3,0.1,0.1,0.5],
+  drawstyle: "solid"
 }
 
 // Target tunnel @ 15 degrees
@@ -35,6 +37,8 @@
   size: ["target_tunnel_size", "target_tunnel_length", "target_tunnel_size"],
   position: ["0.0","0.0","target_tunnel_dist"],
   rotation_mother: [0.0,15.0,0.0],
+  color: [0.9,0.3,0.9,0.9],
+  drawstyle: "solid"
   type: "box"
 }
 
@@ -47,6 +51,8 @@
   size: ["target_tunnel_size", "target_tunnel_length", "target_tunnel_size"],
   position: ["0.0","0.0","target_tunnel_dist"],
   rotation_mother: [0.0,-15.0,0.0],
+  color: [0.3,0.9,0.9,0.9],
+  drawstyle: "solid"
   type: "box"
 }
 
@@ -59,6 +65,8 @@
   size: ["target_tunnel_size", "target_tunnel_length", "target_tunnel_size"],
   position: ["0.0","0.0","target_tunnel_dist"],
   rotation_mother: [0.0,30.0,0.0],
+  color: [0.9,0.3,0.9,0.9],
+  drawstyle: "solid"
   type: "box"
 }
 
@@ -71,6 +79,8 @@
   size: ["target_tunnel_size", "target_tunnel_length", "target_tunnel_size"],
   position: ["0.0","0.0","target_tunnel_dist"],
   rotation_mother: [0.0,-30.0,0.0],
+  color: [0.3,0.9,0.9,0.9],
+  drawstyle: "solid"
   type: "box"
 }
 
@@ -83,6 +93,8 @@
   size: ["target_tunnel_size", "target_tunnel_length", "target_tunnel_size"],
   position: ["0.0","0.0","target_tunnel_dist"],
   rotation_mother: [0.0,45.0,0.0],
+  color: [0.9,0.3,0.9,0.9],
+  drawstyle: "solid"
   type: "box"
 }
 
@@ -95,6 +107,8 @@
   size: ["target_tunnel_size", "target_tunnel_length", "target_tunnel_size"],
   position: ["0.0","0.0","target_tunnel_dist"],
   rotation_mother: [0.0,-45.0,0.0],
+  color: [0.3,0.9,0.9,0.9],
+  drawstyle: "solid"
   type: "box"
 }
 
@@ -107,6 +121,8 @@
   size: ["target_tunnel_size", "target_tunnel_length", "target_tunnel_size"],
   position: ["0.0","0.0","target_tunnel_dist"],
   rotation_mother: [0.0,60.0,0.0],
+  color: [0.9,0.3,0.9,0.9],
+  drawstyle: "solid"
   type: "box"
 }
 
@@ -119,6 +135,8 @@
   size: ["target_tunnel_size", "target_tunnel_length", "target_tunnel_size"],
   position: ["0.0","0.0","target_tunnel_dist"],
   rotation_mother: [0.0,-60.0,0.0],
+  color: [0.3,0.9,0.9,0.9],
+  drawstyle: "solid"
   type: "box"
 }
 
@@ -131,6 +149,8 @@
   size: ["target_tunnel_size", "target_tunnel_length", "target_tunnel_size"],
   position: ["0.0","0.0","target_tunnel_dist"],
   rotation_mother: [0.0,75.0,0.0],
+  color: [0.9,0.3,0.9,0.9],
+  drawstyle: "solid"
   type: "box"
 }
 
@@ -143,10 +163,10 @@
   size: ["target_tunnel_size", "target_tunnel_length", "target_tunnel_size"],
   position: ["0.0","0.0","target_tunnel_dist"],
   rotation_mother: [0.0,-75.0,0.0],
+  color: [0.3,0.9,0.9,0.9],
+  drawstyle: "solid"
   type: "box"
 }
-
-
 
 
 
@@ -170,6 +190,8 @@
   size: ["11.630*m", "7.740*m", "world_box_width"],
   position: ["0.0","0.0","0.0"],
   rotation: [90.0,0.0,90.0],
+  color: [1.0,1.0,1.0,0.8],
+  drawstyle: "wireframe"
 }
 
 {
@@ -181,6 +203,8 @@
   size: ["sampling_target_box_size", "sampling_target_box_size", "sampling_target_box_size"],
   position: ["0.0","0.5*sampling_target_box_size","0.0"],
   rotation_mother: [0.0,-90.0,90.0],
+  color: [0.3,0.9,0.1,0.9],
+  invisible: 1,
   sensitive: "truemuon"
 }
 
@@ -204,8 +228,8 @@
   material: "G4_PLASTIC_SC_VINYLTOLUENE",
   size: ["4*cm","80*cm","10*cm"],
   position: ["0.0","0.0","0.0*det_system_spacing+det_system_offset"],
-  sensitive: "scint",
-  color: [0.0,0.0,1.0],
+  color: [0.3,0.9,0.1,0.9],
+  drawstyle: "solid"
 }
 
 

@@ -14,6 +14,14 @@
   density: 2.65
 }
 
+{
+  name: "MATERIAL",
+  index: "BF3",
+  element_names:  ["B","F"],
+  element_counts: [0.25, 0.75],
+  density: 0.00276
+}
+
 
 // This is an average measurement of soil composition across the USA
 // by the USGS. There is a large variation and number of smaller elements
@@ -23,7 +31,7 @@
 // - counts in parts per thousand (mg/g) and only retained those elements >1
 {
   name: "MATERIAL",
-  index: "SOIL",
+  index: "Soil",
   element_names:  ["Al","C", "Ca", "Fe", "K","Mg", "Na", "S", "Si", "Ti"],
   // in mg/g -> converted to mass fraction
   element_counts: [0.145,0.050,0.048,0.052,0.030,0.018,0.024,0.003,0.623,0.006],

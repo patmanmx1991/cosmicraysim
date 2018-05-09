@@ -9,13 +9,13 @@
   det_system_spacing: "10*cm",
   det_system_xsep: "20*cm",
   det_system_lowbar: "0.0*cm",
-  det_tunnel_depth: "75*m",
+  det_tunnel_depth: "25*m",
   target_tunnel_dist: "8.0*m",
   target_tunnel_size: "0.5*m",
-  target_tunnel_length: "80.0*m",
-  sampling_target_box_size: "2*m"
+  target_tunnel_length: "20.0*m",
+  sampling_target_box_size: "2.0*m",
+  sampling_target_box_scale: "1"
 }
-
 
 // ---------------------------------------------------
 // World Geometry : 20 x 20 x 30 AIR
@@ -225,6 +225,8 @@
 { name: "GEO", index: "bar7", clone: "bar0", position: ["-1.0*det_system_xsep","0.0","det_system_offset+det_system_lowbar"] }
 
 
+
+
 // ---------------------------------------------------
 // Flux Generator Source Location : Default is Shukla
 {
@@ -232,12 +234,29 @@
   index: "source_box",
   size: ["world_box_length", "world_box_width", "1.*mm"],
   position: ["0.0","0.0", "det_tunnel_depth - 2*mm"],
+  require_n: 2
 }
 
 // Target for the main detector stack
 {
   name: "FLUX",
   index: "target_box_0",
-  size: ["sampling_target_box_size","sampling_target_box_size","sampling_target_box_size"],
-  position: ["0.0*m","0.0","0.0"],
+  size: ["sampling_target_box_scale*4*cm","sampling_target_box_scale*80*cm","sampling_target_box_scale*6.0*10.0*cm"],
+  position: ["0.0","0.0","0.0"]
+}
+
+// Target for one lower detector
+{
+  name: "FLUX",
+  index: "target_box_1",
+  size: ["sampling_target_box_scale*4*cm","sampling_target_box_scale*80*cm","sampling_target_box_scale*10*cm"],
+  position: ["det_system_xsep","0.0","det_system_offset+det_system_lowbar"],
+}
+
+// Target for the other lower detector
+{
+  name: "FLUX",
+  index: "target_box_2",
+  size: ["sampling_target_box_scale*4*cm","sampling_target_box_scale*80*cm","sampling_target_box_scale*10*cm"],
+  position: ["-det_system_xsep","0.0","det_system_offset+det_system_lowbar"],
 }
