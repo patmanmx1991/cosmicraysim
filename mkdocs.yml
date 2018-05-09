@@ -6,8 +6,10 @@ pages:
   - Editing Tables: user-guide/editingtables.md
   - Making Geometry: user-guide/makinggeometry.md
   - Choosing a Flux: user-guide/choosingflux.md
-  - Choosing a Physics List: user-guide/choosingphysics.md
-  - Adding Detectors: user-guide/addingdetectors.md
+  - Defining Physics List: user-guide/choosingphysics.md
+  - Defining Detectors: user-guide/addingdetectors.md
+  - Loading Triggers: user-guide/addingtriggers.md
+  - Defining Processors: user-guide/addingprocessors.md
 - Developer Guide:
   - Accessing DataBase: developers-guide/databaseaccess.md
 theme: readthedocs
