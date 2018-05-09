@@ -74,8 +74,8 @@ G4bool TrueMuonTracker::ProcessHits(G4Step* step, G4TouchableHistory* /*touch*/)
   // Get only muons
   G4Track* track = step->GetTrack();
   int steppdg = track->GetParticleDefinition()->GetPDGEncoding();
-  // bool is_muon = ((steppdg == 13) || (steppdg == -13));
-  // if (!is_muon) return true;
+  bool is_muon = ((steppdg == 13) || (steppdg == -13));
+  if (!is_muon) return true;
 
   // Get the step+1 inside the detector
   G4StepPoint* steppoint = step->GetPostStepPoint();
