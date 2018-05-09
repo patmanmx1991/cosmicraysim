@@ -118,27 +118,27 @@ public:
   // Getter Functions
   inline G4double  GetTime() { return fTime; };
 
-  inline const G4double  GetPosX() { return fPosX;  };
-  inline const G4double  GetPosY() { return fPosY;  };
-  inline const G4double  GetPosZ() { return fPosZ;  };
-  inline const G4double  GetErrX() { return fErrX;  };
-  inline const G4double  GetErrY() { return fErrY;  };
-  inline const G4double  GetErrZ() { return fErrZ;  };
+  inline G4double  GetPosX() { return fPosX;  };
+  inline G4double  GetPosY() { return fPosY;  };
+  inline G4double  GetPosZ() { return fPosZ;  };
+  inline G4double  GetErrX() { return fErrX;  };
+  inline G4double  GetErrY() { return fErrY;  };
+  inline G4double  GetErrZ() { return fErrZ;  };
 
-  inline const G4double  GetWorldPosX() { return fWorldPosX;  };
-  inline const G4double  GetWorldPosY() { return fWorldPosY;  };
-  inline const G4double  GetWorldPosZ() { return fWorldPosZ;  };
-  inline const G4double  GetWorldErrX() { return fWorldErrX;  };
-  inline const G4double  GetWorldErrY() { return fWorldErrY;  };
-  inline const G4double  GetWorldErrZ() { return fWorldErrZ;  };
+  inline G4double  GetWorldPosX() { return fWorldPosX;  };
+  inline G4double  GetWorldPosY() { return fWorldPosY;  };
+  inline G4double  GetWorldPosZ() { return fWorldPosZ;  };
+  inline G4double  GetWorldErrX() { return fWorldErrX;  };
+  inline G4double  GetWorldErrY() { return fWorldErrY;  };
+  inline G4double  GetWorldErrZ() { return fWorldErrZ;  };
 
-  inline const G4double  GetGhostPosX() { return fGhostPosX;  };
-  inline const G4double  GetGhostPosY() { return fGhostPosY;  };
-  inline const G4double  GetGhostPosZ() { return fGhostPosZ;  };
+  inline G4double  GetGhostPosX() { return fGhostPosX;  };
+  inline G4double  GetGhostPosY() { return fGhostPosY;  };
+  inline G4double  GetGhostPosZ() { return fGhostPosZ;  };
 
-  inline const G4double  GetGhostWorldPosX() { return fGhostWorldPosX;  };
-  inline const G4double  GetGhostWorldPosY() { return fGhostWorldPosY;  };
-  inline const G4double  GetGhostWorldPosZ() { return fGhostWorldPosZ;  };
+  inline G4double  GetGhostWorldPosX() { return fGhostWorldPosX;  };
+  inline G4double  GetGhostWorldPosY() { return fGhostWorldPosY;  };
+  inline G4double  GetGhostWorldPosZ() { return fGhostWorldPosZ;  };
 
 protected:
 

@@ -27,7 +27,7 @@
 #include "dsc/DryStorageCask_VSC24.hh"
 #include "awemuontom/AWEMuonTomographyDetector.hh"
 #include "awemuontom/AWEMuonTomographyDetectorSecond.hh"
-
+#include "hybrid/HybridMuonTomographyDetector.hh"
 #include "db/DB.hh"
 #include "db/DBTable.hh"
 #include <map>
@@ -47,6 +47,7 @@ GeoObject* GeoObjectFactory::Construct(DBTable table){
   else if (type.compare("DSC_VSC24") == 0) return new DryStorageCask_VSC24(table);
   else if (type.compare("awe_muontom") == 0) return new AWEMuonTomographyDetector(table);
   else if (type.compare("awe_muontom2") == 0) return new AWEMuonTomographyDetectorSecond(table);
+  else if (type.compare("hybrid_muontom") == 0) return new HybridMuonTomographyDetector(table);
 
 
   std::cout << "Failed to Construct Geometry" << std::endl;
@@ -114,7 +115,8 @@ G4VPhysicalVolume* GeoManager::ConstructAll(){
     }
   }
 
-  return fGeoObjects["world"]->GetPhysical();
+  fWorldVolume = fGeoObjects["world"]->GetPhysical();
+  return fWorldVolume;
 }
 
 

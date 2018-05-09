@@ -33,7 +33,7 @@
 
 #include "G4VUserDetectorConstruction.hh"
 #include "globals.hh"
-
+#include "G4GDMLParser.hh"
 #include "db/DB.hh"
 #include "db/DBTable.hh"
 #include "sd/DetectorMessenger.hh"
@@ -62,6 +62,7 @@ private:
   void DefineMaterials();
   DetectorMessenger* fMessenger;
   // G4bool  fCheckOverlaps;
+  G4GDMLParser gdml_parser;
 };
 #endif
 

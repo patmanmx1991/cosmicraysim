@@ -21,7 +21,7 @@ public:
   /// Named Constructor
   VTrigger(std::string id) : fID(id) {};
   /// Destructor
-  ~VTrigger(){};
+  virtual ~VTrigger(){};
 
   /// User should overwrite this function to return
   /// true when an event is triggered. The processor

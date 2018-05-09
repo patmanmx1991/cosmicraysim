@@ -53,23 +53,33 @@ void DetectorConstruction::DefineMaterials()
 
 G4VPhysicalVolume* DetectorConstruction::Construct()
 {
-  // Clear any old processors/triggers 
+  // Clear any old processors/triggers
   //  G4GeometryManager::GetInstance()->OpenGeometry();
   //  G4PhysicalVolumeStore::GetInstance()->Clean();
   //  G4LogicalVolumeStore::GetInstance()->Clean();
   //  G4SolidStore::GetInstance()->Clean();
   //  Analysis::Get()->DestroyTriggers();
-  
-  // Build entire geometry
-  G4VPhysicalVolume* world = GeoManager::Get()->ConstructAll();
 
-  // Create the triggers/processors
-  //  ProcessorFactory::ConstructProcessors();
-  //  TriggerFactory::ConstructTriggers();
-  G4RunManager::GetRunManager()->GeometryHasBeenModified();
-  
-  // Return pointer to physical world volume
-  return world;
+  // if GDML is defined then load from global config
+  DBTable tbl = DB::Get()->GetTable("GLOBAL", "config");
+  if (tbl.Has("gdml")) {
+
+    // Build static GDML Geometry
+    gdml_parser.Read(tbl.GetS("gdml"));
+    return gdml_parser.GetWorldVolume();
+
+  } else {
+
+    // Build entire geometry
+    G4VPhysicalVolume* world = GeoManager::Get()->ConstructAll();
+
+    // Create the triggers/processors
+    ProcessorFactory::ConstructProcessors();
+    TriggerFactory::ConstructTriggers();
+    G4RunManager::GetRunManager()->GeometryHasBeenModified();
+    return world;
+
+  }
 }
 
 void DetectorConstruction::ConstructSDandField()

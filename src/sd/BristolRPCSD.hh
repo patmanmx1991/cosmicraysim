@@ -68,33 +68,16 @@ public:
 protected:
 
   DriftChamberHitsCollection* fHitsCollection;
-  DriftChamberHitsCollection* fGhostCollection;
-
   G4int fHCID;
-  G4int fGhostHCID;
 
   G4LogicalVolume* fLogical;
   G4VPhysicalVolume* fPhysical;
-  int fDriftChamberType;
-  int fLongDim0;
-  int fLongDim1;
-  int fLongDim2;
 
-  G4double fResolutionX;
-  G4double fResolutionY;
-  G4double fResolutionZ;
+  G4double fResolution;
 
   G4double fDetectorSizeX;
   G4double fDetectorSizeY;
   G4double fDetectorSizeZ;
-
-  bool fRestrictX;
-  bool fRestrictY;
-  bool fRestrictZ;
-
-  G4double fWirePositionX;
-  G4double fWirePositionY;
-  G4double fWirePositionZ;
 
   G4double fEfficiency;
   G4double fEfficiencyThrow;

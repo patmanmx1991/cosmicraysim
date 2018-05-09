@@ -42,6 +42,9 @@ public:
   G4LogicalVolume* GetMother(DBTable geo_tab);
 
   G4VPhysicalVolume* ConstructAll();
+  G4VPhysicalVolume* GetWorldVolume(){ return fWorldVolume; };
+  G4VPhysicalVolume* fWorldVolume;
+
   //  std::vector<DBTable> fGeoTables;
   std::map<std::string, GeoObject*> fGeoObjects;
   int MotherStatus(DBTable geo_tab);

@@ -253,7 +253,7 @@ G4VSensitiveDetector* GeoSolid::ConstructSensitiveDetector(DBTable table, G4Logi
   std::string sensitive = table.GetS("sensitive");
 
   // First check detector not already loaded
-  std::string sdname = table.GetIndexName() + "_" + sensitive;
+  std::string sdname = table.GetIndexName();
   VDetector* sd = Analysis::Get()->GetDetector(sdname, true);
   if (!sd){
     DBTable sdtbl = DB::Get()->GetTable("DETECTOR", sensitive);
