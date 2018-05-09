@@ -37,6 +37,8 @@
 #include "Math/Factory.h"
 #include "Math/Functor.h"
 #include "sd/LongDriftSD.hh"
+#include "sd/AWEDriftSD.hh"
+
 #include "sd/SimpleScintillatorSD.hh"
 #include "TH1.h"
 #include "TF1.h"
@@ -101,7 +103,7 @@ protected:
   bool fSave; ///< Whether to auto save
 
   AWEMuonTomographyDetectorSecond* fAWEDetector; ///< Pointer to associated detector medium
-  std::vector<LongDriftProcessor*> fDriftChamberProcs; ///< List of all drift processors
+  std::vector<AWEDriftProcessor*> fDriftChamberProcs; ///< List of all drift processors
   SimpleScintillatorProcessor* fScintProcTop; ///< Scintillator trigger processor
   SimpleScintillatorProcessor* fScintProcBottom; ///< Scintillator trigger processor
 

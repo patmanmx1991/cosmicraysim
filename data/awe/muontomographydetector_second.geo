@@ -37,8 +37,8 @@
   type:  "scintillator"
   effiency: 1.0,
   time_resolution: "30.0*ns",
-  processor: 1,
-  save: 1,
+  processor: 0,
+  save: 0,
 }
 // --> Place plastic scintillator as one big panel
 {
@@ -91,36 +91,26 @@
   drawstyle: "solid"
 }
 
-
 // -------------------------------------
 // Drift Chambers
 // --> Drift Detector : Only Y pos info
 {
   name: "DETECTOR",
   index: "longdrift",
-  type:  "longdrift"
-  //
-  // What DOF information is saved
-  restrict_x: 1,
-  restrict_y: 0,
-  restrict_z: 1,
+  type:  "awedrift"
   //
   // Position resolution width
-  //resolution_x: "2*mm",
-  resolution_y: "2*mm",
-  // resolution_z: "2*mm",
+  resolution: "2*mm",
   //
   // Wire offsets in XYZ
-  //wire_x: "0.0*cm",
-  wire_y: "3.0*cm",
-  //wire_z: "0.0*cm",
+  wire_position: "3.0*cm",
   //
   // 99% Efficieny
-  efficiency: 0.99,
+  efficiency: 1.00,
   //
   // Whether to save debug info
-  processor: 1,
-  save: 1,
+  processor: 0,
+  save: 0,
 }
 
 // --> drift template

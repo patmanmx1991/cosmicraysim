@@ -183,27 +183,20 @@ bool DB::HasTables (std::string tablename) {
 
 
 std::vector<DBTable>  DB::GetTableGroup (std::string tablename) {
-  std::cout << "Getting table group" << std::endl;
+
   std::vector<DBTable> tableset;
   for (uint i = 0; i < (*fCurrentTables).size(); i++) {
-    std::cout << "Comparing table " << i << " " << (*fCurrentTables)[i].GetTableName() << std::endl;
     if (tablename.compare((*fCurrentTables)[i].GetTableName()) != 0) continue;
     std::string index = (*fCurrentTables)[i].GetIndexName();
-    std::cout << "Cloning table from group : " << index << std::endl;
     tableset.push_back((*fCurrentTables)[i].Clone());
   }
   if (fCurrentTables != fDefaultTables) {
     for (uint i = 0; i < (*fDefaultTables).size(); i++) {
-      std::cout << "Comparing table " << i << " " << (*fDefaultTables)[i].GetTableName() << std::endl;
-
       if (tablename.compare((*fDefaultTables)[i].GetTableName()) != 0) continue;
       std::string index = (*fDefaultTables)[i].GetIndexName();
-      std::cout << "Cloning defaulttable from group : " <<  index << std::endl;
-
       tableset.push_back((*fDefaultTables)[i].Clone());
     }
   }
-  std::cout << "Returning table" << std::endl;
   return tableset;
 }
 

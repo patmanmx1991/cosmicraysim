@@ -18,6 +18,12 @@ G4VUserPhysicsList* PhysicsFactory::LoadPhysicsList(DBTable table) {
   G4PhysListFactory *physListFactory = new G4PhysListFactory();
   G4VUserPhysicsList* physicsList;
 
+// const std::vector<G4String> v =
+//           physListFactory->AvailablePhysLists();
+//   for (uint i =0 ; i < v.size(); i++){
+//     std::cout << "AVAILABLE PHYSICS : '" << v[i] << "'" << std::endl;
+//   }
+  
   // Get physics list by horrible string comparison
   std::string physics = table.GetS("physics");
   if (physics.compare("shielding") == 0) physicsList =  new Shielding();

@@ -89,6 +89,8 @@ public:
 
     void SetGhost(bool g) { fGhost = g; };
     bool IsGhost() { return fGhost; };
+
+    void SetDrawOption(int i){ fDrawOption = i; };
 private:
     G4int fLayerID;
     G4double fTime;
@@ -97,6 +99,7 @@ private:
     G4ThreeVector fWorldPos;
     G4ThreeVector fWorldPosErr;
     bool fGhost;
+    uint fDrawOption;
 
 };
 

@@ -6,6 +6,8 @@
 #include "TrueMuonTracker.hh"
 #include "SimpleScintillatorSD.hh"
 #include "LongDriftSD.hh"
+#include "AWEDriftSD.hh"
+#include "BristolRPCSD.hh"
 
 
 namespace COSMIC {
@@ -19,9 +21,11 @@ VDetector* DetectorObjectFactory::CreateSD(DBTable tbl) {
   if (type.compare("truemuon") == 0) return new TrueMuonTracker(tbl);
   else if (type.compare("scintillator") == 0) return new SimpleScintillatorSD(tbl);
   else if (type.compare("longdrift") == 0) return new LongDriftSD(tbl);
+  else if (type.compare("awedrift") == 0) return new AWEDriftSD(tbl);
+  else if (type.compare("bristolrpc") == 0) return new BristolRPCSD(tbl);
 
   // Check we didn't get to here
-  std::cout << "Failed to Create SD : " << type << " NOW" << std::endl;
+  std::cout << "Failed to Create SD : " << type << std::endl;
   throw;  
   return 0;
 }
