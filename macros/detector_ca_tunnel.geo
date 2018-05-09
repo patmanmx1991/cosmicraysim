@@ -23,8 +23,6 @@
   type: "box"
 }
 
-
-
 // Target tunnel @ 15 degrees
 {
   name: "GEO",
@@ -32,7 +30,20 @@
   material: "G4_AIR",
   mother: "world",
   size: ["target_tunnel_size", "20.0*m", "target_tunnel_size"],
-  position: ["target_tunnel_dist*0.96592582628","0.0","target_tunnel_dist*0.2588190451"],
+  position: ["0.0","0.0","target_tunnel_dist"],
+  rotation_global: [0.0,15.0,0.0],
+  type: "box"
+}
+
+// Target tunnel @ 15 degrees
+{
+  name: "GEO",
+  index: "target_tunnel_15w",
+  material: "G4_WATER",
+  mother: "world",
+  size: ["target_tunnel_size", "20.0*m", "target_tunnel_size"],
+  position: ["0.0","0.0","target_tunnel_dist"],
+  rotation_global: [0.0,-15.0,0.0],
   type: "box"
 }
 
@@ -43,63 +54,8 @@
   material: "G4_AIR",
   mother: "world",
   size: ["target_tunnel_size", "20.0*m", "target_tunnel_size"],
-  position: ["target_tunnel_dist*0.5","0.0","target_tunnel_dist*0.866"],
-  type: "box"
-}
-
-// Target tunnel @ 45 degrees
-{
-  name: "GEO",
-  index: "target_tunnel_45",
-  material: "G4_AIR",
-  mother: "world",
-  size: ["target_tunnel_size", "20.0*m", "target_tunnel_size"],
-  position: ["target_tunnel_dist*0.70710678118","0.0","target_tunnel_dist*0.70710678118"],
-  type: "box"
-}
-
-// Target tunnel @ 60 degrees
-{
-  name: "GEO",
-  index: "target_tunnel_60",
-  material: "G4_AIR",
-  mother: "world",
-  size: ["target_tunnel_size", "20.0*m", "target_tunnel_size"],
-  position: ["target_tunnel_dist*0.866","0.0","target_tunnel_dist*0.5"],
-  type: "box"
-}
-
-// Target tunnel @ 75 degrees
-{
-  name: "GEO",
-  index: "target_tunnel_75",
-  material: "G4_AIR",
-  mother: "world",
-  size: ["target_tunnel_size", "20.0*m", "target_tunnel_size"],
-  position: ["target_tunnel_dist*0.2588190451","0.0","target_tunnel_dist*0.96592582628"],
-  type: "box"
-}
-
-// Target tunnel @ 90 degrees
-{
-  name: "GEO",
-  index: "target_tunnel_90",
-  material: "G4_AIR",
-  mother: "world",
-  size: ["target_tunnel_size", "20.0*m", "target_tunnel_size"],
   position: ["0.0","0.0","target_tunnel_dist"],
-  type: "box"
-}
-
-
-// Target tunnel @ 15 degrees
-{
-  name: "GEO",
-  index: "target_tunnel_15w",
-  material: "G4_WATER",
-  mother: "world",
-  size: ["target_tunnel_size", "20.0*m", "target_tunnel_size"],
-  position: ["-target_tunnel_dist*0.96592582628","0.0","target_tunnel_dist*0.2588190451"],
+  rotation_global: [0.0,30.0,0.0],
   type: "box"
 }
 
@@ -110,18 +66,44 @@
   material: "G4_WATER",
   mother: "world",
   size: ["target_tunnel_size", "20.0*m", "target_tunnel_size"],
-  position: ["-target_tunnel_dist*0.5","0.0","target_tunnel_dist*0.866"],
+  position: ["0.0","0.0","target_tunnel_dist"],
+  rotation_global: [0.0,-30.0,0.0],
   type: "box"
 }
 
-// Target tunnel @ 45 degrees
+// Target tunnel @ 45degrees
+{
+  name: "GEO",
+  index: "target_tunnel_45",
+  material: "G4_AIR",
+  mother: "world",
+  size: ["target_tunnel_size", "20.0*m", "target_tunnel_size"],
+  position: ["0.0","0.0","target_tunnel_dist"],
+  rotation_global: [0.0,45.0,0.0],
+  type: "box"
+}
+
+// Target tunnel @ 45degrees
 {
   name: "GEO",
   index: "target_tunnel_45w",
   material: "G4_WATER",
   mother: "world",
   size: ["target_tunnel_size", "20.0*m", "target_tunnel_size"],
-  position: ["-target_tunnel_dist*0.70710678118","0.0","target_tunnel_dist*0.70710678118"],
+  position: ["0.0","0.0","target_tunnel_dist"],
+  rotation_global: [0.0,-45.0,0.0],
+  type: "box"
+}
+
+// Target tunnel @ 60 degrees
+{
+  name: "GEO",
+  index: "target_tunnel_60",
+  material: "G4_AIR",
+  mother: "world",
+  size: ["target_tunnel_size", "20.0*m", "target_tunnel_size"],
+  position: ["0.0","0.0","target_tunnel_dist"],
+  rotation_global: [0.0,60.0,0.0],
   type: "box"
 }
 
@@ -132,7 +114,20 @@
   material: "G4_WATER",
   mother: "world",
   size: ["target_tunnel_size", "20.0*m", "target_tunnel_size"],
-  position: ["-target_tunnel_dist*0.866","0.0","target_tunnel_dist*0.5"],
+  position: ["0.0","0.0","target_tunnel_dist"],
+  rotation_global: [0.0,-60.0,0.0],
+  type: "box"
+}
+
+// Target tunnel @ 75  degrees
+{
+  name: "GEO",
+  index: "target_tunnel_75",
+  material: "G4_AIR",
+  mother: "world",
+  size: ["target_tunnel_size", "20.0*m", "target_tunnel_size"],
+  position: ["0.0","0.0","target_tunnel_dist"],
+  rotation_global: [0.0,75.0,0.0],
   type: "box"
 }
 
@@ -143,24 +138,10 @@
   material: "G4_WATER",
   mother: "world",
   size: ["target_tunnel_size", "20.0*m", "target_tunnel_size"],
-  position: ["-target_tunnel_dist*0.2588190451","0.0","target_tunnel_dist*0.96592582628"],
+  position: ["0.0","0.0","target_tunnel_dist"],
+  rotation_global: [0.0,-75.0,0.0],
   type: "box"
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
