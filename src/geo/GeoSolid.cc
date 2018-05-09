@@ -136,12 +136,6 @@ G4VPhysicalVolume* GeoSolid::ConstructPhysicalPlacement(DBTable table, G4Logical
     rotation->rotateX(angle_x);
     rotation->rotateZ(angle_z);
   }
-  if (table.Has("rotation")) {
-    const std::vector<double> &rotvector = table.GetVecD("rotation");
-    rotation->rotateX(rotvector[0] * CLHEP::deg);
-    rotation->rotateY(rotvector[1] * CLHEP::deg);
-    rotation->rotateZ(rotvector[2] * CLHEP::deg);
-  }
 
   // Setup positoin
   G4ThreeVector position(0.0, 0.0, 0.0);
@@ -151,6 +145,32 @@ G4VPhysicalVolume* GeoSolid::ConstructPhysicalPlacement(DBTable table, G4Logical
     position.setY(posvector[1]);
     position.setZ(posvector[2]);
   }
+
+    if (table.Has("rotation")) {
+
+      const std::vector<double> &rotvector = table.GetVecD("rotation");
+
+      rotation->rotateX(rotvector[0] * CLHEP::deg);
+      rotation->rotateY(rotvector[1] * CLHEP::deg);
+      rotation->rotateZ(rotvector[2] * CLHEP::deg);
+
+    }
+
+      if (table.Has("rotation_global")) {
+
+        const std::vector<double> &rotvector = table.GetVecD("rotation_global");
+
+
+        rotation->rotateX(rotvector[0] * CLHEP::deg);
+        rotation->rotateY(rotvector[1] * CLHEP::deg);
+        rotation->rotateZ(rotvector[2] * CLHEP::deg);
+
+        position.rotateX(-rotvector[0] * CLHEP::deg);
+        position.rotateY(-rotvector[1] * CLHEP::deg);
+        position.rotateZ(-rotvector[2] * CLHEP::deg);
+
+      }
+
 
 
   // Create Physical
@@ -197,7 +217,7 @@ G4VPhysicalVolume* GeoSolid::ConstructPhysicalParametrisation(DBTable table, G4L
   // Maybe thats fine? Need to make sensitive detectors record copyNo so that they account for a layer.
   // Also need to make the Drift Chamber positions do the same really....
 
-  // 
+  //
 
   // // std::string parametrisation = table.GetS("parametrisation");
   // // G4VPVParametrised* pr = GeoManager::GetParametrisation(parametrisation);
