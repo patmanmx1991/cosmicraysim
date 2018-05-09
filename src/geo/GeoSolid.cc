@@ -156,9 +156,11 @@ G4VPhysicalVolume* GeoSolid::ConstructPhysicalPlacement(DBTable table, G4Logical
 
     }
 
-      if (table.Has("rotation_global")) {
+      if (table.Has("rotation_mother")) {
 
-        const std::vector<double> &rotvector = table.GetVecD("rotation_global");
+        const std::vector<double> &rotvector = table.GetVecD("rotation_mother");
+
+        // Get the translation rel. to the global frame
 
 
         rotation->rotateX(rotvector[0] * CLHEP::deg);

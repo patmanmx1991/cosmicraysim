@@ -62,6 +62,7 @@ GeoManager::GeoManager(){
 }
 
 G4VPhysicalVolume* GeoManager::ConstructAll(){
+
   std::cout << "===============================" << std::endl;
   std::cout << "GEO: Building Geometry " << std::endl;
   std::vector<DBTable> tables_clone = DB::Get()->GetTableGroup("GEO");
@@ -85,16 +86,13 @@ G4VPhysicalVolume* GeoManager::ConstructAll(){
       }
 
       // Check if mother already created
-      std::cout << "GEO: Building Geometry " << std::endl;
       int mother_status = MotherStatus(geo_tab);
-      std::cout << "GEO: Building Geometry " << std::endl;
       if (mother_status == 2){
         count++;
         ++geo_iter;
         continue; // If it hasn't skip for now
       }
 
-      std::cout << "GEO: Building Geometry " << std::endl;
       GeoObject* geo_obj = GeoObjectFactory::Construct(geo_tab);
       fGeoObjects[geo_id] = geo_obj;
       fGeoIDs.push_back(geo_id);

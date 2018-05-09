@@ -31,7 +31,7 @@
   mother: "world",
   size: ["target_tunnel_size", "20.0*m", "target_tunnel_size"],
   position: ["0.0","0.0","target_tunnel_dist"],
-  rotation_global: [0.0,15.0,0.0],
+  rotation_mother: [0.0,15.0,0.0],
   type: "box"
 }
 
@@ -43,7 +43,7 @@
   mother: "world",
   size: ["target_tunnel_size", "20.0*m", "target_tunnel_size"],
   position: ["0.0","0.0","target_tunnel_dist"],
-  rotation_global: [0.0,-15.0,0.0],
+  rotation_mother: [0.0,-15.0,0.0],
   type: "box"
 }
 
@@ -55,7 +55,7 @@
   mother: "world",
   size: ["target_tunnel_size", "20.0*m", "target_tunnel_size"],
   position: ["0.0","0.0","target_tunnel_dist"],
-  rotation_global: [0.0,30.0,0.0],
+  rotation_mother: [0.0,30.0,0.0],
   type: "box"
 }
 
@@ -67,7 +67,7 @@
   mother: "world",
   size: ["target_tunnel_size", "20.0*m", "target_tunnel_size"],
   position: ["0.0","0.0","target_tunnel_dist"],
-  rotation_global: [0.0,-30.0,0.0],
+  rotation_mother: [0.0,-30.0,0.0],
   type: "box"
 }
 
@@ -79,7 +79,7 @@
   mother: "world",
   size: ["target_tunnel_size", "20.0*m", "target_tunnel_size"],
   position: ["0.0","0.0","target_tunnel_dist"],
-  rotation_global: [0.0,45.0,0.0],
+  rotation_mother: [0.0,45.0,0.0],
   type: "box"
 }
 
@@ -91,7 +91,7 @@
   mother: "world",
   size: ["target_tunnel_size", "20.0*m", "target_tunnel_size"],
   position: ["0.0","0.0","target_tunnel_dist"],
-  rotation_global: [0.0,-45.0,0.0],
+  rotation_mother: [0.0,-45.0,0.0],
   type: "box"
 }
 
@@ -103,7 +103,7 @@
   mother: "world",
   size: ["target_tunnel_size", "20.0*m", "target_tunnel_size"],
   position: ["0.0","0.0","target_tunnel_dist"],
-  rotation_global: [0.0,60.0,0.0],
+  rotation_mother: [0.0,60.0,0.0],
   type: "box"
 }
 
@@ -115,7 +115,7 @@
   mother: "world",
   size: ["target_tunnel_size", "20.0*m", "target_tunnel_size"],
   position: ["0.0","0.0","target_tunnel_dist"],
-  rotation_global: [0.0,-60.0,0.0],
+  rotation_mother: [0.0,-60.0,0.0],
   type: "box"
 }
 
@@ -127,7 +127,7 @@
   mother: "world",
   size: ["target_tunnel_size", "20.0*m", "target_tunnel_size"],
   position: ["0.0","0.0","target_tunnel_dist"],
-  rotation_global: [0.0,75.0,0.0],
+  rotation_mother: [0.0,75.0,0.0],
   type: "box"
 }
 
@@ -139,7 +139,7 @@
   mother: "world",
   size: ["target_tunnel_size", "20.0*m", "target_tunnel_size"],
   position: ["0.0","0.0","target_tunnel_dist"],
-  rotation_global: [0.0,-75.0,0.0],
+  rotation_mother: [0.0,-75.0,0.0],
   type: "box"
 }
 
