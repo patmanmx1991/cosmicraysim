@@ -50,19 +50,49 @@ public:
   void ResetState();
 
   // Getter Functions
-  inline G4double      GetNeutronTime(){ return fNeutronTime; };
-  inline G4ThreeVector  GetNeutronPos(){ return fNeutronPos;  };
-  inline G4double       GetTotEDep(){ return fTotEDep;  };
-  inline int            GetNeutronPDG(){ return fNeutronPDG;  };
-  inline int            GetNeutronHitsNumber(){ return fNNeutronHits;  };
+  // - Return the number of unique track/parent ids
+  inline int GetMultiplicity(){ return fNeutronEnergyMapped.size(); };
+
+  inline double      GetTotalEnergyDep(){
+      double total_energy=0;
+      for ( std::map< std::pair<G4int, G4int> , double >::iterator  it = fNeutronEnergyMapped.begin(); it != fNeutronEnergyMapped.end(); it++ ) total_energy+= (it->second);
+      return total_energy;
+    };
+
+  inline G4ThreeVector GetAverageMomentum(){
+    G4ThreeVector mom(0,0,0);
+    for ( std::map< std::pair<G4int, G4int> , G4ThreeVector >::iterator  it = fNeutronMomMapped.begin(); it != fNeutronMomMapped.end(); it++ ) mom+=it->second;
+    mom/=fHits;
+    return mom;
+  };
+
+    inline double GetAverageTime(){
+      double t = 0;
+      for ( std::map< std::pair<G4int, G4int> , double >::iterator  it = fNeutronTimeMapped.begin(); it != fNeutronTimeMapped.end(); it++ ) t+=it->second;
+      t/=fHits;
+      return t;
+    };
+
+      inline double GetAverageKE(){
+        double ke = 0;
+        for ( std::map< std::pair<G4int, G4int> , double >::iterator  it = fNeutronKEMapped.begin(); it != fNeutronKEMapped.end(); it++ ) ke+=it->second;
+        ke/=fHits;
+        return ke;
+      };
+
 
 protected:
 
-  G4double      fNeutronTime; ///< HM Neutron Step Time
-  G4ThreeVector fNeutronPos;  ///< HM Neutron Pos Vector
-  G4double      fTotEDep;  ///< Total Energy Deposited this event
-  int           fNeutronPDG;  ///< Neutron PDG Code
-  int           fNNeutronHits; //< Number of deposits
+  int fHits; //< Number of hits
+
+  // Need to know about unqiue particles so keep a map data structure
+  // Key : A pair of unique track and parent IDs
+  // Value : Energy deposited, time
+  std::map< std::pair<G4int,G4int>, double > fNeutronEnergyMapped;// Summed
+  std::map< std::pair<G4int,G4int>, double > fNeutronTimeMapped;// Averaged
+
+  std::map< std::pair<G4int,G4int>, G4ThreeVector > fNeutronMomMapped;// Averaged
+  std::map< std::pair<G4int,G4int>, G4double > fNeutronKEMapped;// Averaged
 
 };
 
@@ -96,11 +126,11 @@ protected:
 
   int fNeutronTimeIndex; ///< Time Ntuple Index
   int fNeutronEdepIndex; ///< Edep Ntuple Index
-  int fNeutronMultIndex; ///< Multiplicity Ntuple Index
-  int fNeutronPosXIndex; ///< PosX Ntuple Index
-  int fNeutronPosYIndex; ///< PosY Ntuple Index
-  int fNeutronPosZIndex; ///< PosZ Ntuple Index
-  int fNeutronPDGIndex;  ///< MPDG Ntuple Index
+  int fNeutronKEIndex; ///< Edep Ntuple Index
+  int fNeutronMultIndex;
+  int fNeutronMomXIndex; ///< MomX Ntuple Index
+  int fNeutronMomYIndex; ///< MomY Ntuple Index
+  int fNeutronMomZIndex; ///< MomZ Ntuple Index
 
 };
 

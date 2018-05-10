@@ -55,49 +55,80 @@ NeutronSD::NeutronSD(std::string name, std::string id, bool autoprocess, bool au
 }
 
 void NeutronSD::ResetState() {
+
   VDetector::ResetState();
-  fNeutronTime = 0.0;
-  fNeutronPos = G4ThreeVector();
-  fNeutronPDG = -999;
-  fTotEDep = 0.0;
-  fNNeutronHits = 0;
+  fHits = 0;
+
+  fNeutronEnergyMapped.clear();
+  fNeutronKEMapped.clear();
+  fNeutronTimeMapped.clear();
+  fNeutronMomMapped.clear();
+
 }
 
 G4bool NeutronSD::ProcessHits(G4Step* step, G4TouchableHistory* /*touch*/) {
 
   // Don't save tracks if no energy left in the detector
   G4double edep = step->GetTotalEnergyDeposit();
-  fTotEDep += edep;
-  if (edep <= 0.) return false;
+  // if (edep <= 0.) return false;
 
   // Get only Neutrons
   G4Track* track = step->GetTrack();
   int steppdg = track->GetParticleDefinition()->GetPDGEncoding();
+  // G4ThreeVector steppos = steppoint->GetPosition();
+  // G4ThreeVector stepmom = track->GetMomentum();
 
-  // FOR DEBUG : std::cout << "StepPDG : " << steppdg << std::endl;
+  // FOR DEBUG :
   bool is_Neutron = (steppdg == 2112);
   bool is_Alpha = (steppdg == 1000020040);
-  if ( (!is_Neutron) || (!is_Alpha) ) return true;
 
-  // Get the step+1 inside the detector
+  if ( !( (is_Neutron) || (is_Alpha) ) ) return true;
+
   G4StepPoint* steppoint = step->GetPostStepPoint();
   G4double steptime = steppoint->GetGlobalTime();
-  G4ThreeVector steppos = steppoint->GetPosition();
 
-  // Very inefficient lazy averaging
-  fNeutronPos  *= fNNeutronHits;
-  fNeutronTime *= fNNeutronHits;
-  fNeutronPDG  *= fNNeutronHits;
+  // Get the unique id of this particle
+  std::pair<G4int, G4int> this_particle_ids = std::make_pair( track->GetTrackID(), track->GetParentID() );
 
-  fNeutronPos  += steppos;
-  fNeutronTime += steptime;
-  fNeutronPDG  += steppdg;
+  // Check whether this particle already contributed to the energy deposited
+  std::map< std::pair<G4int, G4int> , double >::iterator it = fNeutronEnergyMapped.find(this_particle_ids);
 
-  // Get new average
-  fNNeutronHits++;
-  fNeutronPos  /= fNNeutronHits;
-  fNeutronTime /= fNNeutronHits;
-  fNeutronPDG  /= fNNeutronHits;
+  bool already_exists = ( it != fNeutronEnergyMapped.end() );
+
+  if(already_exists){
+    // if it already exists then add the current energy deposited to this
+    // - get the new value and reassign it to the current particle id
+    fNeutronEnergyMapped[this_particle_ids] += edep;
+
+    // Average the time of the hits by track and parent id
+    fNeutronKEMapped[this_particle_ids] *= fHits;
+    fNeutronTimeMapped[this_particle_ids] *= fHits;
+    fNeutronMomMapped[this_particle_ids] *= fHits;
+
+    fNeutronKEMapped[this_particle_ids] += steppoint->GetKineticEnergy();
+    fNeutronMomMapped[this_particle_ids] += steppoint->GetMomentumDirection();
+    fNeutronTimeMapped[this_particle_ids] += steppoint->GetGlobalTime();
+
+    fHits++;
+    fNeutronTimeMapped[this_particle_ids] /= fHits;
+    fNeutronKEMapped[this_particle_ids] /= fHits;
+    fNeutronMomMapped[this_particle_ids] /= fHits;
+
+  } else {
+    fHits++;
+
+    // if not add the ids to the map and initialize the value with the deposited energy
+    fNeutronEnergyMapped[this_particle_ids] = edep;
+    fNeutronKEMapped[this_particle_ids] = steppoint->GetKineticEnergy();
+    fNeutronMomMapped[this_particle_ids] = steppoint->GetMomentumDirection();
+    fNeutronTimeMapped[this_particle_ids] = steppoint->GetGlobalTime();
+
+  }
+
+  // For DEBUG...
+  // std::cout << std::endl << "StepPDG : " << steppdg << " Edep : " << edep << std::endl;
+  // std::cout << "is_Neutron : " << is_Neutron << " is_Alpha : " << is_Alpha << std::endl;
+  // std::cout << "StepPos : " << steppos  << std::endl << std::endl;
 
   return true;
 }
@@ -120,11 +151,11 @@ bool NeutronProcessor::BeginOfRunAction(const G4Run* /*run*/) {
   // Fill index energy
   fNeutronTimeIndex = man ->CreateNtupleDColumn(tableindex + "_t");
   fNeutronEdepIndex = man ->CreateNtupleDColumn(tableindex + "_edep");
-  fNeutronMultIndex = man ->CreateNtupleDColumn(tableindex + "_N");
-  fNeutronPosXIndex = man ->CreateNtupleDColumn(tableindex + "_x");
-  fNeutronPosYIndex = man ->CreateNtupleDColumn(tableindex + "_y");
-  fNeutronPosZIndex = man ->CreateNtupleDColumn(tableindex + "_z");
-  fNeutronPDGIndex  = man ->CreateNtupleIColumn(tableindex + "_pdg");
+  fNeutronMultIndex = man ->CreateNtupleDColumn(tableindex + "_mult");
+  fNeutronMomXIndex = man ->CreateNtupleDColumn(tableindex + "_px");
+  fNeutronMomYIndex = man ->CreateNtupleDColumn(tableindex + "_py");
+  fNeutronMomZIndex = man ->CreateNtupleDColumn(tableindex + "_pz");
+  fNeutronKEIndex = man ->CreateNtupleDColumn(tableindex + "_ke");
 
   return true;
 }
@@ -132,33 +163,32 @@ bool NeutronProcessor::BeginOfRunAction(const G4Run* /*run*/) {
 bool NeutronProcessor::ProcessEvent(const G4Event* /*event*/) {
 
   // Register Trigger State
-  fHasInfo = fTracker->GetTotEDep() > 0.0;
-  fTime    = fTracker->GetNeutronTime();
-  fEnergy  = fTracker->GetTotEDep();
+  fHasInfo = fTracker->GetMultiplicity() > 0.0;
 
   if (fHasInfo) {
     // Fill Neutron vectors
     G4AnalysisManager* man = G4AnalysisManager::Instance();
-    man->FillNtupleDColumn(fNeutronTimeIndex, fTime);
-    man->FillNtupleDColumn(fNeutronEdepIndex, fEnergy / MeV);
-    man->FillNtupleDColumn(fNeutronMultIndex, fTracker->GetNeutronHitsNumber() );
-    man->FillNtupleDColumn(fNeutronPosXIndex, fTracker->GetNeutronPos().x() / m);
-    man->FillNtupleDColumn(fNeutronPosYIndex, fTracker->GetNeutronPos().y() / m);
-    man->FillNtupleDColumn(fNeutronPosZIndex, fTracker->GetNeutronPos().z() / m);
-    man->FillNtupleIColumn(fNeutronPDGIndex , fTracker->GetNeutronPDG());
+    man->FillNtupleDColumn(fNeutronTimeIndex, fTracker->GetAverageTime());
+    man->FillNtupleDColumn(fNeutronEdepIndex, fTracker->GetTotalEnergyDep() / MeV);
+    man->FillNtupleDColumn(fNeutronMultIndex, fTracker->GetMultiplicity() );
+    man->FillNtupleDColumn(fNeutronMomXIndex, fTracker->GetAverageMomentum().x() );
+    man->FillNtupleDColumn(fNeutronMomYIndex, fTracker->GetAverageMomentum().y() );
+    man->FillNtupleDColumn(fNeutronMomZIndex, fTracker->GetAverageMomentum().z() );
+    man->FillNtupleDColumn(fNeutronKEIndex, fTracker->GetAverageKE() );
 
-    NeutronProcessor::DrawEvent();
+    // NeutronProcessor::DrawEvent();
 
     return true;
   } else {
     // Set Ntuple to defaults
     G4AnalysisManager* man = G4AnalysisManager::Instance();
-    man->FillNtupleDColumn(fNeutronTimeIndex, -999.);
-    man->FillNtupleDColumn(fNeutronEdepIndex, -999.);
-    man->FillNtupleDColumn(fNeutronPosXIndex, -999.);
-    man->FillNtupleDColumn(fNeutronPosYIndex, -999.);
-    man->FillNtupleDColumn(fNeutronPosZIndex, -999.);
-    man->FillNtupleIColumn(fNeutronPDGIndex,  fTracker->GetNeutronPDG() );
+    man->FillNtupleDColumn(fNeutronTimeIndex, -999);
+    man->FillNtupleDColumn(fNeutronEdepIndex, -999);
+    man->FillNtupleDColumn(fNeutronMultIndex, -999);
+    man->FillNtupleDColumn(fNeutronMomXIndex, -999 );
+    man->FillNtupleDColumn(fNeutronMomYIndex, -999 );
+    man->FillNtupleDColumn(fNeutronMomZIndex, -999);
+    man->FillNtupleDColumn(fNeutronKEIndex, -999 );
     return false;
   }
 }
@@ -168,8 +198,8 @@ void NeutronProcessor::DrawEvent(){
   G4VVisManager* pVVisManager = G4VVisManager::GetConcreteInstance();
   if (pVVisManager)
   {
-    G4ThreeVector Neutronpos = fTracker->GetNeutronPos();
     /*
+      G4ThreeVector Neutronpos = fTracker->GetNeutronPos();
         G4Polyline polyline;
         polyline.push_back( Neutronpos + 4.0 * m * Neutronmom );
         polyline.push_back( Neutronpos - 4.0 * m * Neutronmom );

@@ -33,10 +33,20 @@
   name: "MATERIAL",
   index: "Soil",
   element_names:  ["Al","C", "Ca", "Fe", "K","Mg", "Na", "S", "Si", "Ti"],
-  // in mg/g -> converted to mass fraction
   element_counts: [0.145,0.050,0.048,0.052,0.030,0.018,0.024,0.003,0.623,0.006],
   density: 2.0,
 }
+
+
+{
+  name: "MATERIAL",
+  index: "Soil90_Water10",
+  element_names:  ["Al","C", "Ca", "Fe", "K","Mg", "Na", "S", "Si", "Ti"],
+  element_counts: [0.145,0.050,0.048,0.052,0.030,0.018,0.024,0.003,0.623,0.006],
+  density: 2.0,
+}
+
+
 
 
 // These are compounds within soil in the UK that are then mixed to find the final composition
