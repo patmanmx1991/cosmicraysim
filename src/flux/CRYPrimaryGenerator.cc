@@ -384,7 +384,8 @@ bool CRYPrimaryFluxProcessor::BeginOfRunAction(const G4Run* /*run*/) {
   fParticlePosYIndex = man ->CreateNtupleDColumn(tableindex + "_y");
   fParticlePosZIndex = man ->CreateNtupleDColumn(tableindex + "_z");
   fParticleEnergyIndex = man ->CreateNtupleDColumn(tableindex + "_E");
-  fParticlePDGIndex    = man ->CreateNtupleIColumn(tableindex + "_pdg");
+  fParticlePDGIndex    = man ->CreateNtupleDColumn(tableindex + "_pdg");
+  fParticleMultIndex    = man ->CreateNtupleDColumn(tableindex + "_N");
 
   return true;
 }
@@ -397,18 +398,8 @@ bool CRYPrimaryFluxProcessor::ProcessEvent(const G4Event* /*event*/) {
 
   // Set Ntuple to defaults
   G4AnalysisManager* man = G4AnalysisManager::Instance();
-  man->FillNtupleDColumn(fTimeIndex, -999.);
-  man->FillNtupleDColumn(fParticleDirXIndex, -999.);
-  man->FillNtupleDColumn(fParticleDirYIndex, -999.);
-  man->FillNtupleDColumn(fParticleDirZIndex, -999.);
-  man->FillNtupleDColumn(fParticlePosXIndex, -999.);
-  man->FillNtupleDColumn(fParticlePosYIndex, -999.);
-  man->FillNtupleDColumn(fParticlePosZIndex, -999.);
-  man->FillNtupleDColumn(fParticleMultIndex, -999.);
-  man->FillNtupleDColumn(fParticlePDGIndex, -999.);
-  man->FillNtupleDColumn(fParticleEnergyIndex, -999.);
-
   if (fHasInfo) {
+
     // Fill muon vectors
     man->FillNtupleDColumn(fTimeIndex,   fGenerator->GetTime());
     man->FillNtupleDColumn(fParticleDirXIndex, fGenerator->GetDirection().x());
@@ -418,14 +409,26 @@ bool CRYPrimaryFluxProcessor::ProcessEvent(const G4Event* /*event*/) {
     man->FillNtupleDColumn(fParticlePosYIndex, fGenerator->GetPosition().y());
     man->FillNtupleDColumn(fParticlePosZIndex, fGenerator->GetPosition().z());
     man->FillNtupleDColumn(fParticleMultIndex, fGenerator->GetMultiplicity());
-    man->FillNtupleDColumn(fParticlePDGIndex, fGenerator->GetPDG());
     man->FillNtupleDColumn(fParticleEnergyIndex, fGenerator->GetEnergy());
-
+    man->FillNtupleDColumn(fParticlePDGIndex, fGenerator->GetPDG());
 
     return true;
   } else {
+
+    man->FillNtupleDColumn(fTimeIndex, -999.);
+    man->FillNtupleDColumn(fParticleDirXIndex, -999.);
+    man->FillNtupleDColumn(fParticleDirYIndex, -999.);
+    man->FillNtupleDColumn(fParticleDirZIndex, -999.);
+    man->FillNtupleDColumn(fParticlePosXIndex, -999.);
+    man->FillNtupleDColumn(fParticlePosYIndex, -999.);
+    man->FillNtupleDColumn(fParticlePosZIndex, -999.);
+    man->FillNtupleDColumn(fParticleEnergyIndex, -999.);
+    man->FillNtupleDColumn(fParticleMultIndex, -999.);
+    man->FillNtupleDColumn(fParticlePDGIndex, -999.);
+
     return false;
   }
+
   return true;
 }
 
