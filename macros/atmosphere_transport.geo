@@ -116,7 +116,7 @@ sensitive:"atmos_det"
 name: "GEO",
 index: "mesosphere0",
 type: "box",
-material: "G4_Air"
+material: "G4_AIR"
 density:"0.0004",
 size: ["100*km", "100.0*km", "mesosphere0_thickness"],
 position: ["0.0", "0.0", "-0.5*world_thickness + troposphere0_thickness + troposphere1_thickness + stratosphere0_thickness + stratosphere1_thickness + stratosphere2_thickness + 0.5*mesosphere0_thickness"],
@@ -130,7 +130,7 @@ name: "GEO",
 index: "mesosphere1",
 type: "box",
 position: ["0.0", "0.0", "-0.5*world_thickness + troposphere0_thickness + troposphere1_thickness + stratosphere0_thickness + stratosphere1_thickness + stratosphere2_thickness + mesosphere0_thickness + 0.5*mesosphere1_thickness"],
-material: "G4_Air"
+material: "G4_AIR"
 density:"0.00001",
 size: ["100*km", "100.0*km", "mesosphere1_thickness"],
 sensitive:"atmos_det",
@@ -152,13 +152,13 @@ drawstyle: "solid"
   name: "FLUX",
   index: "source_box",
   size: ["1.0*mm", "1.0*mm", "1.0*mm"],
-  position: ["0.0","0.0", "100*km"]
+  position: ["0.0","0.0","world_thickness*0.5"]
 }
 
 // Target for the main detector stack
 {
   name: "FLUX",
   index: "target_box_0",
-  size: ["100.*km", "100.0*km", "1.0*mm"],
-  position: ["0.0","0.0","50.0*km"]
+  size: ["1.0*km", "1.0*km", "1.0*mm"],
+  position: ["0.0","0.0","-world_thickness*0.5"]
 }

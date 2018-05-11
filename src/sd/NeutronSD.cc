@@ -80,9 +80,9 @@ G4bool NeutronSD::ProcessHits(G4Step* step, G4TouchableHistory* /*touch*/) {
 
   // FOR DEBUG :
   bool is_Neutron = (steppdg == 2112);
-  bool is_Alpha = (steppdg == 1000020040);
+  // bool is_Alpha = (steppdg == 1000020040);
 
-  if ( !( (is_Neutron) || (is_Alpha) ) ) return true;
+  if ( !is_Neutron ) return true;
 
   G4StepPoint* steppoint = step->GetPostStepPoint();
   G4double steptime = steppoint->GetGlobalTime();

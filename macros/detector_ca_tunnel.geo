@@ -4,17 +4,21 @@
   name: "VARIABLE",
   index: "simconstants",
   world_box_width: "20.0*m",
-  world_box_length: "800.0*m",
+  world_box_length: "120.0*m",// should be set at greater than depth*tan(60)
+
   det_system_offset: "-0.5*m",
   det_system_spacing: "10*cm",
   det_system_xsep: "20*cm",
   det_system_lowbar: "0.0*cm",
   det_tunnel_depth: "25*m",
+
   target_tunnel_dist: "8.0*m",
   target_tunnel_size: "0.5*m",
   target_tunnel_length: "20.0*m",
+
   sampling_target_box_size: "2.0*m",
   sampling_target_box_scale: "1"
+
 }
 
 // ---------------------------------------------------
@@ -121,30 +125,6 @@
   size: ["target_tunnel_size", "target_tunnel_length", "target_tunnel_size"],
   position: ["0.0","0.0","target_tunnel_dist"],
   rotation_mother: [0.0,-60.0,0.0],
-  type: "box"
-}
-
-// Target tunnel @ 75  degrees
-{
-  name: "GEO",
-  index: "target_tunnel_75",
-  material: "G4_AIR",
-  mother: "world",
-  size: ["target_tunnel_size", "target_tunnel_length", "target_tunnel_size"],
-  position: ["0.0","0.0","target_tunnel_dist"],
-  rotation_mother: [0.0,75.0,0.0],
-  type: "box"
-}
-
-// Target tunnel @ 75 degrees
-{
-  name: "GEO",
-  index: "target_tunnel_75w",
-  material: "G4_WATER",
-  mother: "world",
-  size: ["target_tunnel_size", "target_tunnel_length", "target_tunnel_size"],
-  position: ["0.0","0.0","target_tunnel_dist"],
-  rotation_mother: [0.0,-75.0,0.0],
   type: "box"
 }
 
