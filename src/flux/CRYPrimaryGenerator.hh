@@ -77,6 +77,11 @@ public:
 
   // Getter Functions
   G4double GetTime() {return fExposureTime;};
+  G4double GetEnergy() {return fParticleEnergy;};
+  G4ThreeVector GetDirection() {return fParticleDir;};
+  G4ThreeVector GetPosition() {return fParticlePos;};
+  G4double GetPDG() {return fParticlePDG;};
+  G4double GetMultiplicity() {return fParticleMult;};
 
 private:
 
@@ -124,6 +129,14 @@ private:
   G4double fExposureTime; ///< Current integrated exposure time
   int fNthrows; ///< Total number of throws so far
 
+
+  G4double fParticleMult;     ///< MuonTime   Info for auto flux processor
+  G4double fParticleEnergy;     ///< MuonTime   Info for auto flux processor
+  G4ThreeVector fParticleDir; ///< MuonDir    Info for auto flux processor
+  G4ThreeVector fParticlePos; ///< MuonPos    Info for auto flux processor
+  G4double fParticlePDG;      ///< MuonPDG    Info for auto flux processor
+
+
 };
 //---------------------------------------------------------------------------------
 
@@ -154,6 +167,17 @@ protected:
   CRYPrimaryGenerator* fGenerator; ///< Pointer to associated generator
   bool fSave; ///< Flag to save event info automatically
   int fTimeIndex; ///< Time Ntuple Index
+
+  int fParticleMultIndex;     ///< MuonTime   Info for auto flux processor
+  int fParticleEnergyIndex;     ///< MuonTime   Info for auto flux processor
+  int fParticlePDGIndex;      ///< MuonPDG    Info for auto flux processor
+  int fParticleDirXIndex; ///< MuonDir    Info for auto flux processor
+  int fParticleDirYIndex; ///< MuonDir    Info for auto flux processor
+  int fParticleDirZIndex; ///< MuonDir    Info for auto flux processor
+  int fParticlePosXIndex; ///< MuonPos    Info for auto flux processor
+  int fParticlePosYIndex; ///< MuonPos    Info for auto flux processor
+  int fParticlePosZIndex; ///< MuonPos    Info for auto flux processor
+
 
 };
 //---------------------------------------------------------------------------------

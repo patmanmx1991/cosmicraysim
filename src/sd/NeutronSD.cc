@@ -63,6 +63,7 @@ void NeutronSD::ResetState() {
   fNeutronKEMapped.clear();
   fNeutronTimeMapped.clear();
   fNeutronMomMapped.clear();
+  fNeutronPosMapped.clear();
 
 }
 
@@ -104,15 +105,18 @@ G4bool NeutronSD::ProcessHits(G4Step* step, G4TouchableHistory* /*touch*/) {
     fNeutronKEMapped[this_particle_ids] *= fHits;
     fNeutronTimeMapped[this_particle_ids] *= fHits;
     fNeutronMomMapped[this_particle_ids] *= fHits;
+    fNeutronPosMapped[this_particle_ids] *= fHits;
 
     fNeutronKEMapped[this_particle_ids] += steppoint->GetKineticEnergy();
-    fNeutronMomMapped[this_particle_ids] += steppoint->GetMomentumDirection();
+    fNeutronMomMapped[this_particle_ids] += track->GetMomentum();
+    fNeutronPosMapped[this_particle_ids] += steppoint->GetPosition();
     fNeutronTimeMapped[this_particle_ids] += steppoint->GetGlobalTime();
 
     fHits++;
     fNeutronTimeMapped[this_particle_ids] /= fHits;
     fNeutronKEMapped[this_particle_ids] /= fHits;
     fNeutronMomMapped[this_particle_ids] /= fHits;
+    fNeutronPosMapped[this_particle_ids] /= fHits;
 
   } else {
     fHits++;
@@ -121,6 +125,7 @@ G4bool NeutronSD::ProcessHits(G4Step* step, G4TouchableHistory* /*touch*/) {
     fNeutronEnergyMapped[this_particle_ids] = edep;
     fNeutronKEMapped[this_particle_ids] = steppoint->GetKineticEnergy();
     fNeutronMomMapped[this_particle_ids] = steppoint->GetMomentumDirection();
+    fNeutronPosMapped[this_particle_ids] = steppoint->GetPosition();
     fNeutronTimeMapped[this_particle_ids] = steppoint->GetGlobalTime();
 
   }
@@ -152,6 +157,9 @@ bool NeutronProcessor::BeginOfRunAction(const G4Run* /*run*/) {
   fNeutronTimeIndex = man ->CreateNtupleDColumn(tableindex + "_t");
   fNeutronEdepIndex = man ->CreateNtupleDColumn(tableindex + "_edep");
   fNeutronMultIndex = man ->CreateNtupleDColumn(tableindex + "_mult");
+  fNeutronPosXIndex = man ->CreateNtupleDColumn(tableindex + "_x");
+  fNeutronPosYIndex = man ->CreateNtupleDColumn(tableindex + "_y");
+  fNeutronPosZIndex = man ->CreateNtupleDColumn(tableindex + "_z");
   fNeutronMomXIndex = man ->CreateNtupleDColumn(tableindex + "_px");
   fNeutronMomYIndex = man ->CreateNtupleDColumn(tableindex + "_py");
   fNeutronMomZIndex = man ->CreateNtupleDColumn(tableindex + "_pz");
@@ -171,12 +179,15 @@ bool NeutronProcessor::ProcessEvent(const G4Event* /*event*/) {
     man->FillNtupleDColumn(fNeutronTimeIndex, fTracker->GetAverageTime());
     man->FillNtupleDColumn(fNeutronEdepIndex, fTracker->GetTotalEnergyDep() / MeV);
     man->FillNtupleDColumn(fNeutronMultIndex, fTracker->GetMultiplicity() );
+    man->FillNtupleDColumn(fNeutronPosXIndex, fTracker->GetAveragePosition().x() );
+    man->FillNtupleDColumn(fNeutronPosYIndex, fTracker->GetAveragePosition().y() );
+    man->FillNtupleDColumn(fNeutronPosZIndex, fTracker->GetAveragePosition().z() );
     man->FillNtupleDColumn(fNeutronMomXIndex, fTracker->GetAverageMomentum().x() );
     man->FillNtupleDColumn(fNeutronMomYIndex, fTracker->GetAverageMomentum().y() );
     man->FillNtupleDColumn(fNeutronMomZIndex, fTracker->GetAverageMomentum().z() );
     man->FillNtupleDColumn(fNeutronKEIndex, fTracker->GetAverageKE() );
 
-    // NeutronProcessor::DrawEvent();
+    NeutronProcessor::DrawEvent();
 
     return true;
   } else {
@@ -198,18 +209,17 @@ void NeutronProcessor::DrawEvent(){
   G4VVisManager* pVVisManager = G4VVisManager::GetConcreteInstance();
   if (pVVisManager)
   {
-    /*
-      G4ThreeVector Neutronpos = fTracker->GetNeutronPos();
-        G4Polyline polyline;
-        polyline.push_back( Neutronpos + 4.0 * m * Neutronmom );
-        polyline.push_back( Neutronpos - 4.0 * m * Neutronmom );
 
-        G4Colour colour(0., 0., 1.);
+      G4ThreeVector Neutronpos = fTracker->GetAveragePosition();
+
+        G4Circle NeutronMarker(Neutronpos);
+
+        G4Colour colour(1., 0., 0.);
         G4VisAttributes attribs(colour);
-        polyline.SetVisAttributes(attribs);
+        NeutronMarker.SetVisAttributes(attribs);
 
-        pVVisManager->Draw(polyline);
-    */
+        pVVisManager->Draw(NeutronMarker);
+
   }
 }
 

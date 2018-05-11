@@ -151,7 +151,7 @@ drawstyle: "solid"
 {
   name: "FLUX",
   index: "source_box",
-  size: ["1.0*mm", "1.0*mm", "1.0*mm"],
+  size: ["100.0*km", "100.0*km", "1.0*mm"],
   position: ["0.0","0.0","world_thickness*0.5"]
 }
 

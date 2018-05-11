@@ -66,12 +66,19 @@ public:
     return mom;
   };
 
-    inline double GetAverageTime(){
-      double t = 0;
-      for ( std::map< std::pair<G4int, G4int> , double >::iterator  it = fNeutronTimeMapped.begin(); it != fNeutronTimeMapped.end(); it++ ) t+=it->second;
-      t/=fHits;
-      return t;
-    };
+      inline double GetAverageTime(){
+        double t = 0;
+        for ( std::map< std::pair<G4int, G4int> , double >::iterator  it = fNeutronTimeMapped.begin(); it != fNeutronTimeMapped.end(); it++ ) t+=it->second;
+        t/=fHits;
+        return t;
+      };
+
+          inline G4ThreeVector GetAveragePosition(){
+            G4ThreeVector p(0,0,0);
+            for ( std::map< std::pair<G4int, G4int> , G4ThreeVector >::iterator  it = fNeutronPosMapped.begin(); it != fNeutronPosMapped.end(); it++ ) p+=it->second;
+            p/=fHits;
+            return p;
+          };
 
       inline double GetAverageKE(){
         double ke = 0;
@@ -90,9 +97,9 @@ protected:
   // Value : Energy deposited, time
   std::map< std::pair<G4int,G4int>, double > fNeutronEnergyMapped;// Summed
   std::map< std::pair<G4int,G4int>, double > fNeutronTimeMapped;// Averaged
-
-  std::map< std::pair<G4int,G4int>, G4ThreeVector > fNeutronMomMapped;// Averaged
-  std::map< std::pair<G4int,G4int>, G4double > fNeutronKEMapped;// Averaged
+  std::map< std::pair<G4int,G4int>, G4ThreeVector > fNeutronPosMapped;// Averaged
+  std::map< std::pair<G4int,G4int>, G4ThreeVector > fNeutronMomMapped;// Averaged within event
+  std::map< std::pair<G4int,G4int>, G4double > fNeutronKEMapped;// Averaged within event
 
 };
 
@@ -128,6 +135,9 @@ protected:
   int fNeutronEdepIndex; ///< Edep Ntuple Index
   int fNeutronKEIndex; ///< Edep Ntuple Index
   int fNeutronMultIndex;
+  int fNeutronPosXIndex;
+  int fNeutronPosYIndex;
+  int fNeutronPosZIndex;
   int fNeutronMomXIndex; ///< MomX Ntuple Index
   int fNeutronMomYIndex; ///< MomY Ntuple Index
   int fNeutronMomZIndex; ///< MomZ Ntuple Index

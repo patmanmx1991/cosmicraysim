@@ -3,6 +3,7 @@
 {
   name: "VARIABLE",
   index: "simconstants",
+
   world_box_width: "20.0*m",
   world_box_length: "120.0*m",// should be set at greater than depth*tan(60)
 
@@ -10,9 +11,9 @@
   det_system_spacing: "10*cm",
   det_system_xsep: "20*cm",
   det_system_lowbar: "0.0*cm",
-  det_tunnel_depth: "25*m",
+  det_tunnel_depth: "50*m",
 
-  target_tunnel_dist: "8.0*m",
+  target_tunnel_dist: "15.0*m",
   target_tunnel_size: "0.5*m",
   target_tunnel_length: "20.0*m",
 
