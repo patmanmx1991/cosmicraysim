@@ -6,7 +6,6 @@
 
   world_box_width: "20.0*m",
 
-  det_system_offset: "0.0*m",
   det_system_spacing: "10*cm",
   det_system_xsep: "20*cm",
   det_system_lowbar: "0.0*cm",
@@ -18,9 +17,10 @@
   target_tunnel_size: "0.5*m",
   target_tunnel_length: "20.0*m",
 
-  sampling_target_box_size: "2.0*m",
-  sampling_target_box_scale: "1"
 
+      det_system_offset: "5*cm",
+      sampling_target_box_size: "0.8*m"
+      sampling_target_box_offset: "0.5*m"
 }
 
 // ---------------------------------------------------
@@ -223,3 +223,26 @@
   size: ["sampling_target_box_size","sampling_target_box_size","sampling_target_box_size"],
   position: ["0.0","0.0","0.5*sampling_target_box_size"],
 }
+
+// The coincidence trigger - set up to mimic the DAQ system
+// These are all OR'd together
+{
+  name:  "TRIGGER",
+  index: "trigger56",
+  type: "coincidence",
+  energy_threshold: "0",
+  require_n: "2",
+  processors: ["bar5_scint","bar6_scint"]
+}
+{  name:  "TRIGGER",  index: "trigger46",  clone: "trigger56",  processors: ["bar4_scint","bar6_scint"] }
+{  name:  "TRIGGER",  index: "trigger36",  clone: "trigger56",  processors: ["bar3_scint","bar6_scint"] }
+{  name:  "TRIGGER",  index: "trigger26",  clone: "trigger56",  processors: ["bar2_scint","bar6_scint"] }
+{  name:  "TRIGGER",  index: "trigger16",  clone: "trigger56",  processors: ["bar1_scint","bar6_scint"] }
+{  name:  "TRIGGER",  index: "trigger06",  clone: "trigger56",  processors: ["bar0_scint","bar6_scint"] }
+
+{  name:  "TRIGGER",  index: "trigger57",  clone: "trigger56",  processors: ["bar5_scint","bar7_scint"] }
+{  name:  "TRIGGER",  index: "trigger47",  clone: "trigger56",  processors: ["bar4_scint","bar7_scint"] }
+{  name:  "TRIGGER",  index: "trigger37",  clone: "trigger56",  processors: ["bar3_scint","bar7_scint"] }
+{  name:  "TRIGGER",  index: "trigger27",  clone: "trigger56",  processors: ["bar2_scint","bar7_scint"] }
+{  name:  "TRIGGER",  index: "trigger17",  clone: "trigger56",  processors: ["bar1_scint","bar7_scint"] }
+{  name:  "TRIGGER",  index: "trigger07",  clone: "trigger56",  processors: ["bar0_scint","bar7_scint"] }

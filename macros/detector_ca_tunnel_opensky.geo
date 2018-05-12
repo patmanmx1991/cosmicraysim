@@ -6,7 +6,6 @@
 
   world_box_width: "20.0*m",
 
-  det_system_offset: "10.0*cm",
   det_system_spacing: "10*cm",
   det_system_xsep: "20*cm",
   det_system_lowbar: "0.0*cm",
@@ -18,6 +17,8 @@
   target_tunnel_size: "1.0*m",
   target_tunnel_length: "20.0*m",
 
+
+  det_system_offset: "5*cm",
   sampling_target_box_size: "0.8*m"
   sampling_target_box_offset: "0.5*m"
 
@@ -122,7 +123,7 @@
 }
 
 // The coincidence trigger - set up to mimic the DAQ system
-// These are all OR'd together 
+// These are all OR'd together
 {
   name:  "TRIGGER",
   index: "trigger56",
