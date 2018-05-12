@@ -5,6 +5,7 @@
 #include "analysis/Analysis.hh"
 
 #include "SimpleTrigger.hh"
+#include "CoincidenceTrigger.hh"
 
 namespace COSMIC {
 
@@ -15,6 +16,7 @@ VTrigger* TriggerFactory::Construct(DBTable table) {
 
   /// Construct according to table settings
   if (type.compare("simple") == 0) return new SimpleTrigger(table);
+  if (type.compare("coincidence") == 0) return new CoincidenceTrigger(table);
 
   // Check we didn't get to here and fail string comparison
   std::cout << "Failed to Create Trigger : " << type << std::endl;
@@ -44,4 +46,3 @@ void TriggerFactory::ConstructTriggers() {
 }
 
 } // - namespace COSMIC
-

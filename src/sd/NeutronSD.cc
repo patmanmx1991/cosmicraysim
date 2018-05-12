@@ -71,19 +71,21 @@ G4bool NeutronSD::ProcessHits(G4Step* step, G4TouchableHistory* /*touch*/) {
 
   // Don't save tracks if no energy left in the detector
   G4double edep = step->GetTotalEnergyDeposit();
-  // if (edep <= 0.) return false;
+  if (edep <= 0.) return false;
 
   // Get only Neutrons
   G4Track* track = step->GetTrack();
   int steppdg = track->GetParticleDefinition()->GetPDGEncoding();
   // G4ThreeVector steppos = steppoint->GetPosition();
-  // G4ThreeVector stepmom = track->GetMomentum();
+  // G4ThreeVector stepmom =  track->GetMomentum();
 
   // FOR DEBUG :
-  bool is_Neutron = (steppdg == 2112);
+  // bool is_Neutron = (steppdg == 2112);
   // bool is_Alpha = (steppdg == 1000020040);
 
-  if ( !is_Neutron ) return true;
+  // if ( !(is_Neutron||is_Alpha) ) return true;
+  // if(is_Neutron) if(edep>0) std::cout << " Neutron : " << edep << std::endl;
+  // if(is_Alpha) if(edep>0) std::cout << " Alpha : " << edep << std::endl;
 
   G4StepPoint* steppoint = step->GetPostStepPoint();
   G4double steptime = steppoint->GetGlobalTime();
