@@ -98,6 +98,9 @@ public:
     void SetPos(G4ThreeVector xyz) { fPos = xyz; }
     G4ThreeVector GetPos() const { return fPos; }
 
+    void SetVolPos(G4ThreeVector xyz) { fVolPos = xyz; }
+    G4ThreeVector GetVolPos() const { return fVolPos; }
+
     void SetRot(G4RotationMatrix rmat) { fRot = rmat; }
     G4RotationMatrix GetRot() const { return fRot; }
 
@@ -120,6 +123,7 @@ private:
     G4int particle_type;
 
     G4ThreeVector fPos;
+    G4ThreeVector fVolPos;
     G4RotationMatrix fRot;
     //const G4LogicalVolume* fPLogV;
 };

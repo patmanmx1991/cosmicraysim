@@ -73,4 +73,7 @@ bool CoincidenceTrigger::ProcessTrigger(const G4Event* /*event*/) {
   return complete_trig;
 }
 
+
+
+
 } // - namespace COSMIC

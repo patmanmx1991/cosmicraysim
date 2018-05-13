@@ -17,7 +17,7 @@ VProcessor* ProcessorFactory::Construct(DBTable tbl) {
 
   // Check we didn't get to here
   std::cout << "Failed to Create Processor : " << type << " NOW" << std::endl;
-  throw;  
+  throw;
   return 0;
 }
 
@@ -44,4 +44,3 @@ void ProcessorFactory::ConstructProcessors() {
 
 
 } // - namespace COSMIC
-

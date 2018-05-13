@@ -75,23 +75,10 @@
   mother: "detector",
   material: "G4_PLASTIC_SC_VINYLTOLUENE",
   size: ["4*cm","80*cm","10*cm"],
-  position: ["0.0","0.0","-0.5*sampling_target_box_size"],
-  sensitive: "scint",
-}
-
-
-{
-  name: "GEO",
-  index: "bar0",
-  type: "box",
-  mother: "detector",
-  material: "G4_PLASTIC_SC_VINYLTOLUENE",
-  size: ["4*cm","80*cm","10*cm"],
   position: ["0.0","0.0","0.0*det_system_spacing+det_system_offset -0.5*sampling_target_box_size"],
   sensitive: "scint",
   color: [0.0,0.0,1.0],
 }
-
 
 // - The main stack of scintillator detectors
 { name: "GEO", index: "bar1", clone: "bar0", position: ["0.0","0.0","1*det_system_spacing+det_system_offset-0.5*sampling_target_box_size"] }

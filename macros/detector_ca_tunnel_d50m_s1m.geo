@@ -5,21 +5,23 @@
   index: "simconstants",
 
   world_box_width: "20.0*m",
-
-  det_system_spacing: "10*cm",
-  det_system_xsep: "20*cm",
-  det_system_lowbar: "0.0*cm",
-  det_tunnel_depth: "50*m",
-
-  world_box_length: "2.0*det_tunnel_depth*2.144506",// 2*depth*tan(60+delta) (where delta = 5)
-
   target_tunnel_dist: "15.0*m",
   target_tunnel_size: "1.0*m",
   target_tunnel_length: "20.0*m",
+  det_tunnel_depth: "50*m",
 
-    det_system_offset: "5*cm",
-    sampling_target_box_size: "0.8*m"
-    sampling_target_box_offset: "0.5*m"
+  // 2*depth*tan(60+delta) (where delta = 5)
+  world_box_length: "2.0*det_tunnel_depth*2.144506",
+
+  det_sx: "4.0*cm",
+  det_sy: "80.0*cm",
+  det_sz: "15.0*cm",
+  det_system_offset: "0.5*15*cm",// can't seem to set this as "0.5*det_sz"???
+  det_system_spacing: "15*cm",// can't seem to set this as "det_sz"???
+
+  det_system_xsep: "20*cm",
+  det_system_lowbar: "0.0*cm",
+  sampling_target_box_size: "0.9*m"
 
 }
 
@@ -176,19 +178,8 @@
   type: "box",
   mother: "detector",
   material: "G4_PLASTIC_SC_VINYLTOLUENE",
-  size: ["4*cm","80*cm","10*cm"],
-  position: ["0.0","0.0","-0.5*sampling_target_box_size"],
-  sensitive: "scint",
-}
-
-
-{
-  name: "GEO",
-  index: "bar0",
-  type: "box",
-  mother: "detector",
-  material: "G4_PLASTIC_SC_VINYLTOLUENE",
-  size: ["4*cm","80*cm","10*cm"],
+  size: ["det_sx","det_sy","det_sz"],
+  //size: ["4*cm","80*cm","15*cm"],
   position: ["0.0","0.0","0.0*det_system_spacing+det_system_offset -0.5*sampling_target_box_size"],
   sensitive: "scint",
   color: [0.0,0.0,1.0],
