@@ -11,7 +11,7 @@
 
   det_tunnel_depth: "75*m",// also sets the world box depth to be 2*det_tunnel_depth
 
-  // Should be set to 2*depth*tan(60+delta) (where delta = 5) 
+  // Should be set to 2*depth*tan(60+delta) (where delta = 5)
   world_box_length: "2.0*det_tunnel_depth*2.144506",
 
   det_sx: "4.0*cm",
