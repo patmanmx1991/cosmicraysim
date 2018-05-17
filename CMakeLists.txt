@@ -75,10 +75,6 @@ add_custom_target(COSMO DEPENDS cosmicraysim)
 # relies on these scripts being in the current working directory.
 #
 set(COSMIC_SCRIPTS
-  debug.mac
-  init.mac
-  init_vis.mac
-  vis.mac
   )
 
 foreach(_script ${COSMIC_SCRIPTS})

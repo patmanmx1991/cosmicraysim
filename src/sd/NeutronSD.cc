@@ -80,10 +80,14 @@ G4bool NeutronSD::ProcessHits(G4Step* step, G4TouchableHistory* /*touch*/) {
   // G4ThreeVector stepmom =  track->GetMomentum();
 
   // FOR DEBUG :
-  // bool is_Neutron = (steppdg == 2112);
-  // bool is_Alpha = (steppdg == 1000020040);
+  bool is_Neutron = (steppdg == 2112);
+  bool is_Alpha = (steppdg == 1000020040);
 
-  // if ( !(is_Neutron||is_Alpha) ) return true;
+  if ( !(is_Neutron||is_Alpha) ) return true;
+
+  // We only want secondary particles in the detector
+  if(step->GetTrack()->GetParentID() == 0) return true;
+
   // if(is_Neutron) if(edep>0) std::cout << " Neutron : " << edep << std::endl;
   // if(is_Alpha) if(edep>0) std::cout << " Alpha : " << edep << std::endl;
 
@@ -187,7 +191,7 @@ bool NeutronProcessor::ProcessEvent(const G4Event* /*event*/) {
     man->FillNtupleDColumn(fNeutronMomXIndex, fTracker->GetAverageMomentum().x() );
     man->FillNtupleDColumn(fNeutronMomYIndex, fTracker->GetAverageMomentum().y() );
     man->FillNtupleDColumn(fNeutronMomZIndex, fTracker->GetAverageMomentum().z() );
-    man->FillNtupleDColumn(fNeutronKEIndex, fTracker->GetAverageKE() );
+    man->FillNtupleDColumn(fNeutronKEIndex, fTracker->GetAverageKE()/MeV );
 
     NeutronProcessor::DrawEvent();
 
