@@ -5,10 +5,10 @@
  index: "simconstants",
  det_tunnel_depth: "25*m",
 
-  world_box_width: "20.0*m",
+  world_box_width: "10.0*m",
   target_tunnel_dist: "15.0*m",
   target_tunnel_size: "0.5*m",
-  target_tunnel_length: "20.0*m",
+  target_tunnel_length: "10.0*m",
 
   // 2*depth*tan(60+delta) (where delta = 5)
   world_box_length: "2.0*det_tunnel_depth*2.144506",

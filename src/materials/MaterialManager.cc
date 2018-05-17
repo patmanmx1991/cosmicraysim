@@ -60,6 +60,7 @@ G4Material* MaterialFactory::GetMaterial(std::string name) {
   std::vector<std::string> elements = mattbl.GetVecS("element_names");
   std::vector<double>         counts   = mattbl.GetVecD("element_counts");
   G4double density = mattbl.GetG4D("density");
+  std::cout << "Material Density : " << density << std::endl;
 
   // Create the material
   std::cout << "MAT: Creating : " << name << std::endl;
@@ -69,6 +70,10 @@ G4Material* MaterialFactory::GetMaterial(std::string name) {
     G4Element* ele = GetElement(elements[j]);
     mat->AddElement( ele, counts[j] );
   }
+  std::cout << "MAT: Material Density : " << mat->GetDensity()*cm3/g << " g/cm3" << std::endl;
+
+
+
 
   // Dump the Table of registered materials
   // G4cout << *(G4Material::GetMaterialTable()) << G4endl;
@@ -77,7 +82,3 @@ G4Material* MaterialFactory::GetMaterial(std::string name) {
 }
 
 } // - namespace COSMIC
-
-
-
-

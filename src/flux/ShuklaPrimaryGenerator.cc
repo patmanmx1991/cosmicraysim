@@ -27,7 +27,7 @@ ShuklaPrimaryGenerator::ShuklaPrimaryGenerator()
 
     // Setup Defaults + Table Inputs
     fMinEnergy = 0.1;
-    fMaxEnergy = 5000.0;
+    fMaxEnergy = 10000.0;
 
     fPar_I0  = 88.5; // m-2 s-1 sr-1
     fPar_n   = 3.00;
@@ -79,7 +79,7 @@ ShuklaPrimaryGenerator::ShuklaPrimaryGenerator()
     }
 
     // Now look for manual overrides
-    if (table.Has("min_energy")) fMaxEnergy = table.GetD("min_energy");
+    if (table.Has("min_energy")) fMinEnergy = table.GetD("min_energy");
     if (table.Has("max_energy")) fMaxEnergy = table.GetD("max_energy");
 
     if (table.Has("I0"))       fPar_I0  = table.GetD("I0");
@@ -94,7 +94,7 @@ ShuklaPrimaryGenerator::ShuklaPrimaryGenerator()
     std::cout << "FLX: --> Max Energy : " << fMaxEnergy << " GeV" << std::endl;
     std::cout << "FLX: --> I0         : " << fPar_I0 << " m-2 s-1 sr -1" << std::endl;
     std::cout << "FLX: --> n          : " << fPar_n << std::endl;
-    std::cout << "FLX: --> E0         : " << fPar_E0  << " GeV" << std::endl;
+    std::cout << "FLX: --> E0         : " << fPar_E0 << " GeV" << std::endl;
     std::cout << "FLX: --> epsilon    : " << fPar_eps << " GeV" << std::endl;
     std::cout << "FLX: --> radius     : " << fPar_rad << " km"  << std::endl;
     std::cout << "FLX: --> distance   : " << fPar_dis << " km"  << std::endl;
@@ -122,8 +122,12 @@ ShuklaPrimaryGenerator::ShuklaPrimaryGenerator()
     fEnergyPDF->SetParameter(3, 1.0);
 
     // Normalize the PDF
-    G4double norm = fEnergyPDF->Integral(fMinEnergy * GeV, fMaxEnergy * GeV);
+    G4double norm = fEnergyPDF->Integral(0.1 * GeV, 5000.0 * GeV);
     fEnergyPDF->SetParameter(3, 1.0 / norm);
+
+    // Get the speed up factor
+    fSpeedUp = fEnergyPDF->Integral(fMinEnergy * GeV, fMaxEnergy * GeV);
+    std::cout << "FLX: --> fSpeedUp        : " << fSpeedUp << std::endl;
 
     // From dataset fit in Shukla paper
     G4double vertical_flux_rate = fPar_I0;// m-2 s-1 sr-1
@@ -334,7 +338,7 @@ void ShuklaPrimaryGenerator::GeneratePrimaries(G4Event* anEvent) {
     G4int num_target_boxes_hit=0;
     // The muon rate
     //  - fArea is in mm (internal G4 units) so need to convert to m
-    G4double adjusted_rate = fFluxIntegrated*fArea;//< Adjust this rate if we are only sampling a smaller portion of the energy-angle PDF
+    G4double adjusted_rate = fFluxIntegrated*fArea/fSpeedUp;//< Adjust this rate if we are only sampling a smaller portion of the energy-angle PDF
     // G4cout << "Adj. Rate : " << adjusted_rate << G4endl;
 
     do {
@@ -393,14 +397,15 @@ void ShuklaPrimaryGenerator::GeneratePrimaries(G4Event* anEvent) {
     // std::cout << "EventID " << anEvent->GetEventID() << G4endl;
     // std::cout << " --> Position " << position << G4endl;
     // std::cout << " --> Direction " << direction << G4endl;
-    // std::cout << " --> Global Time " << global_time << G4endl;
+    // std::cout << " --> Energy " << E*1000 << G4endl;
+    // std::cout << " --> Global Time " << fMuonTime << G4endl;
 
 
     /// This is incorrect. Need to incremenent the muon exposure time each throw using random stuff from Chris's code.
     // fMuonTime = fNThrows / fFluxIntegrated / fArea;
     fMuonDir = direction;
     fMuonPos = position;
-    fMuonEnergy = E;
+    fMuonEnergy = E*1000.0;
 
     fParticleGun->SetParticleEnergy(fMuonEnergy);
     fParticleGun->SetParticleTime(fMuonTime);

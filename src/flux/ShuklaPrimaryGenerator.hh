@@ -127,6 +127,7 @@ private:
     G4ThreeVector fMuonDir; ///< MuonDir    Info for auto flux processor
     G4ThreeVector fMuonPos; ///< MuonPos    Info for auto flux processor
     G4double fMuonPDG;      ///< MuonPDG    Info for auto flux processor
+    G4double fSpeedUp;      ///< MuonPDG    Info for auto flux processor
 
 };
 //---------------------------------------------------------------------------------

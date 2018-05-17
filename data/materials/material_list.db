@@ -12,7 +12,7 @@
   index: "Standard_Rock",
   element_names:  ["O","C", "Ca", "Mg"],
   element_counts: [0.52, 0.12, 0.27, 0.09],
-  density: 2.65,
+  density: 2.0,
   density_units: "g/cm3"
 }
 
