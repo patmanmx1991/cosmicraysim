@@ -110,8 +110,8 @@ G4int LongDriftSD::GetGhostHCID() {
 }
 
 void LongDriftSD::ResetState() {
-  VDetector::ResetState();
-  fEfficiencyThrow = G4UniformRand();
+    VDetector::ResetState();
+    fEfficiencyThrow = G4UniformRand();
 }
 
 G4bool LongDriftSD::ProcessHits(G4Step* step, G4TouchableHistory* /*touch*/)
@@ -140,9 +140,9 @@ G4bool LongDriftSD::ProcessHits(G4Step* step, G4TouchableHistory* /*touch*/)
     G4ThreeVector localPos = trans_worldtolocal.TransformPoint(worldPos);
 
     // Apply local smearing
-    localPos[0] = G4RandGauss::shoot(localPos[0],fResolutionX);
-    localPos[1] = G4RandGauss::shoot(localPos[1],fResolutionY);
-    localPos[2] = G4RandGauss::shoot(localPos[2],fResolutionZ);
+    localPos[0] = G4RandGauss::shoot(localPos[0], fResolutionX);
+    localPos[1] = G4RandGauss::shoot(localPos[1], fResolutionY);
+    localPos[2] = G4RandGauss::shoot(localPos[2], fResolutionZ);
 
     // Depending on the detector, we must restrict location in the local geometry
     G4ThreeVector localPosP = localPos;
@@ -305,23 +305,20 @@ bool LongDriftProcessor::ProcessEvent(const G4Event* event) {
             fTime += (( ( *(hc) )[ihit]->GetTime() / ns) - T / ns);
 
             G4ThreeVector pos = ( *(hc) )[ihit]->GetPos();
+            G4ThreeVector err = ( *(hc) )[ihit]->GetPosErr();
+
             if (!(*(hc))[ihit]->IsGhost()) {
                 fPosX += pos[0];
                 fPosY += pos[1];
                 fPosZ += pos[2];
-
-                G4ThreeVector err = ( *(hc) )[ihit]->GetPosErr();
                 fErrX += err[0];
                 fErrY += err[1];
                 fErrZ += err[2];
                 ngoodhits++;
             } else {
-                G4ThreeVector pos = ( *(hc) )[ihit]->GetPos();
                 fGhostPosX += pos[0];
                 fGhostPosY += pos[1];
                 fGhostPosZ += pos[2];
-
-                G4ThreeVector err = ( *(hc) )[ihit]->GetPosErr();
                 fGhostErrX += err[0];
                 fGhostErrY += err[1];
                 fGhostErrZ += err[2];
