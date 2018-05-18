@@ -11,4 +11,5 @@
 #include "TGraph.h"
 #include "TGraphErrors.h"
 #include "TCanvas.h"
+#include "TTree.h"
 #pragma GCC diagnostic pop
