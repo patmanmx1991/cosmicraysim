@@ -77,7 +77,7 @@ void HybridMuonTomographyDetector::Construct(DBTable table) {
   // Make the scintillator plane
   std::cout << "GEO: --> Making scintillator panels" << std::endl;
 
-  if (DB::Get()->HasTable("GEO","scintillator_top")){
+  if (DB::Get()->HasTable("GEO", "scintillator_top")) {
     DBTable tbl = DB::Get()->GetTable("GEO", "scintillator_top");
     tbl.SetIndexName(fName + "_scintillator_top");
     tbl.Prefix("mother", fName + "_");
@@ -85,7 +85,7 @@ void HybridMuonTomographyDetector::Construct(DBTable table) {
     fSubObjects.push_back(fScintObjectTop);
   }
 
-  if (DB::Get()->HasTable("GEO","scintillator_bottom")){
+  if (DB::Get()->HasTable("GEO", "scintillator_bottom")) {
     DBTable tbl = DB::Get()->GetTable("GEO", "scintillator_bottom");
     tbl.SetIndexName(fName + "_scintillator_bottom");
     tbl.Prefix("mother", fName + "_");
@@ -125,32 +125,32 @@ void HybridMuonTomographyDetector::Construct(DBTable table) {
 
   // -----------------------------------------------------------------
   // Make the RPCs above and below
-  if (DB::Get()->HasTable("GEO","rpc_topx")){
-    DBTable rpctemplate = DB::Get()->GetTable("GEO","rpc_topx");
+  if (DB::Get()->HasTable("GEO", "rpc_topx")) {
+    DBTable rpctemplate = DB::Get()->GetTable("GEO", "rpc_topx");
     rpctemplate.SetIndexName(fName + "_rpc_topx");
     rpctemplate.Prefix("mother", fName + "_");
     fRPCTopX = new GeoBox(rpctemplate);
     fSubObjects.push_back(fRPCTopX);
   }
 
-  if (DB::Get()->HasTable("GEO","rpc_topy")){
-    DBTable rpctemplate = DB::Get()->GetTable("GEO","rpc_topy");
+  if (DB::Get()->HasTable("GEO", "rpc_topy")) {
+    DBTable rpctemplate = DB::Get()->GetTable("GEO", "rpc_topy");
     rpctemplate.SetIndexName(fName + "_rpc_topy");
     rpctemplate.Prefix("mother", fName + "_");
     fRPCTopY = new GeoBox(rpctemplate);
     fSubObjects.push_back(fRPCTopY);
   }
 
-  if (DB::Get()->HasTable("GEO","rpc_bottomx")){
-    DBTable rpctemplate = DB::Get()->GetTable("GEO","rpc_bottomx");
+  if (DB::Get()->HasTable("GEO", "rpc_bottomx")) {
+    DBTable rpctemplate = DB::Get()->GetTable("GEO", "rpc_bottomx");
     rpctemplate.SetIndexName(fName + "_rpc_bottomx");
     rpctemplate.Prefix("mother", fName + "_");
     fRPCBottomX = new GeoBox(rpctemplate);
     fSubObjects.push_back(fRPCBottomX);
   }
 
-  if (DB::Get()->HasTable("GEO","rpc_bottomy")){
-    DBTable rpctemplate = DB::Get()->GetTable("GEO","rpc_bottomy");
+  if (DB::Get()->HasTable("GEO", "rpc_bottomy")) {
+    DBTable rpctemplate = DB::Get()->GetTable("GEO", "rpc_bottomy");
     rpctemplate.SetIndexName(fName + "_rpc_bottomy");
     rpctemplate.Prefix("mother", fName + "_");
     fRPCBottomY = new GeoBox(rpctemplate);
@@ -158,11 +158,11 @@ void HybridMuonTomographyDetector::Construct(DBTable table) {
   }
 
   // -----------------------------------------------------------------
-  // Register an HybridMuonTomographyProcessor to combine hits and return trigger
-  // if (!table.Has("processor") or table.GetB("processor")) {
-  //   std::cout << "GEO: --> Making processor" << std::endl;
-  //   Analysis::Get()->RegisterProcessor(new HybridMuonTomographyProcessor(this));
-  // }
+  //Register an HybridMuonTomographyProcessor to combine hits and return trigger
+  if (!table.Has("processor") or table.GetB("processor")) {
+    std::cout << "GEO: --> Making processor" << std::endl;
+    Analysis::Get()->RegisterProcessor(new HybridMuonTomographyProcessor(this));
+  }
 
   // Remove the temporary database.
   tdb->SelectDataBase("default");
@@ -175,80 +175,199 @@ void HybridMuonTomographyDetector::Construct(DBTable table) {
 HybridMuonTomographyProcessor::HybridMuonTomographyProcessor(HybridMuonTomographyDetector* det) :
   VProcessor(det->GetID()), fSave(true)
 {
-  // fHybridDetector = det;
+  fHybridDetector = det;
 
-  // // Get Scintillator objects
-  // G4VSensitiveDetector* sd = fHybridDetector->GetScintillatorTop()->GetSensitive();
-  // fScintProcTop = new SimpleScintillatorProcessor(static_cast<SimpleScintillatorSD*>(sd), true);
+  // Get Scintillator objects
+  G4VSensitiveDetector* sd = fHybridDetector->GetScintillatorTop()->GetSensitive();
+  fScintProcTop = new SimpleScintillatorProcessor(static_cast<SimpleScintillatorSD*>(sd), false);
 
-  // sd = fHybridDetector->GetScintillatorBottom()->GetSensitive();
-  // fScintProcBottom = new SimpleScintillatorProcessor(static_cast<SimpleScintillatorSD*>(sd), true);
+  sd = fHybridDetector->GetScintillatorBottom()->GetSensitive();
+  fScintProcBottom = new SimpleScintillatorProcessor(static_cast<SimpleScintillatorSD*>(sd), false);
 
-  // // Get RPC Objects
-  // G4VSensitiveDetector* sd = fHybridDetector->GetRPCTop()->GetSensitive();
-  // fRPCProcTop = new BristolRPCProcessor(static_cast<BristolRPCSD*>(sd), true);
+  // Get RPC Objects
+  sd = fHybridDetector->GetRPCTopX()->GetSensitive();
+  fRPCProcTopX = new BristolRPCProcessor(static_cast<BristolRPCSD*>(sd), false);
 
-  // sd = fHybridDetector->GetRPCBottom()->GetSensitive();
-  // fRPCProcBottom = new BristolRPCProcessor(static_cast<BristolRPCSD*>(sd), true);
+  sd = fHybridDetector->GetRPCTopY()->GetSensitive();
+  fRPCProcTopY = new BristolRPCProcessor(static_cast<BristolRPCSD*>(sd), false);
 
-  // // From each one get the sensitive and manually create a processor.
-  // // This is super awkward. May need to rethink.
-  // std::vector<GeoObject*> drifts = fHybridDetector->GetDriftObjects();
-  // for (uint i = 0; i < drifts.size(); i++) {
-  //   AWEDriftSD* sd = static_cast<AWEDriftSD*>(drifts[i]->GetSensitive());
-  //   AWEDriftProcessor* pr = new AWEDriftProcessor(sd, true);
-  //   fDriftChamberProcs.push_back( pr );
-  // }
+  sd = fHybridDetector->GetRPCBottomX()->GetSensitive();
+  fRPCProcBottomX = new BristolRPCProcessor(static_cast<BristolRPCSD*>(sd), false);
+
+  sd = fHybridDetector->GetRPCBottomY()->GetSensitive();
+  fRPCProcBottomY = new BristolRPCProcessor(static_cast<BristolRPCSD*>(sd), false);
+
+  // From each one get the sensitive and manually create a processor.
+  // This is super awkward. May need to rethink.
+  std::vector<GeoObject*> drifts = fHybridDetector->GetDriftObjects();
+  for (uint i = 0; i < drifts.size(); i++) {
+    AWEDriftSD* sdd = static_cast<AWEDriftSD*>(drifts[i]->GetSensitive());
+    AWEDriftProcessor* pr = new AWEDriftProcessor(sdd, false);
+    fDriftChamberProcs.push_back( pr );
+  }
 
 }
 
-bool HybridMuonTomographyProcessor::BeginOfRunAction(const G4Run* run) {
-  // std::string tableindex = GetID();
-  // std::cout << "Registering HybridMuonTomographyProcessor NTuples " << tableindex << std::endl;
+bool HybridMuonTomographyProcessor::BeginOfRunAction(const G4Run* /*run*/) {
+  std::string tableindex = GetID();
+  std::cout << "Registering HybridMuonTomographyProcessor NTuples " << tableindex << std::endl;
 
-  // G4AnalysisManager* man = G4AnalysisManager::Instance();
+  G4AnalysisManager* man = G4AnalysisManager::Instance();
 
-  // fScintProcTop->BeginOfRunAction(run);
-  // fScintProcBottom->BeginOfRunAction(run); 
+  ResetVariables();
 
-  // fTopRPCProc->BeginOfRunAction(run);
-  // fBottomRPCProc->BeginOfRunAction(run);
+  fScintTopEIndex = man ->CreateNtupleDColumn(tableindex + "_sct_te");
+  fScintTopTIndex = man ->CreateNtupleDColumn(tableindex + "_sct_tt");
+  fScintBottomEIndex = man ->CreateNtupleDColumn(tableindex + "_sct_be");
+  fScintBottomTIndex = man ->CreateNtupleDColumn(tableindex + "_sct_bt");
 
-  // for (uint i = 0; i < fDriftChamberProcs.size(); i++) {
-  //   fDriftChamberProcs[i]->BeginOfRunAction(run);
-  // }
+  man ->CreateNtupleDColumn(tableindex + "_rpc_xx", fRPCHits_XX);
+  man ->CreateNtupleDColumn(tableindex + "_rpc_xt", fRPCHits_XT);
+  man ->CreateNtupleDColumn(tableindex + "_rpc_xz", fRPCHits_XZ);
+  man ->CreateNtupleDColumn(tableindex + "_rpc_xe", fRPCHits_XE);
 
-  // return true;
+  man ->CreateNtupleDColumn(tableindex + "_rpc_yy", fRPCHits_YY);
+  man ->CreateNtupleDColumn(tableindex + "_rpc_yt", fRPCHits_YT);
+  man ->CreateNtupleDColumn(tableindex + "_rpc_yz", fRPCHits_YZ);
+  man ->CreateNtupleDColumn(tableindex + "_rpc_ye", fRPCHits_YE);
+
+  man ->CreateNtupleDColumn(tableindex + "_drift_xx", fDriftHits_XX);
+  man ->CreateNtupleDColumn(tableindex + "_drift_xg", fDriftHits_XG);
+  man ->CreateNtupleDColumn(tableindex + "_drift_xt", fDriftHits_XT);
+  man ->CreateNtupleDColumn(tableindex + "_drift_xz", fDriftHits_XZ);
+  man ->CreateNtupleDColumn(tableindex + "_drift_xe", fDriftHits_XE);
+
+  man ->CreateNtupleDColumn(tableindex + "_drift_yy", fDriftHits_YY);
+  man ->CreateNtupleDColumn(tableindex + "_drift_yg", fDriftHits_YG);
+  man ->CreateNtupleDColumn(tableindex + "_drift_yt", fDriftHits_YT);
+  man ->CreateNtupleDColumn(tableindex + "_drift_yz", fDriftHits_YZ);
+  man ->CreateNtupleDColumn(tableindex + "_drift_ye", fDriftHits_YE);
+
+  return true;
 }
 
 
 bool HybridMuonTomographyProcessor::ProcessEvent(const G4Event* event) {
 
-  // // Get the processor from the scintillator
-  // fScintProcTop->Reset();
-  // fScintProcTop->ProcessEvent(event);
-  // fScintProcBottom->Reset();
-  // fScintProcBottom->ProcessEvent(event);
-  // bool hasvalue = fScintProcTop->HasInfo() || fScintProcBottom->HasInfo();
-  // if (!hasvalue) {
-  //   return false;
-  // }
+  // Reset all processors
+  fScintProcTop->Reset();
+  fScintProcBottom->Reset();
+  fRPCProcTopX->Reset();
+  fRPCProcTopY->Reset();
+  fRPCProcBottomX->Reset();
+  fRPCProcBottomY->Reset();
+  for (uint i = 0; i < fDriftChamberProcs.size(); i++) {
+    fDriftChamberProcs[i]->Reset();
+  }
 
-  // G4double averagetime = 0.0;
-  // for (uint i = 0; i < fDriftChamberProcs.size(); i++) {
-  //   // Run our processing
-  //   fDriftChamberProcs[i]->Reset();
-  //   fDriftChamberProcs[i]->ProcessEvent(event);
-  // }
+  // Run event sub processing
+  fScintProcTop->ProcessEvent(event);
+  fScintProcBottom->ProcessEvent(event);
+  fRPCProcTopX->ProcessEvent(event);
+  fRPCProcTopY->ProcessEvent(event);
+  fRPCProcBottomX->ProcessEvent(event);
+  fRPCProcBottomY->ProcessEvent(event);
+  for (uint i = 0; i < fDriftChamberProcs.size(); i++) {
+    fDriftChamberProcs[i]->ProcessEvent(event);
+  }
 
-  // // Now get top bottom RPC Info
-  // fTopRPCProc->Reset();
-  // fTopRPCProc->ProcessEvent(event);
-  
-  // fBottomRPCProc->Reset();
-  // fBottomRPCProc->ProcessEvent(event);
+  // TRIGGERING
+  // Check at least one scinillator hit
+  bool hasvalue = fScintProcTop->HasInfo() || fScintProcBottom->HasInfo();
+  if (!hasvalue) {
+    ResetVariables();
+    return false;
+  }
+  ResetVariables();
 
-  // return true;
+  // Scint info processing
+  G4AnalysisManager* man = G4AnalysisManager::Instance();
+
+  man->FillNtupleDColumn(fScintTopEIndex, fScintProcTop->GetEnergy());
+  man->FillNtupleDColumn(fScintTopTIndex, fScintProcTop->GetEnergy());
+  man->FillNtupleDColumn(fScintBottomEIndex, fScintProcBottom->GetEnergy());
+  man->FillNtupleDColumn(fScintBottomTIndex, fScintProcBottom->GetEnergy());
+
+  // RPC Hit Processing
+  if (fRPCProcTopX->HasInfo()) {
+    fRPCHits_XX.push_back(fRPCProcTopX->GetWorldPosX()/ m);
+    fRPCHits_XT.push_back(fRPCProcTopX->GetWorldPosTrueX()/ m);
+    fRPCHits_XZ.push_back(fRPCProcTopX->GetWorldPosZ()/ m);
+    fRPCHits_XE.push_back(fRPCProcTopX->GetWorldErrX()/ m);
+  }
+
+  if (fRPCProcBottomX->HasInfo()) {
+    fRPCHits_XX.push_back(fRPCProcBottomX->GetWorldPosX()/ m);
+    fRPCHits_XT.push_back(fRPCProcBottomX->GetWorldPosTrueX()/ m);
+    fRPCHits_XZ.push_back(fRPCProcBottomX->GetWorldPosZ()/ m);
+    fRPCHits_XE.push_back(fRPCProcBottomX->GetWorldErrX()/ m);
+  }
+
+  if (fRPCProcTopY->HasInfo()) {
+    fRPCHits_YY.push_back(fRPCProcTopY->GetWorldPosY()/ m);
+    fRPCHits_YT.push_back(fRPCProcTopY->GetWorldPosTrueY()/ m);
+    fRPCHits_YZ.push_back(fRPCProcTopY->GetWorldPosZ()/ m);
+    fRPCHits_YE.push_back(fRPCProcTopY->GetWorldErrY()/ m);
+  }
+
+  if (fRPCProcBottomY->HasInfo()) {
+    fRPCHits_YY.push_back(fRPCProcBottomY->GetWorldPosY()/ m);
+    fRPCHits_YT.push_back(fRPCProcBottomY->GetWorldPosTrueY()/ m);
+    fRPCHits_YZ.push_back(fRPCProcBottomY->GetWorldPosZ()/ m);
+    fRPCHits_YE.push_back(fRPCProcBottomY->GetWorldErrY()/ m);
+  }
+
+  // Drift Processing is more awkward.
+  // Count up in 3s, switching between left and right.
+  for (uint i = 0; i < fDriftChamberProcs.size(); i++) {
+    if (!fDriftChamberProcs[i]->HasInfo()) continue;
+    if (i % 6 < 3) {
+      fDriftHits_YY.push_back(fDriftChamberProcs[i]->GetWorldPosY() / m);
+      fDriftHits_YG.push_back(fDriftChamberProcs[i]->GetGhostWorldPosY() / m );
+      fDriftHits_YT.push_back(fDriftChamberProcs[i]->GetWorldPosTrueY() / m );
+      fDriftHits_YZ.push_back(fDriftChamberProcs[i]->GetWorldPosZ() / m );
+      fDriftHits_YE.push_back(fDriftChamberProcs[i]->GetErrY()/ m);
+    } else {
+      fDriftHits_XX.push_back(fDriftChamberProcs[i]->GetWorldPosX()/ m);
+      fDriftHits_XG.push_back(fDriftChamberProcs[i]->GetGhostWorldPosX()/ m);
+      fDriftHits_XT.push_back(fDriftChamberProcs[i]->GetWorldPosTrueX()/ m);
+      fDriftHits_XZ.push_back(fDriftChamberProcs[i]->GetWorldPosZ()/ m);
+      fDriftHits_XE.push_back(fDriftChamberProcs[i]->GetErrY()/ m);
+    }
+  }
+
+  return true;
+}
+
+void HybridMuonTomographyProcessor::ResetVariables() {
+
+  fScintTopE = -999.0;
+  fScintTopT = -999.0;
+  fScintBottomT = -999.0;
+  fScintBottomE = -999.0;
+
+  fRPCHits_XX.clear();
+  fRPCHits_XT.clear();
+  fRPCHits_XZ.clear();
+  fRPCHits_XE.clear();
+
+  fRPCHits_YY.clear();
+  fRPCHits_YT.clear();
+  fRPCHits_YZ.clear();
+  fRPCHits_YE.clear();
+
+  fDriftHits_XX.clear();
+  fDriftHits_XT.clear();
+  fDriftHits_XG.clear();
+  fDriftHits_XZ.clear();
+  fDriftHits_XE.clear();
+
+  fDriftHits_YY.clear();
+  fDriftHits_YT.clear();
+  fDriftHits_YG.clear();
+  fDriftHits_YZ.clear();
+  fDriftHits_YE.clear();
+
 }
 
 // --------------------------------------------------------------------------

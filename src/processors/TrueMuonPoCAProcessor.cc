@@ -3,8 +3,6 @@
 #include "analysis/Analysis.hh"
 #include "db/DBTable.hh"
 
-
-
 #include "G4VVisManager.hh"
 #include "G4VisAttributes.hh"
 #include "G4Circle.hh"
