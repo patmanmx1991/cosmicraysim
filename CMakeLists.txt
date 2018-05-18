@@ -32,15 +32,9 @@ endif()
 # Setup Geant4 include directories and compile definitions
 # Setup include directory for this project
 #
-if(ROOT_FOUND)
 add_definitions(-DG4ANALYSIS_USE_ROOT)
 include(${Geant4_USE_FILE})
-include_directories(${ROOT_INCLUDE_DIR} ${Geant4_INCLUDE_DIR} ${PROJECT_SOURCE_DIR}/src/RAT/ ${PROJECT_SOURCE_DIR}/src/ ${PROJECT_SOURCE_DIR}/src/geo/)
-else()
-include(${Geant4_USE_FILE})
-include_directories(${PROJECT_SOURCE_DIR}/src/ ${PROJECT_SOURCE_DIR}/src/ ${PROJECT_SOURCE_DIR}/src/geo/)
-endif()
-
+include_directories(${ROOT_INCLUDE_DIR} ${Geant4_INCLUDE_DIR} ${PROJECT_SOURCE_DIR}/src/ ${PROJECT_SOURCE_DIR}/geo/)
 
 #----------------------------------------------------------------------------
 # Locate sources and headers for this project
@@ -53,15 +47,22 @@ file(GLOB headers ${PROJECT_SOURCE_DIR}/src/*/*.hh ${PROJECT_SOURCE_DIR}/src/geo
 configure_file(cmake/setup.sh.in
   "${PROJECT_BINARY_DIR}/setup.sh" @ONLY)
 
+
+# Build PUMAS
+add_library (pumas ${PROJECT_SOURCE_DIR}/src/pumas/pumas.c ${PROJECT_SOURCE_DIR}/src/pumas/pumas.h)
+
 #----------------------------------------------------------------------------
 # Add the executable, and link it to the Geant4 libraries
 #
 add_executable(cosmicraysim ${PROJECT_SOURCE_DIR}/app/cosmicraysim.cc ${sources} ${headers})
-if(ROOT_FOUND)
-target_link_libraries(cosmicraysim ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} )
-else()
-target_link_libraries(cosmicraysim ${Geant4_LIBRARIES})
-endif()
+add_executable(bristol_trackfit ${PROJECT_SOURCE_DIR}/app/cosmicraysim.cc ${sources} ${headers})
+add_executable(pumas_example ${PROJECT_SOURCE_DIR}/app/pumas_example.cc ${sources} ${headers})
+
+target_link_libraries(cosmicraysim ${Geant4_LIBRARIES} ${ROOT_LIBRARIES})
+target_link_libraries(bristol_trackfit ${Geant4_LIBRARIES} ${ROOT_LIBRARIES})
+target_link_libraries(pumas_example ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} pumas)
+
+
 
 #----------------------------------------------------------------------------
 # For internal Geant4 use - but has no effect if you build this
@@ -94,3 +95,4 @@ endforeach()
 # Install the executable to 'bin' directory under CMAKE_INSTALL_PREFIX
 #
 install(TARGETS cosmicraysim DESTINATION bin )
+install(TARGETS pumas DESTINATION lib )
