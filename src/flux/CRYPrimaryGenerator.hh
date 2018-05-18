@@ -127,6 +127,8 @@ private:
   G4double fExposureTime; ///< Current integrated exposure time
   int fNthrows; ///< Total number of throws so far
 
+  bool fAggressiveSelection; ///< Flag to keep only tracks that hit a target box
+
 };
 //---------------------------------------------------------------------------------
 

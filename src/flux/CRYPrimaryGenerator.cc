@@ -11,8 +11,9 @@ namespace COSMIC {
 
 //----------------------------------------------------------------------------//
 CRYPrimaryGenerator::CRYPrimaryGenerator() :
-InputState(-1),
-fSourceBox(0)
+  InputState(-1),
+  fSourceBox(0),
+  fAggressiveSelection(0)
 {
   std::cout << "FLX: Building CRY Generator" << std::endl;
   DBTable table = DB::Get()->GetTable("CRY", "config");
@@ -32,7 +33,7 @@ fSourceBox(0)
 
   fNParticlesMin = -1; // No Truncation
   fNParticlesMax = -1; // No Truncation
-  
+
   fMinEnergy = -1.0; // No energy cut
   fMaxEnergy = -1.0; // No energy cut
 
@@ -110,7 +111,7 @@ void CRYPrimaryGenerator::UpdateCRY()
 
   // Fill truncation if provided
   if (fNParticlesMin > 0) {
-  cryconfigs << " nParticlesMin " << fNParticlesMin;
+    cryconfigs << " nParticlesMin " << fNParticlesMin;
   }
   if (fNParticlesMax > 0) {
     cryconfigs << " nParticlesMax " << fNParticlesMax;
@@ -171,6 +172,11 @@ G4Box* CRYPrimaryGenerator::GetSourceBox() {
     // Find box placement
     std::vector<G4double> pos = tbl.GetVecG4D("position");
     fSourceBoxPosition = G4ThreeVector(pos[0], pos[1], pos[2]);
+
+    // Check if user wants to keep only tracks hitting a target box
+    if (tbl.Has("aggressive")){
+      fAggressiveSelection = tbl.GetB("aggressive");
+    }
 
     break;
   }
@@ -252,6 +258,7 @@ void CRYPrimaryGenerator::GeneratePrimaries(G4Event* anEvent)
   G4String particleName;
   uint stacksize = 0;
   uint throws = 0;
+  std::vector<bool> goodtrack;
 
   do {
     throws++;
@@ -259,6 +266,8 @@ void CRYPrimaryGenerator::GeneratePrimaries(G4Event* anEvent)
     gen->genEvent(vect);
     fExposureTime = gen->timeSimulated();
     fNthrows++;
+
+    goodtrack = std::vector<bool>(vect->size(), false);
 
     // Number of trajectories that intercept at least one targetbox
     stacksize = 0;
@@ -297,13 +306,16 @@ void CRYPrimaryGenerator::GeneratePrimaries(G4Event* anEvent)
       // If one good trajectory then event is good.
       if (good_traj) {
         stacksize++;
+        goodtrack[j] = true;
       }
     }
 
     if (stacksize == 0) {
       for (unsigned j = 0; j < vect->size(); j++) {
+        if (!(*vect)[j]) continue;
         delete (*vect)[j];
       }
+      goodtrack.clear();
     }
 
   } while (stacksize < 1 and throws < 1E8);
@@ -326,27 +338,30 @@ void CRYPrimaryGenerator::GeneratePrimaries(G4Event* anEvent)
     // Skip if trajectory was NULL
     if (!(*vect)[j]) continue;
 
-    // // Get Name
-    // particleName = CRYUtils::partName((*vect)[j]->id());
+    if (!fAggressiveSelection or goodtrack[j]) {
 
-    // //....debug output
-    // cout << "  "          << particleName << " "
-    //      << "charge="      << (*vect)[j]->charge() << " "
-    //      << setprecision(4)
-    //      << "energy (MeV)=" << (*vect)[j]->ke()*MeV << " "
-    //      << "pos (m)"
-    //      << G4ThreeVector((*vect)[j]->x(), (*vect)[j]->y(), (*vect)[j]->z())
-    //      << " " << "direction cosines "
-    //      << G4ThreeVector((*vect)[j]->u(), (*vect)[j]->v(), (*vect)[j]->w())
-    //      << " " << endl;
+      // // Get Name
+      // particleName = CRYUtils::partName((*vect)[j]->id());
 
-    // Add particles to gun
-    particleGun->SetParticleDefinition(particleTable->FindParticle((*vect)[j]->PDGid()));
-    particleGun->SetParticleEnergy((*vect)[j]->ke()*MeV);
-    particleGun->SetParticlePosition(G4ThreeVector((*vect)[j]->x(), (*vect)[j]->y(), (*vect)[j]->z()));
-    particleGun->SetParticleMomentumDirection(G4ThreeVector((*vect)[j]->u(), (*vect)[j]->v(), (*vect)[j]->w()));
-    particleGun->SetParticleTime((*vect)[j]->t());
-    particleGun->GeneratePrimaryVertex(anEvent);
+      // //....debug output
+      // cout << "  "          << particleName << " "
+      //      << "charge="      << (*vect)[j]->charge() << " "
+      //      << setprecision(4)
+      //      << "energy (MeV)=" << (*vect)[j]->ke()*MeV << " "
+      //      << "pos (m)"
+      //      << G4ThreeVector((*vect)[j]->x(), (*vect)[j]->y(), (*vect)[j]->z())
+      //      << " " << "direction cosines "
+      //      << G4ThreeVector((*vect)[j]->u(), (*vect)[j]->v(), (*vect)[j]->w())
+      //      << " " << endl;
+
+      // Add particles to gun
+      particleGun->SetParticleDefinition(particleTable->FindParticle((*vect)[j]->PDGid()));
+      particleGun->SetParticleEnergy((*vect)[j]->ke()*MeV);
+      particleGun->SetParticlePosition(G4ThreeVector((*vect)[j]->x(), (*vect)[j]->y(), (*vect)[j]->z()));
+      particleGun->SetParticleMomentumDirection(G4ThreeVector((*vect)[j]->u(), (*vect)[j]->v(), (*vect)[j]->w()));
+      particleGun->SetParticleTime((*vect)[j]->t());
+      particleGun->GeneratePrimaryVertex(anEvent);
+    }
 
     // Remove this particle
     delete (*vect)[j];
