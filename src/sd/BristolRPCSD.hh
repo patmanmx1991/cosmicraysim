@@ -74,7 +74,8 @@ protected:
   G4VPhysicalVolume* fPhysical;
 
   G4double fResolution;
-
+  G4double fResolutionThrow;
+  
   G4double fDetectorSizeX;
   G4double fDetectorSizeY;
   G4double fDetectorSizeZ;
@@ -114,6 +115,9 @@ public:
   inline G4double       GetPosX() { return fPosX;  };
   inline G4double       GetPosY() { return fPosY;  };
   inline G4double       GetPosZ() { return fPosZ;  };
+  inline G4double       GetPosTrueX() { return fPosTrueX;  };
+  inline G4double       GetPosTrueY() { return fPosTrueY;  };
+  inline G4double       GetPosTrueZ() { return fPosTrueZ;  };
   inline G4double       GetErrX() { return fErrX;  };
   inline G4double       GetErrY() { return fErrY;  };
   inline G4double       GetErrZ() { return fErrZ;  };
@@ -121,6 +125,9 @@ public:
   inline G4double       GetWorldPosX() { return fWorldPosX;  };
   inline G4double       GetWorldPosY() { return fWorldPosY;  };
   inline G4double       GetWorldPosZ() { return fWorldPosZ;  };
+  inline G4double       GetWorldPosTrueX() { return fWorldPosTrueX;  };
+  inline G4double       GetWorldPosTrueY() { return fWorldPosTrueY;  };
+  inline G4double       GetWorldPosTrueZ() { return fWorldPosTrueZ;  };
   inline G4double       GetWorldErrX() { return fWorldErrX;  };
   inline G4double       GetWorldErrY() { return fWorldErrY;  };
   inline G4double       GetWorldErrZ() { return fWorldErrZ;  };
@@ -143,6 +150,9 @@ protected:
   G4double fPosX;
   G4double fPosY;
   G4double fPosZ;
+  G4double fPosTrueX;
+  G4double fPosTrueY;
+  G4double fPosTrueZ;
   G4double fErrX;
   G4double fErrY;
   G4double fErrZ;
@@ -150,6 +160,9 @@ protected:
   G4double fWorldPosX;
   G4double fWorldPosY;
   G4double fWorldPosZ;
+  G4double fWorldPosTrueX;
+  G4double fWorldPosTrueY;
+  G4double fWorldPosTrueZ;
   G4double fWorldErrX;
   G4double fWorldErrY;
   G4double fWorldErrZ;
