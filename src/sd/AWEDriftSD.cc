@@ -48,7 +48,7 @@ AWEDriftSD::AWEDriftSD(DBTable tbl):
 }
 
 AWEDriftSD::AWEDriftSD(std::string name, std::string id,
-                         bool autoprocess, bool autosave):
+                       bool autoprocess, bool autosave):
     VDetector(name, id)
 {
     std::cout << "DET: Creating new " << GetType()
@@ -63,7 +63,7 @@ AWEDriftSD::AWEDriftSD(std::string name, std::string id,
     }
 
     fEfficiency = 1.0;
-    fResolution = 0.1 * mm;
+    fResolution = 2 * mm;
 
     fDetectorSizeX = 0.0;
     fDetectorSizeY = 0.0;
@@ -76,7 +76,7 @@ AWEDriftSD::AWEDriftSD(std::string name, std::string id,
 
     // By default also include the auto processor
     if (autoprocess) {
-      Analysis::Get()->RegisterProcessor(new AWEDriftProcessor(this, autosave));
+        Analysis::Get()->RegisterProcessor(new AWEDriftProcessor(this, autosave));
     }
 }
 
@@ -98,8 +98,16 @@ G4int AWEDriftSD::GetGhostHCID() {
 }
 
 void AWEDriftSD::ResetState() {
-  VDetector::ResetState();
-  fEfficiencyThrow = G4UniformRand();
+    VDetector::ResetState();
+
+    fEfficiencyThrow = G4UniformRand();
+
+    if (fResolution > 0.0) {
+        fResolutionThrow = G4RandGauss::shoot(0.0, fResolution);
+    } else {
+        fResolutionThrow = 0.0;
+    }
+
 }
 
 G4bool AWEDriftSD::ProcessHits(G4Step* step, G4TouchableHistory* /*touch*/)
@@ -136,39 +144,51 @@ G4bool AWEDriftSD::ProcessHits(G4Step* step, G4TouchableHistory* /*touch*/)
     G4ThreeVector localPosP = localPos;
     G4ThreeVector localPosE;
 
-    // Set Resolution
-    localPosE[1] = 2.0*mm; //fResolution;
-
     // Restrict to DOF in Y
     localPosP[0] = 0.0 * mm;
-    localPosE[0] = fDetectorSizeX;    
+    localPosE[0] = fDetectorSizeX;
+
+    localPosE[1] = fResolution;
+
     localPosP[2] = 0.0 * mm;
     localPosE[2] = fDetectorSizeZ;
-    
+
     // Throw the position in Y according to the error
-    if (fResolution > 0.0){
-        localPosP[1] = G4RandGauss::shoot(localPosP[1],fResolution);
-    }
+    localPosP[1] = localPosP[1] + fResolutionThrow;
 
     // World volume seems to be the local point
     G4AffineTransform trans_localtoworld = trans_worldtolocal.Invert();
 
     // Convert restricted data back to world geometry
     G4ThreeVector worldPosP = trans_localtoworld.TransformPoint(localPosP);
-    G4ThreeVector emptyE = trans_localtoworld.TransformPoint(G4ThreeVector());
     G4ThreeVector worldPosE = trans_localtoworld.TransformPoint(localPosE);
-    worldPosE -= emptyE;
+    worldPosE -= trans_localtoworld.TransformPoint(G4ThreeVector());
+    worldPosE[0] = fabs(worldPosE[0]);
+    worldPosE[1] = fabs(worldPosE[1]);
+    worldPosE[2] = fabs(worldPosE[2]);
 
     // Push back a hit for the true hit
     DriftChamberHit* hit = new DriftChamberHit(copyNo);
+    hit->SetTime(preStepPoint->GetGlobalTime());
+    hit->SetWorldPosTrue(worldPos);
     hit->SetWorldPos(worldPosP);
     hit->SetWorldPosErr(worldPosE);
+    hit->SetLocalPosTrue(localPos);
     hit->SetLocalPos(localPosP);
     hit->SetLocalPosErr(localPosE);
-    hit->SetTime(preStepPoint->GetGlobalTime());
     hit->SetGhost(false);
     fHitsCollection->insert(hit);
-    
+
+    std::cout << GetID() << std::endl;
+    std::cout << "World Before : " << worldPos[0] / m  << " " << worldPos[1] / m  << " " << worldPos[2] / m << std::endl;
+    std::cout << "Local Before : " << localPos[0] / m  << " " << localPos[1] / m  << " " << localPos[2] / m << std::endl;
+    std::cout << "World After  : " << worldPosP[0] / m << " " << worldPosP[1] / m << " " << worldPosP[2] / m << std::endl;
+    std::cout << "World Error  : " << worldPosE[0] / m << " " << worldPosE[1] / m << " " << worldPosE[2] / m << std::endl;
+    std::cout << "Local After  : " << localPosP[0] / m << " " << localPosP[1] / m << " " << localPosP[2] / m << std::endl;
+    std::cout << "Local Error  : " << localPosE[0] / m << " " << localPosE[1] / m << " " << localPosE[2] / m << std::endl;
+
+
+
     // Always Add a ghost hit according to wire drift
     G4double updateY = fWirePosition  - (localPosP[1] - fWirePosition);
     if (fabs(updateY) < fDetectorSizeY) {
@@ -176,14 +196,15 @@ G4bool AWEDriftSD::ProcessHits(G4Step* step, G4TouchableHistory* /*touch*/)
         worldPosP = trans_localtoworld.TransformPoint(localPosP);
     }
     hit = new DriftChamberHit(copyNo);
+    hit->SetTime(preStepPoint->GetGlobalTime());
+    hit->SetWorldPosTrue(worldPos);
     hit->SetWorldPos(worldPosP);
     hit->SetWorldPosErr(worldPosE);
+    hit->SetLocalPosTrue(localPos);
     hit->SetLocalPos(localPosP);
     hit->SetLocalPosErr(localPosE);
-    hit->SetTime(preStepPoint->GetGlobalTime());
     hit->SetGhost(true);
     fHitsCollection->insert(hit);
-
 
     return true;
 }
@@ -219,7 +240,7 @@ AWEDriftProcessor::AWEDriftProcessor(AWEDriftSD* trkr, bool autosave) :
     fHCID = trkr->GetHCID();
 }
 
-bool AWEDriftProcessor::BeginOfRunAction(const G4Run* /*run*/) 
+bool AWEDriftProcessor::BeginOfRunAction(const G4Run* /*run*/)
 {
     if (fSave) {
         std::string tableindex = GetID();
@@ -229,7 +250,7 @@ bool AWEDriftProcessor::BeginOfRunAction(const G4Run* /*run*/)
 
         // Fill index energy
         fTimeIndex = man ->CreateNtupleDColumn(tableindex + "_t");
-        
+
         // fPosXIndex = man ->CreateNtupleDColumn(tableindex + "_lx");
         fPosYIndex = man ->CreateNtupleDColumn(tableindex + "_ly");
         // fPosZIndex = man ->CreateNtupleDColumn(tableindex + "_lz");
@@ -253,7 +274,7 @@ bool AWEDriftProcessor::BeginOfRunAction(const G4Run* /*run*/)
         // fGhostWorldPosXIndex = man ->CreateNtupleDColumn(tableindex + "_gwx");
         // fGhostWorldPosYIndex = man ->CreateNtupleDColumn(tableindex + "_gwy");
         // fGhostWorldPosZIndex = man ->CreateNtupleDColumn(tableindex + "_gwz");
-    
+
         std::cout << "Registering AWEDriftSD NTuples " << tableindex << " : " << fTimeIndex << std::endl;
 
     }
@@ -261,14 +282,14 @@ bool AWEDriftProcessor::BeginOfRunAction(const G4Run* /*run*/)
     return true;
 }
 
-bool AWEDriftProcessor::ProcessEvent(const G4Event* event) 
+bool AWEDriftProcessor::ProcessEvent(const G4Event* event)
 {
 
     // Get the hit collection
     fHCID = fDetector->GetHCID();
     DriftChamberHitsCollection* hc =
         static_cast<DriftChamberHitsCollection*> (event->GetHCofThisEvent()->GetHC(fHCID));
-    
+
     // Get hit count for this SD
     int nhits = (int)  (hc)->GetSize();
     if (nhits < 1) {
@@ -289,14 +310,16 @@ bool AWEDriftProcessor::ProcessEvent(const G4Event* event)
         fTime += (( ( *(hc) )[ihit]->GetTime() / ns) - T / ns);
 
         G4ThreeVector pos = ( *(hc) )[ihit]->GetLocalPos();
+        G4ThreeVector postrue = ( *(hc) )[ihit]->GetLocalPosTrue();
         G4ThreeVector wpos = ( *(hc) )[ihit]->GetWorldPos();
+        G4ThreeVector wpostrue = ( *(hc) )[ihit]->GetWorldPosTrue();
 
         G4ThreeVector err = ( *(hc) )[ihit]->GetLocalPosErr();
         G4ThreeVector werr = ( *(hc) )[ihit]->GetWorldPosErr();
 
         // Save info depending on if its a ghost
         if (!(*(hc))[ihit]->IsGhost()) {
-                        
+
             fPosX += pos[0];
             fPosY += pos[1];
             fPosZ += pos[2];
@@ -304,6 +327,10 @@ bool AWEDriftProcessor::ProcessEvent(const G4Event* event)
             fErrX += err[0];
             fErrY += err[1];
             fErrZ += err[2];
+
+            fPosTrueX += postrue[0];
+            fPosTrueY += postrue[1];
+            fPosTrueZ += postrue[2];
 
             fWorldPosX += wpos[0];
             fWorldPosY += wpos[1];
@@ -313,10 +340,14 @@ bool AWEDriftProcessor::ProcessEvent(const G4Event* event)
             fWorldErrY += werr[1];
             fWorldErrZ += werr[2];
 
+            fWorldPosTrueX += wpostrue[0];
+            fWorldPosTrueY += wpostrue[1];
+            fWorldPosTrueZ += wpostrue[2];
+
             ngoodhits++;
-        
+
         } else {
-            
+
             fGhostPosX += pos[0];
             fGhostPosY += pos[1];
             fGhostPosZ += pos[2];
@@ -328,13 +359,17 @@ bool AWEDriftProcessor::ProcessEvent(const G4Event* event)
             nghosthits++;
         }
     }
-    
+
     // Calculate hit averages
     fTime /= double(ngoodhits + nghosthits);
 
     fPosX /= double(ngoodhits);
     fPosY /= double(ngoodhits);
     fPosZ /= double(ngoodhits);
+    fPosTrueX /= double(ngoodhits);
+    fPosTrueY /= double(ngoodhits);
+    fPosTrueZ /= double(ngoodhits);
+
     fErrX /= double(ngoodhits);
     fErrY /= double(ngoodhits);
     fErrZ /= double(ngoodhits);
@@ -342,6 +377,10 @@ bool AWEDriftProcessor::ProcessEvent(const G4Event* event)
     fWorldPosX /= double(ngoodhits);
     fWorldPosY /= double(ngoodhits);
     fWorldPosZ /= double(ngoodhits);
+    fWorldPosTrueX /= double(ngoodhits);
+    fWorldPosTrueY /= double(ngoodhits);
+    fWorldPosTrueZ /= double(ngoodhits);
+
     fWorldErrX /= double(ngoodhits);
     fWorldErrY /= double(ngoodhits);
     fWorldErrZ /= double(ngoodhits);
@@ -349,7 +388,6 @@ bool AWEDriftProcessor::ProcessEvent(const G4Event* event)
     fGhostPosX /= double(nghosthits);
     fGhostPosY /= double(nghosthits);
     fGhostPosZ /= double(nghosthits);
-
     fGhostWorldPosX /= double(nghosthits);
     fGhostWorldPosY /= double(nghosthits);
     fGhostWorldPosZ /= double(nghosthits);
@@ -361,19 +399,19 @@ bool AWEDriftProcessor::ProcessEvent(const G4Event* event)
     return FillNTuples();
 }
 
-bool AWEDriftProcessor::FillNTuples(){
+bool AWEDriftProcessor::FillNTuples() {
 
     if (!fSave) return false;
     G4AnalysisManager* man = G4AnalysisManager::Instance();
 
-    if (fHasInfo){
+    if (fHasInfo) {
 
         man->FillNtupleDColumn(fTimeIndex, fTime);
 
         // man->FillNtupleDColumn(fPosXIndex, fPosX);
         man->FillNtupleDColumn(fPosYIndex, fPosY);
         // man->FillNtupleDColumn(fPosZIndex, fPosZ);
-        
+
         // man->FillNtupleDColumn(fErrXIndex, fErrX);
         man->FillNtupleDColumn(fErrYIndex, fErrY);
         // man->FillNtupleDColumn(fErrZIndex, fErrZ);
@@ -381,7 +419,7 @@ bool AWEDriftProcessor::FillNTuples(){
         // man->FillNtupleDColumn(fWorldPosXIndex, fWorldPosX);
         // man->FillNtupleDColumn(fWorldPosYIndex, fWorldPosY);
         // man->FillNtupleDColumn(fWorldPosZIndex, fWorldPosZ);
-        
+
         // man->FillNtupleDColumn(fWorldErrXIndex, fWorldErrX);
         // man->FillNtupleDColumn(fWorldErrYIndex, fWorldErrY);
         // man->FillNtupleDColumn(fWorldErrZIndex, fWorldErrZ);
@@ -397,7 +435,7 @@ bool AWEDriftProcessor::FillNTuples(){
         return true;
 
     } else {
-        
+
         man->FillNtupleDColumn(fTimeIndex, -999.);
 
         // man->FillNtupleDColumn(fPosXIndex, -999.);
@@ -411,7 +449,7 @@ bool AWEDriftProcessor::FillNTuples(){
         // man->FillNtupleDColumn(fWorldPosXIndex, -999.);
         // man->FillNtupleDColumn(fWorldPosYIndex, -999.);
         // man->FillNtupleDColumn(fWorldPosZIndex, -999.);
-        
+
         // man->FillNtupleDColumn(fWorldErrXIndex, -999.);
         // man->FillNtupleDColumn(fWorldErrYIndex, -999.);
         // man->FillNtupleDColumn(fWorldErrZIndex, -999.);
@@ -436,7 +474,11 @@ void AWEDriftProcessor::Reset() {
     fPosX = 0.0;
     fPosY = 0.0;
     fPosZ = 0.0;
-    
+
+    fPosTrueX = 0.0;
+    fPosTrueY = 0.0;
+    fPosTrueZ = 0.0;
+
     fErrX = 0.0;
     fErrY = 0.0;
     fErrZ = 0.0;
@@ -444,11 +486,15 @@ void AWEDriftProcessor::Reset() {
     fWorldPosX = 0.0;
     fWorldPosY = 0.0;
     fWorldPosZ = 0.0;
-    
+
+    fWorldPosTrueX = 0.0;
+    fWorldPosTrueY = 0.0;
+    fWorldPosTrueZ = 0.0;
+
     fWorldErrX = 0.0;
     fWorldErrY = 0.0;
     fWorldErrZ = 0.0;
-    
+
     fGhostPosX = 0.0;
     fGhostPosY = 0.0;
     fGhostPosZ = 0.0;
