@@ -91,7 +91,7 @@ G4bool TrueMuonTracker::ProcessHits(G4Step* step, G4TouchableHistory* /*touch*/)
   fMuonPos  += steppos;
   fMuonMom  += stepmom;
   fMuonTime += steptime;
-  fMuonPDG  += steppdg; 
+  fMuonPDG  += steppdg;
 
   // Get new average
   fNMuonHits++;
@@ -132,12 +132,12 @@ bool TrueMuonProcessor::BeginOfRunAction(const G4Run* /*run*/) {
 }
 
 bool TrueMuonProcessor::ProcessEvent(const G4Event* /*event*/) {
-  
+
   // Register Trigger State
   fHasInfo = fTracker->GetTotEDep() > 0.0;
   fTime    = fTracker->GetMuonTime();
   fEnergy  = fTracker->GetTotEDep();
-  
+
   if (fHasInfo) {
     // Fill muon vectors
     G4AnalysisManager* man = G4AnalysisManager::Instance();
@@ -163,7 +163,7 @@ bool TrueMuonProcessor::ProcessEvent(const G4Event* /*event*/) {
     man->FillNtupleDColumn(fMuonPosXIndex, -999.);
     man->FillNtupleDColumn(fMuonPosYIndex, -999.);
     man->FillNtupleDColumn(fMuonPosZIndex, -999.);
-    man->FillNtupleIColumn(fMuonPDGIndex,  -999 );
+    man->FillNtupleIColumn(fMuonPDGIndex,  fTracker->GetMuonPDG() );
     return false;
   }
 }

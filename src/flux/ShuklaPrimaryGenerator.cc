@@ -16,6 +16,15 @@ ShuklaPrimaryGenerator::ShuklaPrimaryGenerator()
     // Setup Table
     DBTable table = DB::Get()->GetTable("SHUKLA", "config");
 
+    // Get the particle table
+    G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
+    // Save particle definitions
+    fParticleDefs.push_back(particleTable->FindParticle("mu-"));
+    fParticleDefs.push_back(particleTable->FindParticle("mu+"));
+    fParticleDefs.push_back(particleTable->FindParticle("proton"));
+    fParticleDefs.push_back(particleTable->FindParticle("alpha"));
+
+
     // Setup Defaults + Table Inputs
     fMinEnergy = 0.1;
     fMaxEnergy = 5000.0;
@@ -26,6 +35,7 @@ ShuklaPrimaryGenerator::ShuklaPrimaryGenerator()
     fPar_eps = 854;
     fPar_rad = 6371.0;
     fPar_dis = 36.61;
+    fMuonPDG = 13;//  Initialize this as a muon first (samples +/- later on)
 
     // Check for predef sets
     if (table.Has("parameters")) {
@@ -34,8 +44,8 @@ ShuklaPrimaryGenerator::ShuklaPrimaryGenerator()
         if (parset.compare("nottingham") == 0) {
             std::cout << "FLX: --> Using Nottingham parset." << std::endl;
 
-        } else if (parset.compare("princealbert")) {
-            std::cout << "FLX: --> Using Nottingham parset." << std::endl;
+        } else if (parset.compare("princealbert")==0) {
+            std::cout << "FLX: --> Using Nottingham-PA parset." << std::endl;
             fPar_I0 = 110.0;
             fPar_E0 = 3.6;
 
@@ -50,17 +60,22 @@ ShuklaPrimaryGenerator::ShuklaPrimaryGenerator()
             fPar_I0 = 8952.0;
             fPar_n = 2.93;
             fPar_E0 = 1.42;
-            fPar_eps = 0.0;
+            fPar_eps = 1e12;// 1/epsilon = 0
+
+            // Set particle as a proton
+            fMuonPDG = 2212;
 
         } else if (parset.compare("helium") == 0) {
             std::cout << "FLX: --> Using Helium parset." << std::endl;
             fPar_I0 = 5200.0;
             fPar_n = 2.75;
             fPar_E0 = 0.28;
-            fPar_eps = 0.0;
+            fPar_eps = 1e12;// 1/epsilon = 0
+            // Set particle as an alpha particle
+            fMuonPDG = 47;
         }
     } else {
-        std::cout << "FLX: --> Using Nottingham parset." << std::endl;
+        std::cout << "FLX: --> Using default Nottingham parset." << std::endl;
     }
 
     // Now look for manual overrides
@@ -79,7 +94,7 @@ ShuklaPrimaryGenerator::ShuklaPrimaryGenerator()
     std::cout << "FLX: --> Max Energy : " << fMaxEnergy << " GeV" << std::endl;
     std::cout << "FLX: --> I0         : " << fPar_I0 << " m-2 s-1 sr -1" << std::endl;
     std::cout << "FLX: --> n          : " << fPar_n << std::endl;
-    std::cout << "FLX: --> E0         : " << fPar_E0  << " GeV" << std::endl;
+    std::cout << "FLX: --> E0         : " << fPar_E0 << " GeV" << std::endl;
     std::cout << "FLX: --> epsilon    : " << fPar_eps << " GeV" << std::endl;
     std::cout << "FLX: --> radius     : " << fPar_rad << " km"  << std::endl;
     std::cout << "FLX: --> distance   : " << fPar_dis << " km"  << std::endl;
@@ -107,8 +122,12 @@ ShuklaPrimaryGenerator::ShuklaPrimaryGenerator()
     fEnergyPDF->SetParameter(3, 1.0);
 
     // Normalize the PDF
-    G4double norm = fEnergyPDF->Integral(fMinEnergy * GeV, fMaxEnergy * GeV);
+    G4double norm = fEnergyPDF->Integral(0.1 * GeV, 5000.0 * GeV);
     fEnergyPDF->SetParameter(3, 1.0 / norm);
+
+    // Get the speed up factor
+    fSpeedUp = fEnergyPDF->Integral(fMinEnergy * GeV, fMaxEnergy * GeV);
+    std::cout << "FLX: --> fSpeedUp        : " << fSpeedUp << std::endl;
 
     // From dataset fit in Shukla paper
     G4double vertical_flux_rate = fPar_I0;// m-2 s-1 sr-1
@@ -133,11 +152,7 @@ ShuklaPrimaryGenerator::ShuklaPrimaryGenerator()
     std::cout << "FLX: --> Creating Particle Gun." << std::endl;
     G4int nofParticles = 1;
     fParticleGun  = new G4ParticleGun(nofParticles);
-    G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
 
-    // Save particle definitions
-    fParticleDefs.push_back(particleTable->FindParticle("mu-"));
-    fParticleDefs.push_back(particleTable->FindParticle("mu+"));
 
     // Now setup the particle integrals and source/target boxes
     fEnergyPDF->SetRange(fMinEnergy*GeV, fMaxEnergy*GeV);
@@ -167,6 +182,8 @@ G4ThreeVector ShuklaPrimaryGenerator::SampleDirection() {
 }
 
 void ShuklaPrimaryGenerator::SampleParticleType() {
+
+  if(fabs(fMuonPDG)==13) {
     // From fig 24.5 in PDG Fmu+/Fmu- is 1.3, so Fmu-/(Fmu+Fmu-) = 0.43
     // At a future date, an effect due to energy should be included.
     G4double r = G4UniformRand();
@@ -177,6 +194,13 @@ void ShuklaPrimaryGenerator::SampleParticleType() {
         fParticleGun->SetParticleDefinition(fParticleDefs[1]);
         fMuonPDG = -13;
     }
+  } else {
+    if(fMuonPDG==2212)    fParticleGun->SetParticleDefinition(fParticleDefs[2]);
+    if(fMuonPDG==47)    fParticleGun->SetParticleDefinition(fParticleDefs[3]);
+  }
+
+
+
 }
 
 void ShuklaPrimaryGenerator::GetSourceBox() {
@@ -300,6 +324,8 @@ void ShuklaPrimaryGenerator::GeneratePrimaries(G4Event* anEvent) {
     // Sample the energy and particle type
     G4double E = 0.0;
     E = fEnergyPDF->GetRandom();
+
+    // Only want to sample the particle if we want muons
     SampleParticleType();
 
     // Start of the rejection sampling of muon tracks
@@ -311,7 +337,7 @@ void ShuklaPrimaryGenerator::GeneratePrimaries(G4Event* anEvent) {
     G4int num_target_boxes_hit=0;
     // The muon rate
     //  - fArea is in mm (internal G4 units) so need to convert to m
-    G4double adjusted_rate = fFluxIntegrated*fArea;//< Adjust this rate if we are only sampling a smaller portion of the energy-angle PDF
+    G4double adjusted_rate = fFluxIntegrated*fArea/fSpeedUp;//< Adjust this rate if we are only sampling a smaller portion of the energy-angle PDF
     // G4cout << "Adj. Rate : " << adjusted_rate << G4endl;
 
     do {
@@ -370,14 +396,15 @@ void ShuklaPrimaryGenerator::GeneratePrimaries(G4Event* anEvent) {
     // std::cout << "EventID " << anEvent->GetEventID() << G4endl;
     // std::cout << " --> Position " << position << G4endl;
     // std::cout << " --> Direction " << direction << G4endl;
-    // std::cout << " --> Global Time " << global_time << G4endl;
+    // std::cout << " --> Energy " << E*1000 << G4endl;
+    // std::cout << " --> Global Time " << fMuonTime << G4endl;
 
 
     /// This is incorrect. Need to incremenent the muon exposure time each throw using random stuff from Chris's code.
     // fMuonTime = fNThrows / fFluxIntegrated / fArea;
     fMuonDir = direction;
     fMuonPos = position;
-    fMuonEnergy = E;
+    fMuonEnergy = E*1000.0;
 
     fParticleGun->SetParticleEnergy(fMuonEnergy);
     fParticleGun->SetParticleTime(fMuonTime);

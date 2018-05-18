@@ -61,8 +61,9 @@ void CosmicRun::RecordEvent(const G4Event* event)
   // Logging
   int eventid = event->GetEventID();
   if (eventid % fPrintSize == 0) {
-    std::cout << "RUN: --> Processing Event : " << eventid
+      std::cout << "RUN: --> Processing Event : " << eventid
               << "/" << numberOfEventToBeProcessed << std::endl;
+      
   }
 
   Analysis::Get()->ProcessEvent(event);
@@ -77,4 +78,3 @@ void CosmicRun::Merge(const G4Run* aRun)
   // const CosmicRun* localRun = static_cast<const CosmicRun*>(aRun);
   G4Run::Merge(aRun);
 }
-

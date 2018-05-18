@@ -167,10 +167,29 @@ int main(int argc, char** argv) {
 
       // Geometry input " -g geofile1 -g geofile2 "
     } else if (std::strcmp(argv[i], "-g") == 0) {
+
       std::vector<std::string> geoms = DBUtils::Expand(std::string(argv[++i]));
+
       for (uint j = 0; j < geoms.size(); j++) {
         gGeomtryFiles.push_back(geoms[j]);
+
+        // We need to check that the file exists
+        ifstream f(gGeomtryFiles.back());
+        if(!f.good()){
+          std::cout << " Cannot file geometry file : " << gGeomtryFiles.back() << std::endl;
+          throw;
+        }
+
       }
+
+      // We need at least one geometry file
+      if(gGeomtryFiles.size()==0){
+            std::cout << std::endl << "You must include at least one geometry file! " << std::endl << std::endl;
+            PrintHelpScreen();
+            throw;
+      }
+
+
 
       // Print Splash Screen
     } else if (std::strcmp(argv[i], "-h") == 0) {
@@ -433,4 +452,3 @@ int main(int argc, char** argv) {
 
   return 0;
 }
-

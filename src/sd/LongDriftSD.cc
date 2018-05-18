@@ -54,7 +54,6 @@ LongDriftSD::LongDriftSD(DBTable tbl):
     if (!tbl.Has("processor") or tbl.GetI("processor") > 0) {
         Analysis::Get()->RegisterProcessor(new LongDriftProcessor(this));
     }
-
 }
 
 LongDriftSD::LongDriftSD(std::string name, std::string id,

@@ -50,7 +50,6 @@ bool TrueMuonPoCAProcessor::BeginOfRunAction(const G4Run* /*run*/) {
 }
 
 bool TrueMuonPoCAProcessor::ProcessEvent(const G4Event* /*event*/) {
-  
 
   // Set Ntuple to defaults
   G4AnalysisManager* man = G4AnalysisManager::Instance();
@@ -121,6 +120,7 @@ void TrueMuonPoCAProcessor::DrawEvent(){
   G4VVisManager* pVVisManager = G4VVisManager::GetConcreteInstance();
   if (pVVisManager)
   {
+
     G4Polyline polyline;
     polyline.push_back( fTrackerA->GetMuonPos() );
     polyline.push_back( fPoCA );

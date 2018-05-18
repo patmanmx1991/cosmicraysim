@@ -50,7 +50,7 @@ bool SimpleTrigger::ProcessTrigger(const G4Event* /*event*/) {
 
   // Trigger requires all detectors to be triggered within a certain time window
   bool complete_trig = true;
-  for (uint i = 0; i < fProcessors.size(); i++) {
+  for (uint i = 0; i < fProcessors.size(); i++){
 
     bool trig = fProcessors[i]->HasInfo();
 
@@ -59,11 +59,12 @@ bool SimpleTrigger::ProcessTrigger(const G4Event* /*event*/) {
       if (ener < fEnergyThreshold) trig = false;
     }
 
-    if (!trig) {
+    if (!trig){
       complete_trig = false;
     }
+
   }
-  
+
   // std::cout << "Returning True Trigger : " << complete_trig << std::endl;
   fTriggered = complete_trig;
   return complete_trig;

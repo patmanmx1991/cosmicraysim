@@ -26,9 +26,16 @@ G4VUserPhysicsList* PhysicsFactory::LoadPhysicsList(DBTable table) {
   
   // Get physics list by horrible string comparison
   std::string physics = table.GetS("physics");
-  if (physics.compare("shielding") == 0) physicsList =  new Shielding();
-  else if (physics.compare("default") == 0) physicsList = new DefaultPhysics();
-  else {
+  if (physics.compare("shielding") == 0){
+    physicsList =  new Shielding();
+    std::cout << "PHY: Setting Shielding Physics List" << std::endl;
+  } else if (physics.compare("QGSP_BERT_HP") == 0) {
+    physicsList =  new QGSP_BERT_HP();
+    std::cout << "PHY: Setting QGSP_BERT_HP Physics List" << std::endl;
+  } else if (physics.compare("default") == 0){
+    physicsList = new DefaultPhysics();
+    std::cout << "PHY: Setting Default Physics List" << std::endl;
+  } else {
     physicsList = physListFactory->GetReferencePhysList(physics);
   }
 

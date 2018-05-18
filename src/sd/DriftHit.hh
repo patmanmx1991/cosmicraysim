@@ -79,6 +79,7 @@ public:
 
     void SetWorldPos(G4ThreeVector xyz) { fWorldPos = xyz; }
     void SetWorldPosErr(G4ThreeVector xyz) { fWorldPosErr = xyz; }
+  //<<<<<<< HEAD
 
     void SetLocalPosTrue(G4ThreeVector xyz) { fLocalPosTrue = xyz; }
     void SetWorldPosTrue(G4ThreeVector xyz) { fWorldPosTrue = xyz; }
@@ -87,10 +88,15 @@ public:
     void SetDrawOption(int i){ fDrawOption = i; };
 
     bool IsGhost() { return fGhost; };
+  //=======
+	//    G4ThreeVector GetWorldPos() const { return fWorldPos; }
+  //    G4ThreeVector GetWorldPosErr() const { return fWorldPosErr; }
+  //>>>>>>> chrisfork/new
 
     G4ThreeVector GetPos() const { return fWorldPos; }
     G4ThreeVector GetPosErr() const { return fWorldPosErr; }
 
+  //<<<<<<< HEAD
     G4ThreeVector GetLocalPos() const { return fLocalPos; }
     G4ThreeVector GetLocalPosErr() const { return fLocalPosErr; }
 
@@ -101,6 +107,10 @@ public:
     G4ThreeVector GetWorldPosTrue() const { return fWorldPosTrue; }
 
 
+  //=======
+  //    void SetGhost(bool g) { fGhost = g; };
+  //    bool IsGhost() { return fGhost; };
+  //>>>>>>> chrisfork/new
 private:
     G4int fLayerID;
     G4double fTime;

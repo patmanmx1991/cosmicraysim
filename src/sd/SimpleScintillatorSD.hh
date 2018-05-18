@@ -90,6 +90,9 @@ public:
   inline G4double       GetPosX() { return fPosX;  };
   inline G4double       GetPosY() { return fPosY;  };
   inline G4double       GetPosZ() { return fPosZ;  };
+  inline G4double       GetVolPosX() { return fVolPosX;  };
+  inline G4double       GetVolPosY() { return fVolPosY;  };
+  inline G4double       GetVolPosZ() { return fVolPosZ;  };
   inline G4double       GetEDep() { return fEdep;  };
   inline G4double       GetThetaXZ() { return fThetaXZ;  };
   inline G4double       GetThetaYZ() { return fThetaYZ;  };
@@ -107,13 +110,21 @@ protected:
   G4double fPosX;
   G4double fPosY;
   G4double fPosZ;
+  G4double fVolPosX;
+  G4double fVolPosY;
+  G4double fVolPosZ;
+  G4double fPDG;
   G4double fThetaXZ;
   G4double fThetaYZ;
 
   int fTimeIndex;
+  int fPDGIndex;
   int fPosXIndex;
   int fPosYIndex;
   int fPosZIndex;
+  int fVolPosXIndex;
+  int fVolPosYIndex;
+  int fVolPosZIndex;
   int fThXZIndex;
   int fThYZIndex;
   int fEdepIndex;
@@ -123,8 +134,3 @@ protected:
 
 }
 #endif
-
-
-
-
-

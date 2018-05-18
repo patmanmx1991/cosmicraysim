@@ -86,7 +86,7 @@
   //
   // Wire offsets in XYZ
   //wire_x: "0.0*cm",
-  wire_y: "0.0*cm",
+  wire_y: "3.0*cm",
   //wire_z: "0.0*cm",
   //
   // 99% Efficient

@@ -91,16 +91,25 @@ void AWEMuonTomographyDetector::Construct(DBTable table) {
     // if (chname.find("chamber_") == std::string::npos) continue;
 
     // Get position
+    std::cout << "Getting vec d "<< chname << std::endl;
     std::vector<double> posrot = postable.GetVecD(chname);
     std::vector<double> position = {posrot[0], posrot[1], posrot[2]};
     std::vector<double> rotation = {posrot[3], posrot[4], posrot[5]};
 
     // Create the target by overloading table
+    std::cout << "Getting vec d "<< chname << std::endl;
+
     DBTable chtemplate = DB::Get()->GetTable("GEO", "drift_chamber");
+    
     chtemplate.SetIndexName(fName + "_" + chname);
+    std::cout << "Getting vec d "<< chname << std::endl;
+    
     chtemplate.Set("position", position);
+    
+    std::cout << "Getting vec d "<< chname << std::endl;
     chtemplate.Set("rotation", rotation);
 
+    std::cout << "Getting vec d "<< chname << std::endl;
     GeoBox* obj = new GeoBox(chtemplate);
     fSubObjects.push_back(obj);
     fDriftObjects.push_back(obj);
@@ -170,7 +179,7 @@ bool AWEMuonTomographyProcessor::ProcessEvent(const G4Event* event) {
 
   // Get the processor from the scintillator
   fScintProc->ProcessEvent(event);
-  // bool hasvalue = fScintProc->HasInfo();
+  bool hasvalue = fScintProc->HasInfo();
   if (!fScintProc->HasInfo()) {
     return false;
   }
@@ -182,7 +191,8 @@ bool AWEMuonTomographyProcessor::ProcessEvent(const G4Event* event) {
 
   // No processors have been automatically handled for the drift chamber objects
   // We have to manually get the HitPosition from each
-  // int fNHitPositions;
+  int fNHitPositions;
+
   std::vector<double> fTimes;
   std::vector<G4ThreeVector> fHitPositions;
   std::vector<G4ThreeVector> fHitErrors;
@@ -452,8 +462,8 @@ void AWEMuonTomographyProcessor::GetMXC(G4double& m, G4double& me,
   double variable[2] = {(maxy - miny) / (maxx - minx), (maxy + miny) / 2.0 };
   min->SetFunction(f);
 
-  // double maxgrad = 20 * (maxy - miny) / (maxx - minx);
-  // double maxc = 2 * (fabs(miny) + fabs(maxy));
+  double maxgrad = 20 * (maxy - miny) / (maxx - minx);
+  double maxc = 2 * (fabs(miny) + fabs(maxy));
 
   std::vector<std::vector<int>> pairwise;
   if (x.size() == 6) {
@@ -465,7 +475,6 @@ void AWEMuonTomographyProcessor::GetMXC(G4double& m, G4double& me,
     pairwise.push_back(std::vector<int> {1, 2, 5}); // 101
     pairwise.push_back(std::vector<int> {1, 3, 4}); // 110
     pairwise.push_back(std::vector<int> {1, 3, 5}); // 111
-
   } else {
     pairwise.push_back(std::vector<int> {0, 1, 2});
   }
@@ -479,7 +488,6 @@ void AWEMuonTomographyProcessor::GetMXC(G4double& m, G4double& me,
     min->SetVariable(0, "m", variable[0], step[0]);
     min->SetVariable(1, "c", variable[1], step[1]);
     min->Minimize();
-
 
     const double *xs = min->X();
     const double *es = min->Errors();

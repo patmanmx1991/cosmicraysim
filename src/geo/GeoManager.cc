@@ -24,6 +24,7 @@
 #include "simple/GeoTubs.hh"
 #include "simple/GeoCone.hh"
 #include "simple/GeoEllipticalTube.hh"
+#include "simple/GeoEllipticalTunnel.hh"
 #include "dsc/DryStorageCask_VSC24.hh"
 #include "awemuontom/AWEMuonTomographyDetector.hh"
 #include "awemuontom/AWEMuonTomographyDetectorSecond.hh"
@@ -38,12 +39,13 @@ namespace COSMIC{
 GeoObject* GeoObjectFactory::Construct(DBTable table){
 
   std::string type = table.GetS("type");
-  
+
   std::cout << "GEO: Constructing " << type << " : " << table.GetIndexName() <<  std::endl;
   if (type.compare("box")==0) return new GeoBox(table);
   else if (type.compare("tubs")==0) return new GeoTubs(table);
   else if (type.compare("cons")==0) return new GeoCone(table);
   else if (type.compare("eliptube")==0) return new GeoEllipticalTube(table);
+  else if (type.compare("eliptunnel")==0) return new GeoEllipticalTunnel(table);
   else if (type.compare("DSC_VSC24") == 0) return new DryStorageCask_VSC24(table);
   else if (type.compare("awe_muontom") == 0) return new AWEMuonTomographyDetector(table);
   else if (type.compare("awe_muontom2") == 0) return new AWEMuonTomographyDetectorSecond(table);
@@ -67,14 +69,11 @@ GeoManager::GeoManager(){
 
 G4VPhysicalVolume* GeoManager::ConstructAll(){
 
-
-  fGeoObjects.clear();
-
-
   std::cout << "===============================" << std::endl;
   std::cout << "GEO: Building Geometry " << std::endl;
   std::vector<DBTable> tables_clone = DB::Get()->GetTableGroup("GEO");
   std::vector<DBTable>::iterator geo_iter = tables_clone.begin();
+
 
   int count = 0;
   while (tables_clone.size() > 0){
@@ -86,12 +85,12 @@ G4VPhysicalVolume* GeoManager::ConstructAll(){
 
       // Check doesn't already exist
       if (HasGeoObject(geo_id)){
-        std::cout << "Trying to add duplicate GEOM! " 
+        std::cout << "Trying to add duplicate GEOM! "
                   << "INDEX : " << geo_id << std::endl;
         geo_tab.Print();
         throw;
       }
-        
+
       // Check if mother already created
       int mother_status = MotherStatus(geo_tab);
       if (mother_status == 2){
@@ -106,7 +105,6 @@ G4VPhysicalVolume* GeoManager::ConstructAll(){
 
       // Remove tabs
       geo_iter = tables_clone.erase(geo_iter);
-
 
     }
     if (count > 10000){

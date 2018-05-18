@@ -47,4 +47,3 @@ void ProcessorFactory::ConstructProcessors() {
 
 
 } // - namespace COSMIC
-

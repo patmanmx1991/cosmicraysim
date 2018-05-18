@@ -74,8 +74,8 @@ public:
 
 
     G4int GetID() const { return fId; }
-    G4int GetType() const { return fType; }// type=0, muon ; type=1 neutron; type=2 gamma
-    void SetType(G4int val){fType=val; }// type=0, muon ; type=1 neutron; type=2 gamma
+    G4int GetType() const { return fType; }
+    void SetType(G4int val){fType=val; }
 
     void SetTime(G4double val) { fTime = val; }
     G4double GetTime() const { return fTime; }
@@ -97,6 +97,9 @@ public:
 
     void SetPos(G4ThreeVector xyz) { fPos = xyz; }
     G4ThreeVector GetPos() const { return fPos; }
+
+    void SetVolPos(G4ThreeVector xyz) { fVolPos = xyz; }
+    G4ThreeVector GetVolPos() const { return fVolPos; }
 
     void SetRot(G4RotationMatrix rmat) { fRot = rmat; }
     G4RotationMatrix GetRot() const { return fRot; }
@@ -120,6 +123,7 @@ private:
     G4int particle_type;
 
     G4ThreeVector fPos;
+    G4ThreeVector fVolPos;
     G4RotationMatrix fRot;
     //const G4LogicalVolume* fPLogV;
 };

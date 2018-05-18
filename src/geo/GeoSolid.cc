@@ -136,12 +136,6 @@ G4VPhysicalVolume* GeoSolid::ConstructPhysicalPlacement(DBTable table, G4Logical
     rotation->rotateX(angle_x);
     rotation->rotateZ(angle_z);
   }
-  if (table.Has("rotation")) {
-    const std::vector<double> &rotvector = table.GetVecD("rotation");
-    rotation->rotateX(rotvector[0] * CLHEP::deg);
-    rotation->rotateY(rotvector[1] * CLHEP::deg);
-    rotation->rotateZ(rotvector[2] * CLHEP::deg);
-  }
 
   // Setup positoin
   G4ThreeVector position(0.0, 0.0, 0.0);
@@ -151,6 +145,34 @@ G4VPhysicalVolume* GeoSolid::ConstructPhysicalPlacement(DBTable table, G4Logical
     position.setY(posvector[1]);
     position.setZ(posvector[2]);
   }
+
+    if (table.Has("rotation")) {
+
+      const std::vector<double> &rotvector = table.GetVecD("rotation");
+
+      rotation->rotateX(rotvector[0] * CLHEP::deg);
+      rotation->rotateY(rotvector[1] * CLHEP::deg);
+      rotation->rotateZ(rotvector[2] * CLHEP::deg);
+
+    }
+
+      if (table.Has("rotation_mother")) {
+
+        const std::vector<double> &rotvector = table.GetVecD("rotation_mother");
+
+        // Get the translation rel. to the global frame
+
+
+        rotation->rotateX(rotvector[0] * CLHEP::deg);
+        rotation->rotateY(rotvector[1] * CLHEP::deg);
+        rotation->rotateZ(rotvector[2] * CLHEP::deg);
+
+        position.rotateX(-rotvector[0] * CLHEP::deg);
+        position.rotateY(-rotvector[1] * CLHEP::deg);
+        position.rotateZ(-rotvector[2] * CLHEP::deg);
+
+      }
+
 
 
   // Create Physical
