@@ -27,7 +27,7 @@ ShuklaPrimaryGenerator::ShuklaPrimaryGenerator()
 
     // Setup Defaults + Table Inputs
     fMinEnergy = 0.1;
-    fMaxEnergy = 10000.0;
+    fMaxEnergy = 5000.0;
 
     fPar_I0  = 88.5; // m-2 s-1 sr-1
     fPar_n   = 3.00;
