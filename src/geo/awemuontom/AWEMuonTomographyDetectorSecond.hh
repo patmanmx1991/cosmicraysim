@@ -44,7 +44,6 @@
 #include "TF1.h"
 #include "TRandom3.h"
 #include "TVirtualFitter.h"
-#include "TStyle.h"
 #include "TSystem.h"
 #include "TStopwatch.h"
 

@@ -147,8 +147,8 @@ AWEMuonTomographyProcessorSecond::AWEMuonTomographyProcessorSecond(AWEMuonTomogr
   // From each one get the sensitive and manually create a processor.
   // This is super awkward. May need to rethink.
   for (uint i = 0; i < drifts.size(); i++) {
-    AWEDriftSD* sd = static_cast<AWEDriftSD*>(drifts[i]->GetSensitive());
-    AWEDriftProcessor* pr = new AWEDriftProcessor(sd, true);
+    AWEDriftSD* sdd = static_cast<AWEDriftSD*>(drifts[i]->GetSensitive());
+    AWEDriftProcessor* pr = new AWEDriftProcessor(sdd, true);
     std::cout << "Adding PROC : " << pr->GetID() << std::endl;
     fDriftChamberProcs.push_back( pr );
   }
@@ -209,7 +209,7 @@ bool AWEMuonTomographyProcessorSecond::ProcessEvent(const G4Event* event) {
 
   // No processors have been automatically handled for the drift chamber objects
   // We have to manually get the HitPosition from each
-  int fNHitPositions;
+  // int fNHitPositions;
   std::vector<double> fTimes;
   std::vector<G4ThreeVector> fHitPositions;
   std::vector<G4ThreeVector> fHitErrors;
@@ -445,7 +445,7 @@ double FitTrackSecond(const double *x) {
   G4double m = x[0];
   G4double c = x[1];
   double totalres = 0.0;
-  for (uint i = 0; i < GlobalFitTrackSecond::npoints; i++) {
+  for (int i = 0; i < GlobalFitTrackSecond::npoints; i++) {
     int iter = GlobalFitTrackSecond::indices[i];
     totalres += pow( (GlobalFitTrackSecond::pointsy[iter] - m * GlobalFitTrackSecond::pointsx[iter] + c ) / GlobalFitTrackSecond::errsy[iter], 2);
   }
@@ -479,8 +479,8 @@ void AWEMuonTomographyProcessorSecond::GetMXC(G4double& m, G4double& me,
   double variable[2] = {(maxy - miny) / (maxx - minx), (maxy + miny) / 2.0 };
   min->SetFunction(f);
 
-  double maxgrad = 20 * (maxy - miny) / (maxx - minx);
-  double maxc = 2 * (fabs(miny) + fabs(maxy));
+  // double maxgrad = 20 * (maxy - miny) / (maxx - minx);
+  // double maxc = 2 * (fabs(miny) + fabs(maxy));
 
   std::vector<std::vector<int>> pairwise;
   if (x.size() == 6) {
@@ -498,7 +498,7 @@ void AWEMuonTomographyProcessorSecond::GetMXC(G4double& m, G4double& me,
   }
 
   double bestfit = -1.0;
-  for (int i = 0; i < pairwise.size(); i++) {
+  for (uint i = 0; i < pairwise.size(); i++) {
 
     // std::cout << "INDICES " << pairwise[i][0] << " " << x.size() << std::endl;
     GlobalFitTrackSecond::indices = &(pairwise[i][0]);
