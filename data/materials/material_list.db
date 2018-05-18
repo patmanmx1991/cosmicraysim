@@ -2,7 +2,131 @@
   name: "MATERIAL",
   index: "COSMIC_STEEL",
   element_names:  ["Fe","C"]
-  element_counts: [0.98, 0.2],
+  element_counts: [98, 2],
   density: 8.05,
+  density_units: "g/cm3"
 }
 
+{
+  name: "MATERIAL",
+  index: "Standard_Rock",
+  element_names:  ["O","C", "Ca", "Mg"],
+  element_counts: [0.52, 0.12, 0.27, 0.09],
+  density: 2.65,
+  density_units: "g/cm3"
+}
+
+{
+  name: "MATERIAL",
+  index: "BF3",
+  element_names:  ["B","F"],
+  element_counts: [0.25, 0.75],
+  density: 0.00276,
+  density_units: "g/cm3"
+}
+
+
+// This is an average measurement of soil composition across the USA
+// by the USGS. There is a large variation and number of smaller elements
+//
+// https://pubs.usgs.gov/pp/1270/pdf/PP1270_508.pdf
+// in mg/g element_counts: [  72.0, 25.0, 24.0, 26.0, 15.0, 9.0, 12.0, 1.6, 310.0, 2.9],
+// - counts in parts per thousand (mg/g) and only retained those elements >1
+{
+  name: "MATERIAL",
+  index: "Soil_2p0",
+  element_names:  ["Al","C", "Ca", "Fe", "K","Mg", "Na", "S", "Si", "Ti"],
+  element_counts: [0.145,0.050,0.048,0.052,0.030,0.018,0.024,0.003,0.623,0.006],
+  density: 2.0,
+  density_units: "g/cm3"
+}
+{
+  name: "MATERIAL",
+  index: "Soil_1p0",
+  element_names:  ["Al","C", "Ca", "Fe", "K","Mg", "Na", "S", "Si", "Ti"],
+  element_counts: [0.145,0.050,0.048,0.052,0.030,0.018,0.024,0.003,0.623,0.006],
+  density: 1.0,
+  density_units: "g/cm3"
+}
+{
+  name: "MATERIAL",
+  index: "Soil_0p5",
+  element_names:  ["Al","C", "Ca", "Fe", "K","Mg", "Na", "S", "Si", "Ti"],
+  element_counts: [0.145,0.050,0.048,0.052,0.030,0.018,0.024,0.003,0.623,0.006],
+  density: 0.5,
+  density_units: "g/cm3"
+}
+{
+  name: "MATERIAL",
+  index: "Soil_0p25",
+  element_names:  ["Al","C", "Ca", "Fe", "K","Mg", "Na", "S", "Si", "Ti"],
+  element_counts: [0.145,0.050,0.048,0.052,0.030,0.018,0.024,0.003,0.623,0.006],
+  density: 0.25,
+  density_units: "g/cm3"
+}
+{
+  name: "MATERIAL",
+  index: "Soil_0p1",
+  element_names:  ["Al","C", "Ca", "Fe", "K","Mg", "Na", "S", "Si", "Ti"],
+  element_counts: [0.145,0.050,0.048,0.052,0.030,0.018,0.024,0.003,0.623,0.006],
+  density: 0.1,
+  density_units: "g/cm3"
+}
+
+
+
+
+// These are compounds within soil in the UK that are then mixed to find the final composition
+{
+  name: "MATERIAL",
+  index: "SiO2",
+  element_names:  ["Si","O"],
+  // mass fraction
+  element_counts: [0.467435, 0.532565],
+  density: 2.65,
+  density_units: "g/cm3"
+}
+{
+  name: "MATERIAL",
+  index: "K2O",
+  element_names:  ["K","O"],
+  // mass fraction
+  element_counts: [0.830148, 0.169852],
+  density: 2.35,
+  density_units: "g/cm3"
+}
+{
+  name: "MATERIAL",
+  index: "MgO",
+  element_names:  ["Mg","O"],
+  // mass fraction
+  element_counts: [0.603036,0.0.396964],
+  density: 3.58,
+  density_units: "g/cm3"
+}
+
+{
+  name: "MATERIAL",
+  index: "MnO",
+  element_names:  ["Mn","O"],
+  // mass fraction
+  element_counts: [0.774462,0.225538],
+  density: 5.37,
+  density_units: "g/cm3"
+}
+{
+  name: "MATERIAL",
+  index: "Fe2O3",
+  element_names:  ["Fe","O"],
+  element_counts: [0.699431,0.300569],
+  density: 5.24,
+  density_units: "g/cm3"
+}
+{
+  name: "MATERIAL",
+  index: "CaO",
+  element_names:  ["Ca","O"],
+  element_counts: [0.714695,0.285305],
+  density: 3.35,
+  density_units: "g/cm3"
+}
