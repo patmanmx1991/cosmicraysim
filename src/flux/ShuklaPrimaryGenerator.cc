@@ -64,7 +64,7 @@ ShuklaPrimaryGenerator::ShuklaPrimaryGenerator()
     }
 
     // Now look for manual overrides
-    if (table.Has("min_energy")) fMaxEnergy = table.GetD("min_energy");
+    if (table.Has("min_energy")) fMinEnergy = table.GetD("min_energy");
     if (table.Has("max_energy")) fMaxEnergy = table.GetD("max_energy");
 
     if (table.Has("I0"))       fPar_I0  = table.GetD("I0");
@@ -140,11 +140,10 @@ ShuklaPrimaryGenerator::ShuklaPrimaryGenerator()
     fParticleDefs.push_back(particleTable->FindParticle("mu+"));
 
     // Now setup the particle integrals and source/target boxes
-    fEnergyPDF->SetRange(fMinEnergy, fMaxEnergy);
+    fEnergyPDF->SetRange(fMinEnergy*GeV, fMaxEnergy*GeV);
     fSourceBox = false;
     GetSourceBox();
     GetTargetBoxes();
-    fEnergyPDF->SetRange(fMinEnergy, fMaxEnergy); // E in MeV
 
     std::cout << "FLX: --> Complete." << std::endl;
 
