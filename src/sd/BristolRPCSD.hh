@@ -3,7 +3,6 @@
 
 #include "G4UserRunAction.hh"
 #include "globals.hh"
-
 #include "G4NistManager.hh"
 #include "G4Box.hh"
 #include "G4Tubs.hh"
@@ -23,9 +22,10 @@
 #include "G4Run.hh"
 #include "globals.hh"
 #include "g4root.hh"
+
 #include "analysis/VProcessor.hh"
 #include "analysis/VDetector.hh"
-#include "DriftHit.hh"
+#include "sd/DriftHit.hh"
 
 namespace COSMIC {
 

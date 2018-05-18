@@ -1,6 +1,14 @@
 #ifndef __HybridMuonTomographyDetector_HH__
 #define __HybridMuonTomographyDetector_HH__
 
+#include <vector>
+#include <iostream>
+#include <vector>
+#include <string>
+#include <iostream>
+#include <sstream>
+#include <cstring>
+
 #include "G4NistManager.hh"
 #include "G4Box.hh"
 #include "G4Tubs.hh"
@@ -16,40 +24,29 @@
 #include "G4VisAttributes.hh"
 #include "G4PhysicalConstants.hh"
 #include "G4SystemOfUnits.hh"
-#include "GeoObject.hh"
-#include "GeoUtils.hh"
-#include "analysis/VProcessor.hh"
-#include "analysis/Analysis.hh"
 
-
-#include "db/ROOTHeaders.hh"
-
-
-#include <vector>
-#include <string>
-#include <iostream>
-#include <sstream>
-#include <cstring>
-
-
-
-#include "Math/Minimizer.h"
-#include "Math/Factory.h"
-#include "Math/Functor.h"
-#include "sd/LongDriftSD.hh"
-#include "sd/AWEDriftSD.hh"
-#include "sd/BristolRPCSD.hh"
-
-#include "sd/SimpleScintillatorSD.hh"
 #include "TH1.h"
 #include "TF1.h"
 #include "TRandom3.h"
 #include "TVirtualFitter.h"
 #include "TSystem.h"
 #include "TStopwatch.h"
+#include "Math/Minimizer.h"
+#include "Math/Factory.h"
+#include "Math/Functor.h"
 
-#include <vector>
-#include <iostream>
+#include "db/ROOTHeaders.hh"
+#include "sd/LongDriftSD.hh"
+#include "sd/AWEDriftSD.hh"
+#include "sd/BristolRPCSD.hh"
+#include "geo/GeoObject.hh"
+#include "geo/GeoUtils.hh"
+#include "analysis/VProcessor.hh"
+#include "analysis/Analysis.hh"
+#include "sd/SimpleScintillatorSD.hh"
+
+
+
 
 class G4LogicalVolume;
 class G4VPhysicalVolume;

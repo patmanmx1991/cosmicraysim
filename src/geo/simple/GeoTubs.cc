@@ -1,6 +1,6 @@
 #include "GeoTubs.hh"
 
-#include "GeoSolid.hh"
+#include "geo/GeoSolid.hh"
 #include "G4Box.hh"
 
 namespace COSMIC {

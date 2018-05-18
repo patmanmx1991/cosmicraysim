@@ -1,7 +1,4 @@
 #include "BristolRPCSD.hh"
-#include "analysis/Analysis.hh"
-#include "db/DBTable.hh"
-#include "DriftHit.hh"
 
 #include "G4VVisManager.hh"
 #include "G4VisAttributes.hh"
@@ -18,7 +15,10 @@
 #include "G4Box.hh"
 #include "G4Navigator.hh"
 
-#include "GeoManager.hh"
+#include "analysis/Analysis.hh"
+#include "db/DBTable.hh"
+#include "sd/DriftHit.hh"
+#include "geo/GeoManager.hh"
 
 namespace COSMIC {
 

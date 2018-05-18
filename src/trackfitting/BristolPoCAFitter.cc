@@ -288,7 +288,6 @@ int BristolPoCAFitter::FitTracks() {
 
 						std::cout << " TRYING NEW FIT " << i << j << g << h << " MEV = " << MeV << std::endl;
 
-						std::cout << 2.65 << " vs " << 2.65 * g/cm3 << std::endl;
 						above_drift_xc = &xcombomapa.at(i);
 						above_drift_yc = &ycombomapa.at(j);
 						below_drift_xc = &xcombomapb.at(g);

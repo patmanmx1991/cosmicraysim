@@ -1,6 +1,5 @@
 #include "AWEMuonTomographyDetector.hh"
 
-#include "GeoObject.hh"
 #include "G4NistManager.hh"
 #include "G4Box.hh"
 #include "G4Tubs.hh"
@@ -16,11 +15,7 @@
 #include "G4VisAttributes.hh"
 #include "G4PhysicalConstants.hh"
 #include "G4SystemOfUnits.hh"
-#include "GeoUtils.hh"
-#include "sd/DetectorManager.hh"
-#include "simple/GeoBox.hh"
-#include "simple/GeoTubs.hh"
-#include "sd/LongDriftSD.hh"
+
 
 #include "G4VVisManager.hh"
 #include "G4VisAttributes.hh"
@@ -35,9 +30,16 @@
 #include "G4SystemOfUnits.hh"
 #include "G4ios.hh"
 #include "G4Box.hh"
-#include "db/ROOTHeaders.hh"
 #include "G4Polyline.hh"
 #include "Math/Functor.h"
+
+#include "db/ROOTHeaders.hh"
+#include "geo/GeoObject.hh"
+#include "geo/GeoUtils.hh"
+#include "sd/DetectorManager.hh"
+#include "geo/simple/GeoBox.hh"
+#include "geo/simple/GeoTubs.hh"
+#include "sd/LongDriftSD.hh"
 
 namespace COSMIC {
 

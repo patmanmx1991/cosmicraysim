@@ -1,7 +1,7 @@
 #include "GeoCone.hh"
-
-#include "GeoSolid.hh"
 #include "G4Cons.hh"
+#include "geo/GeoSolid.hh"
+
 
 namespace COSMIC {
 

@@ -1,11 +1,10 @@
 #ifndef __DET_BUILDER_HH__
 #define __DET_BUILDER_HH__
 
+#include <map>
+
 #include "G4VUserDetectorConstruction.hh"
 #include "globals.hh"
-#include "db/DB.hh"
-#include "db/DBTable.hh"
-
 #include "G4NistManager.hh"
 #include "G4Box.hh"
 #include "G4Tubs.hh"
@@ -21,16 +20,11 @@
 #include "G4VisAttributes.hh"
 #include "G4PhysicalConstants.hh"
 #include "G4SystemOfUnits.hh"
+#include "G4GlobalMagFieldMessenger.hh"
 
-///Task5d.1: Don't forget to include header file of your sensitive detector
 #include "db/DB.hh"
 #include "db/DBTable.hh"
-#include <map>
-
-//$$$$$$$$$$$$$$$$$$ task 1c
-#include "G4GlobalMagFieldMessenger.hh"
-//$$$$$$$$$$$$$$$$$$$$$$$$$$
-#include "GeoObject.hh"
+#include "geo/GeoObject.hh"
 
 namespace COSMIC {
 

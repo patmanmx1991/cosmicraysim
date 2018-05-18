@@ -1,9 +1,9 @@
 #ifndef __DryStorageCask_VSC24_HH__
 #define __DryStorageCask_VSC24_HH__
 
-#include "GeoObject.hh"
 #include "db/DB.hh"
 #include "db/DBTable.hh"
+#include "geo/GeoObject.hh"
 
 class G4LogicalVolume;
 class G4VPhysicalVolume;

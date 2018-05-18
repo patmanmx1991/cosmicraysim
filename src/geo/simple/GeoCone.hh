@@ -1,10 +1,10 @@
 #ifndef __GEO_CONS__HH__
 #define __GEO_CONS__HH__
 
-#include "GeoSolid.hh"
 #include "G4Cons.hh"
 
 #include "db/DBTable.hh"
+#include "geo/GeoSolid.hh"
 
 namespace COSMIC {
 

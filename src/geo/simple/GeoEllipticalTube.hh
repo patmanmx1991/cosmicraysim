@@ -1,10 +1,10 @@
 #ifndef __GEO_ELLIPTICALTUBE_HH__
 #define __GEO_ELLIPTICALTUBE_HH__
 
-#include "GeoSolid.hh"
 #include "G4EllipticalTube.hh"
 
 #include "db/DBTable.hh"
+#include "geo/GeoSolid.hh"
 
 namespace COSMIC {
 

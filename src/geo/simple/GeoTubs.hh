@@ -1,10 +1,10 @@
 #ifndef __GEO_TUBS__HH__
 #define __GEO_TUBS__HH__
 
-#include "GeoSolid.hh"
 #include "G4Tubs.hh"
 
 #include "db/DBTable.hh"
+#include "geo/GeoSolid.hh"
 
 namespace COSMIC {
 

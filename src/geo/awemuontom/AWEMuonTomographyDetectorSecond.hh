@@ -16,14 +16,15 @@
 #include "G4VisAttributes.hh"
 #include "G4PhysicalConstants.hh"
 #include "G4SystemOfUnits.hh"
-#include "GeoObject.hh"
-#include "GeoUtils.hh"
+
 #include "analysis/VProcessor.hh"
 #include "analysis/Analysis.hh"
 
 
 #include "db/ROOTHeaders.hh"
 
+#include "geo/GeoObject.hh"
+#include "geo/GeoUtils.hh"
 
 #include <vector>
 #include <string>
