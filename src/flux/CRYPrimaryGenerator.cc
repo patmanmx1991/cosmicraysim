@@ -338,7 +338,7 @@ void CRYPrimaryGenerator::GeneratePrimaries(G4Event* anEvent)
     // Skip if trajectory was NULL
     if (!(*vect)[j]) continue;
 
-    if (!fAggressiveSelection or goodtrack[j]) {
+    if (!fTargetBoxes.size() or !fAggressiveSelection or goodtrack[j]) {
 
       // // Get Name
       // particleName = CRYUtils::partName((*vect)[j]->id());
