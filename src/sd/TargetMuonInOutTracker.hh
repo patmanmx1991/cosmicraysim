@@ -102,19 +102,34 @@ protected:
 
   int fMuonInTimeIndex; ///< Time Ntuple Index
   int fMuonInMomXIndex; ///< MomX Ntuple Index
-  int fMuonInMomYIndex; ///< MomY Ntuple Index
-  int fMuonInMomZIndex; ///< MomZ Ntuple Index
+  // int fMuonInMomYIndex; ///< MomY Ntuple Index
+  // int fMuonInMomZIndex; ///< MomZ Ntuple Index
   int fMuonInPosXIndex; ///< PosX Ntuple Index
-  int fMuonInPosYIndex; ///< PosY Ntuple Index
-  int fMuonInPosZIndex; ///< PosZ Ntuple Index
+  // int fMuonInPosYIndex; ///< PosY Ntuple Index
+  // int fMuonInPosZIndex; ///< PosZ Ntuple Index
 
   int fMuonOutTimeIndex; ///< Time Ntuple Index
   int fMuonOutMomXIndex; ///< MomX Ntuple Index
-  int fMuonOutMomYIndex; ///< MomY Ntuple Index
-  int fMuonOutMomZIndex; ///< MomZ Ntuple Index
+  // int fMuonOutMomYIndex; ///< MomY Ntuple Index
+  // int fMuonOutMomZIndex; ///< MomZ Ntuple Index
   int fMuonOutPosXIndex; ///< PosX Ntuple Index
-  int fMuonOutPosYIndex; ///< PosY Ntuple Index
-  int fMuonOutPosZIndex; ///< PosZ Ntuple Index
+  // int fMuonOutPosYIndex; ///< PosY Ntuple Index
+  // int fMuonOutPosZIndex; ///< PosZ Ntuple Index
+
+  int fPoCAXIndex; 
+  // int fPoCAYIndex; 
+  // int fPoCAZIndex; 
+  int fPoCAAngleIndex; 
+  int fPoCADistanceIndex; 
+
+  std::vector<double> fInMom;  ///< HM Muon Mom Vector
+  std::vector<double> fInPos;  ///< HM Muon Pos Vector
+
+  G4double      fOutTime; ///< HM Muon Step Time
+  std::vector<double> fOutMom;  ///< HM Muon Mom Vector
+  std::vector<double> fOutPos;  ///< HM Muon Pos Vector
+  std::vector<double> fPoCA;
+
 
 };
 
