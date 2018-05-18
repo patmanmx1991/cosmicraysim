@@ -76,28 +76,43 @@ public:
 
     void SetLocalPos(G4ThreeVector xyz) { fLocalPos = xyz; }
     void SetLocalPosErr(G4ThreeVector xyz) { fLocalPosErr = xyz; }
-    G4ThreeVector GetLocalPos() const { return fLocalPos; }
-    G4ThreeVector GetLocalPosErr() const { return fLocalPosErr; }
 
     void SetWorldPos(G4ThreeVector xyz) { fWorldPos = xyz; }
     void SetWorldPosErr(G4ThreeVector xyz) { fWorldPosErr = xyz; }
-    G4ThreeVector GetWorldPos() const { return fWorldPos; }
-    G4ThreeVector GetWorldPosErr() const { return fWorldPosErr; }
+
+    void SetLocalPosTrue(G4ThreeVector xyz) { fLocalPosTrue = xyz; }
+    void SetWorldPosTrue(G4ThreeVector xyz) { fWorldPosTrue = xyz; }
+
+    void SetGhost(bool ghost) { fGhost = ghost; };
+    void SetDrawOption(int i){ fDrawOption = i; };
+
+    bool IsGhost() { return fGhost; };
 
     G4ThreeVector GetPos() const { return fWorldPos; }
     G4ThreeVector GetPosErr() const { return fWorldPosErr; }
 
-    void SetGhost(bool g) { fGhost = g; };
-    bool IsGhost() { return fGhost; };
+    G4ThreeVector GetLocalPos() const { return fLocalPos; }
+    G4ThreeVector GetLocalPosErr() const { return fLocalPosErr; }
 
-    void SetDrawOption(int i){ fDrawOption = i; };
+    G4ThreeVector GetWorldPos() const { return fWorldPos; }
+    G4ThreeVector GetWorldPosErr() const { return fWorldPosErr; }
+
+    G4ThreeVector GetLocalPosTrue() const { return fLocalPosTrue; }
+    G4ThreeVector GetWorldPosTrue() const { return fWorldPosTrue; }
+
+
 private:
     G4int fLayerID;
     G4double fTime;
+
+    G4ThreeVector fLocalPosTrue;
     G4ThreeVector fLocalPos;
     G4ThreeVector fLocalPosErr;
+
+    G4ThreeVector fWorldPosTrue;
     G4ThreeVector fWorldPos;
     G4ThreeVector fWorldPosErr;
+
     bool fGhost;
     uint fDrawOption;
 
