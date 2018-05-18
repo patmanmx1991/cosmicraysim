@@ -31,7 +31,7 @@ void TriggerFactory::ConstructTriggers() {
   if (tables_clone.empty()) {
     std::cout << "Done constructing triggers" << std::endl;
     return;
-}
+  }
   std::cout << "Searching triggers" << std::endl;
   std::vector<DBTable>::iterator trg_iter = tables_clone.begin();
 
@@ -40,17 +40,17 @@ void TriggerFactory::ConstructTriggers() {
     DBTable trg_tab = (*trg_iter);
     std::string trg_id = trg_tab.GetIndexName();
 
-    VTrigger* trg_obj = Analysis::Get()->GetTrigger(trg_id);
-    
+    VTrigger* trg_obj = Analysis::Get()->GetTrigger(trg_id, true);
+
     // If not existing
     if (!trg_obj) {
       // Create and register to analysis manager
-      VTrigger* trg_obj = TriggerFactory::Construct(trg_tab);
+      trg_obj = TriggerFactory::Construct(trg_tab);
       Analysis::Get()->RegisterTrigger(trg_obj);
     }
     std::cout << " --> Loaded: " << trg_id << std::endl;
   }
-    std::cout << "Done constructing triggers" << std::endl;
+  std::cout << "Done constructing triggers" << std::endl;
 
   return;
 }

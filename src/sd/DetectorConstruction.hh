@@ -60,7 +60,7 @@ public:
 private:
   /// Defines all the materials the detector is made of.
   void DefineMaterials();
-  DetectorMessenger* fMessenger;
+  // DetectorMessenger* fMessenger;
   // G4bool  fCheckOverlaps;
   G4GDMLParser gdml_parser;
 };
