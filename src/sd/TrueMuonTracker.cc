@@ -33,7 +33,6 @@ TrueMuonTracker::TrueMuonTracker(DBTable tbl):
   ResetState();
 
   // By default also include the auto processor
-  // std::cout << "TRUE MUON PROCESSOR : " << tbl->GetI("processor") << std::endl;
   if (!tbl.Has("processor") or tbl.GetI("processor") > 0) {
     Analysis::Get()->RegisterProcessor(new TrueMuonProcessor(this));
   }
