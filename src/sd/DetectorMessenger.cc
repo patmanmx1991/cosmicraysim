@@ -46,7 +46,7 @@
 namespace COSMIC {
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-DetectorMessenger::DetectorMessenger(DetectorConstruction* dc_in) : fDC(dc_in)
+DetectorMessenger::DetectorMessenger(DetectorConstruction* /*dc_in*/) 
 {
   std::cout << "Setting up detector messenger" << std::endl;
   GeoDir = new G4UIdirectory("/geo/");
@@ -61,7 +61,6 @@ DetectorMessenger::DetectorMessenger(DetectorConstruction* dc_in) : fDC(dc_in)
   UpdateGEO->SetGuidance("Updates the Geometry");
   UpdateGEO->AvailableForStates(G4State_PreInit, G4State_Idle);
 
-
   MessInput = new std::string;
 }
 
@@ -73,7 +72,7 @@ DetectorMessenger::~DetectorMessenger()
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void DetectorMessenger::SetNewValue(G4UIcommand* command, G4String newValue)
+void DetectorMessenger::SetNewValue(G4UIcommand* /*command*/, G4String /*newValue*/)
 {
 
   // if (command == InputValue) {

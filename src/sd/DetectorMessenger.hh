@@ -58,7 +58,7 @@ public:
     void UpdateGeoTable(G4String newValue);
 
 private:
-    DetectorConstruction*      fDC;
+    // DetectorConstruction*      fDC;
 
     G4UIdirectory*         GeoDir;
     G4UIcmdWithAString*    InputValue;
