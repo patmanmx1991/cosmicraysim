@@ -49,7 +49,7 @@ void SimpleScintillatorSD::Initialize(G4HCofThisEvent* hce)
     hce->AddHitsCollection(fHCID, fHitsCollection);
 }
 
-G4bool SimpleScintillatorSD::ProcessHits(G4Step* step, G4TouchableHistory* touch) {
+G4bool SimpleScintillatorSD::ProcessHits(G4Step* step, G4TouchableHistory* /*touch*/) {
 
     G4double edep = step->GetTotalEnergyDeposit();
     if (edep <= 0.) {
@@ -60,8 +60,8 @@ G4bool SimpleScintillatorSD::ProcessHits(G4Step* step, G4TouchableHistory* touch
 
     // Get the step inside the detector
     G4StepPoint* preStepPoint = step->GetPreStepPoint();
-    G4TouchableHistory* touchable = (G4TouchableHistory*)(preStepPoint->GetTouchable());
-    G4int copyNo = touchable->GetVolume()->GetCopyNo();
+    // G4TouchableHistory* touchable = (G4TouchableHistory*)(preStepPoint->GetTouchable());
+    // G4int copyNo = touchable->GetVolume()->GetCopyNo();
 
     // Get the hitTime
     G4double hitTime = preStepPoint->GetGlobalTime();
