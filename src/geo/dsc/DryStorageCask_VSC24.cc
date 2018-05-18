@@ -95,7 +95,7 @@ void DryStorageCask_VSC24::Construct(DBTable table)
 
     // Masking
     bool badrod = false;
-    for (int j = 0; j < rodmask.size(); j++) {
+    for (uint j = 0; j < rodmask.size(); j++) {
       if (i == rodmask[j]) {
         badrod = true;
         break;
@@ -105,7 +105,7 @@ void DryStorageCask_VSC24::Construct(DBTable table)
 
     // Altered Materials
     std::string rodtype = "uranium_rod";
-    for (int j = 0; j < rodmatindex.size(); j++) {
+    for (uint j = 0; j < rodmatindex.size(); j++) {
       if (i == rodmatindex[j]) {
         rodtype = radmatstring[j];
       }
