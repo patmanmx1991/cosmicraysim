@@ -16,17 +16,18 @@ namespace COSMIC {
 
 Analysis::Analysis() :
   fFluxProcessor(0),
-  fSavedEventsLimit(-1),
-  fGeneratedEventsLimit(-1),
   fSavedEvents(0),
+  fSavedEventsLimit(-1),
   fGeneratedEvents(0),
+  fGeneratedEventsLimit(-1),
   fExposureTimeLimit(-1.0),
   fNTuplesSetup(0),
   fChunkSize(10000)
 {
 }
 
-Analysis::~Analysis() {
+Analysis::~Analysis() 
+{
 }
 
 Analysis *Analysis::fPrimary(0);
