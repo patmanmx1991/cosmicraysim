@@ -22,7 +22,7 @@ public:
   };
 
   /// Destructor
-  ~VDetector() {};
+  virtual ~VDetector() {};
 
 
   /// Reset detector state at start of event

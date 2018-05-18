@@ -18,7 +18,7 @@ public:
   /// Named Constructor
   VProcessor(std::string id) : fID(id) {};
   /// Destructor
-  ~VProcessor(){};
+  virtual ~VProcessor(){};
 
   /// Virtual start of run action. All processors
   /// should implement this, as it is used to setup
