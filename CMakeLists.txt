@@ -49,18 +49,18 @@ configure_file(cmake/setup.sh.in
 
 
 # Build PUMAS
-add_library (pumas ${PROJECT_SOURCE_DIR}/src/pumas/pumas.c ${PROJECT_SOURCE_DIR}/src/pumas/pumas.h)
+#add_library (pumas ${PROJECT_SOURCE_DIR}/src/pumas/pumas.c ${PROJECT_SOURCE_DIR}/src/pumas/pumas.h)
 
 #----------------------------------------------------------------------------
 # Add the executable, and link it to the Geant4 libraries
 #
 add_executable(cosmicraysim ${PROJECT_SOURCE_DIR}/app/cosmicraysim.cc ${sources} ${headers})
 add_executable(bristol_trackfit ${PROJECT_SOURCE_DIR}/app/cosmicraysim.cc ${sources} ${headers})
-add_executable(pumas_example ${PROJECT_SOURCE_DIR}/app/pumas_example.cc ${sources} ${headers})
+#add_executable(pumas_example ${PROJECT_SOURCE_DIR}/app/pumas_example.cc ${sources} ${headers})
 
 target_link_libraries(cosmicraysim ${Geant4_LIBRARIES} ${ROOT_LIBRARIES})
 target_link_libraries(bristol_trackfit ${Geant4_LIBRARIES} ${ROOT_LIBRARIES})
-target_link_libraries(pumas_example ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} pumas)
+#target_link_libraries(pumas_example ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} pumas)
 
 
 
@@ -91,4 +91,4 @@ endforeach()
 # Install the executable to 'bin' directory under CMAKE_INSTALL_PREFIX
 #
 install(TARGETS cosmicraysim DESTINATION bin )
-install(TARGETS pumas DESTINATION lib )
+#install(TARGETS pumas DESTINATION lib )
