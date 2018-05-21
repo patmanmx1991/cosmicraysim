@@ -404,7 +404,7 @@ void ShuklaPrimaryGenerator::GeneratePrimaries(G4Event* anEvent) {
     // fMuonTime = fNThrows / fFluxIntegrated / fArea;
     fMuonDir = direction;
     fMuonPos = position;
-    fMuonEnergy = E*1000.0;
+    fMuonEnergy = E;
 
     fParticleGun->SetParticleEnergy(fMuonEnergy);
     fParticleGun->SetParticleTime(fMuonTime);
