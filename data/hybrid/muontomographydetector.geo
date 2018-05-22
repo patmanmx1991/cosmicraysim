@@ -20,22 +20,25 @@
   index: "AWE_GASMIX1",
   element_names: ["Ar","C","O","H"],
   element_counts: [0.925,0.75,0.100,0.100],
-  density: 8.05,  
+  density: 2.4,  
+  density_units: "g/cm3"
 }
 {
   name: "MATERIAL",
   index: "AWE_SCINTMIX",
   element_names: ["C","H"]
   element_counts: [0.9,0.1],
-  density: 8.05,
+  density: 2.4,
+  density_units: "g/cm3"
 }
 
 {
   name:	"MATERIAL",
   index: "BRISTOL_GASMIX1",
-  element_names: ["C","H"]
-  element_counts: [0.9,0.1],
-  density: 8.05,
+  element_names: ["O","Na","Si","Ca"]
+  element_counts: [0.45,0.10,0.35,0.10],
+  density: 2.4,
+  density_units: "g/cm3"
 }
 
 // --------------------------------
