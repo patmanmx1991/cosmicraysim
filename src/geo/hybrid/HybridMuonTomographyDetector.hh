@@ -62,29 +62,16 @@ public:
   void Construct(DBTable table);
 
   std::vector<GeoObject*> GetDriftObjects() { return fDriftObjects; };
-
-  GeoObject* GetScintillatorTop() { return fScintObjectTop; };
-  GeoObject* GetScintillatorBottom() { return fScintObjectBottom; };
-
-  GeoObject* GetRPCTopX() { return fRPCTopX; };
-  GeoObject* GetRPCTopY() { return fRPCTopY; };
-
-  GeoObject* GetRPCBottomX() { return fRPCBottomX; };
-  GeoObject* GetRPCBottomY() { return fRPCBottomY; };
+  std::vector<GeoObject*> GetScintObjects() { return fScintObjects; };
+  std::vector<GeoObject*> GetRPCObjects() { return fRPCObjects; };
 
 protected:
 
   std::vector<GeoObject*> fSubObjects;
   std::vector<GeoObject*> fDriftObjects;
+  std::vector<GeoObject*> fScintObjects;
+  std::vector<GeoObject*> fRPCObjects;
 
-  GeoObject* fScintObjectTop;
-  GeoObject* fScintObjectBottom;
-
-  GeoObject* fRPCTopX;
-  GeoObject* fRPCTopY;
-
-  GeoObject* fRPCBottomX;
-  GeoObject* fRPCBottomY;
 };
 
 /// Hybrid Processor Object :
@@ -96,7 +83,7 @@ public:
 
   /// Processor can only be created with an associated
   /// tracker object.
-  HybridMuonTomographyProcessor(HybridMuonTomographyDetector* trkr);
+  HybridMuonTomographyProcessor(HybridMuonTomographyDetector* trkr, std::map<std::string, std::string>& hitinfo);
   /// Destructor
   ~HybridMuonTomographyProcessor() {};
 
@@ -109,31 +96,30 @@ public:
   void GetMXC(G4double& m, G4double& me, G4double& c, G4double& ce, std::vector<G4double>& x, std::vector<G4double>& y, std::vector<G4double>& yerr);
 void ResetVariables();
 
+  int ConvertHitInfo(std::string s);
+
+  enum {
+    kHitInfoX = 0,
+    kHitInfoY,
+  };
 
 protected:
 
   bool fSave; ///< Whether to auto save
 
   HybridMuonTomographyDetector* fHybridDetector; ///< Pointer to associated detector medium
+
   std::vector<AWEDriftProcessor*> fDriftChamberProcs; ///< List of all drift processors
+  std::vector<int> fDriftHitInfo;
 
-  BristolRPCProcessor* fRPCProcTopX; ///< Processor for the Bristol RPC Hits above
-  BristolRPCProcessor* fRPCProcBottomX; ///< Processor for the Bristol RPC hits below
-  BristolRPCProcessor* fRPCProcTopY; ///< Processor for the Bristol RPC Hits above
-  BristolRPCProcessor* fRPCProcBottomY; ///< Processor for the Bristol RPC hits below
+  std::vector<SimpleScintillatorProcessor*> fScintProcs; ///< List of all drift processors
 
-  SimpleScintillatorProcessor* fScintProcTop; ///< Scintillator trigger processor
-  SimpleScintillatorProcessor* fScintProcBottom; ///< Scintillator trigger processor
+  std::vector<BristolRPCProcessor*> fRPCProcs; ///< List of all drift processors
+  std::vector<int> fRPCHitInfo;
 
-  int fScintTopEIndex; ///< Time Ntuple Index
-  int fScintTopTIndex; ///< Time Ntuple Index
-  int fScintBottomEIndex; ///< Time Ntuple Index
-  int fScintBottomTIndex; ///< Time Ntuple Index
 
-  G4double fScintTopE;
-  G4double fScintTopT;
-  G4double fScintBottomT;
-  G4double fScintBottomE;
+  std::vector<double> fScintE;
+  std::vector<double> fScintT;
 
   std::vector<double> fRPCHits_XX;
   std::vector<double> fRPCHits_XT;
