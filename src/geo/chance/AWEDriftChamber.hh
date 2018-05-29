@@ -1,0 +1,72 @@
+#ifndef __AWEDriftChamber_HH__
+#define __AWEDriftChamber_HH__
+
+#include <vector>
+#include <iostream>
+#include <vector>
+#include <string>
+#include <iostream>
+#include <sstream>
+#include <cstring>
+
+#include "G4NistManager.hh"
+#include "G4Box.hh"
+#include "G4Tubs.hh"
+#include "G4LogicalVolume.hh"
+#include "G4PVPlacement.hh"
+#include "G4RotationMatrix.hh"
+#include "G4Transform3D.hh"
+#include "G4SDManager.hh"
+#include "G4MultiFunctionalDetector.hh"
+#include "G4VPrimitiveScorer.hh"
+#include "G4PSEnergyDeposit.hh"
+#include "G4PSDoseDeposit.hh"
+#include "G4VisAttributes.hh"
+#include "G4PhysicalConstants.hh"
+#include "G4SystemOfUnits.hh"
+
+#include "TH1.h"
+#include "TF1.h"
+#include "TRandom3.h"
+#include "TVirtualFitter.h"
+#include "TSystem.h"
+#include "TStopwatch.h"
+#include "Math/Minimizer.h"
+#include "Math/Factory.h"
+#include "Math/Functor.h"
+
+#include "db/ROOTHeaders.hh"
+#include "sd/LongDriftSD.hh"
+#include "sd/AWEDriftSD.hh"
+#include "sd/BristolRPCSD.hh"
+#include "geo/GeoObject.hh"
+#include "geo/GeoUtils.hh"
+#include "analysis/VProcessor.hh"
+#include "analysis/Analysis.hh"
+#include "sd/SimpleScintillatorSD.hh"
+
+
+
+
+class G4LogicalVolume;
+class G4VPhysicalVolume;
+
+namespace COSMIC {
+
+// double inheritance, super dodgy!
+class AWEDriftChamber : public GeoObject {
+public:
+  inline AWEDriftChamber() {};
+  inline AWEDriftChamber(DBTable table) {Construct(table);};
+
+  void Construct(DBTable table);
+
+
+protected:
+
+  std::vector<GeoObject*> fSubObjects;
+
+};
+
+} // namespace COSMIC
+#endif

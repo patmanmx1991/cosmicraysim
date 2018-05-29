@@ -1,0 +1,99 @@
+// ------------------------------------------------
+{
+ name: "DETECTOR",
+ index: "truemuon",
+ type: "truemuon",
+}
+
+// ------------------------------------------------
+{
+  name: "DETECTOR",
+  index: "bristol_rpc_true"
+  type: "bristolrpc",
+  efficiency: "1.0",
+  resolution: "0.0001*mm"
+  processor: 0,
+}
+
+{
+  name: "DETECTOR",
+  index: "bristol_rpc_rec"
+  type: "bristolrpc",
+  efficiency: "0.9",
+  resolution: "0.3*mm"
+  processor: 0,
+}
+
+{
+  name: "DETECTOR",
+  index: "bristol_rpc_true_save"
+  type: "bristolrpc",
+  efficiency: "1.0",
+  resolution: "0.0001*mm"
+  processor: 1,
+}
+
+{
+  name: "DETECTOR",
+  index: "bristol_rpc_rec_save"
+  type: "bristolrpc",
+  efficiency: "0.9",
+  resolution: "0.3*mm"
+  processor: 1,
+}
+
+
+// ------------------------------------------------
+{
+  name: "DETECTOR",
+  index: "scint_true",
+  type:  "scintillator"
+  effiency: 1.0,
+  processor: 0,
+}
+
+{
+  name: "DETECTOR",
+  index: "scint_true_save",
+  type:  "scintillator"
+  effiency: 1.0,
+  processor: 1
+}
+
+{
+  name: "DETECTOR",
+  index: "scint_rec",
+  type:  "scintillator"
+  effiency: 0.9,
+  processor: 0,
+}
+
+{
+  name: "DETECTOR",
+  index: "scint_rec_save",
+  type:  "scintillator"
+  effiency: 0.9,
+  processor: 1
+}
+
+
+// ------------------------------------------------
+{
+  name: "DETECTOR",
+  index: "awe_drift_true",
+  type:  "awedrift"
+  resolution: "0.0001*mm",
+  wire_position: "3.0*cm",
+  efficiency: 1.00,
+  processor: 0
+}
+
+{
+  name: "DETECTOR",
+  index: "awe_drift_rec",
+  type:  "awedrift"
+  resolution: "2.0*mm",
+  wire_position: "3.0*cm",
+  efficiency: 1.00,
+  processor: 0
+}
