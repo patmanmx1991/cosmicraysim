@@ -31,6 +31,7 @@
 #include "hybrid/HybridMuonTomographyDetector.hh"
 #include "db/DB.hh"
 #include "db/DBTable.hh"
+#include "geo/chance/AWEDriftChamber.hh"
 #include <map>
 
 namespace COSMIC{
@@ -50,7 +51,7 @@ GeoObject* GeoObjectFactory::Construct(DBTable table){
   else if (type.compare("awe_muontom") == 0) return new AWEMuonTomographyDetector(table);
   else if (type.compare("awe_muontom2") == 0) return new AWEMuonTomographyDetectorSecond(table);
   else if (type.compare("hybrid_muontom") == 0) return new HybridMuonTomographyDetector(table);
-
+  else if (type.compare("awe_drift") == 0) return new AWEDriftChamber(table);
 
   std::cout << "Failed to Construct Geometry" << std::endl;
   throw;

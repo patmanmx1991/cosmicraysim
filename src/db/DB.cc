@@ -237,6 +237,25 @@ std::string DB::GetDataPath() {
   return datadir;
 }
 
+std::vector<double> DB::BlueColor(){
+  std::vector<double> col;
+  col.push_back(0.0);
+  col.push_back(0.0);
+  col.push_back(1.0);
+  col.push_back(1.0);
+  return col;
+}
+
+std::vector<double> DB::RedColor(){
+  std::vector<double> col;
+  col.push_back(1.0);
+  col.push_back(0.0);
+  col.push_back(0.0);
+  col.push_back(1.0);
+  return col;
+}
+
+
 void DB::PrintSplashScreen() {
   std::cout << "=========================================" << std::endl;
   std::cout << "\n CRESTA : Cosmic Rays Simulation Package" << std::endl;

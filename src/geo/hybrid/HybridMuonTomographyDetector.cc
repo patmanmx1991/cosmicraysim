@@ -42,6 +42,7 @@
 #include "sd/LongDriftSD.hh"
 #include "sd/AWEDriftSD.hh"
 #include "sd/BristolRPCSD.hh"
+#include "geo/chance/AWEDriftChamber.hh"
 
 namespace COSMIC {
 
@@ -133,13 +134,13 @@ void HybridMuonTomographyDetector::Construct(DBTable table) {
     std::vector<double> rotation = {posrot[3], posrot[4], posrot[5]};
 
     // Create the target by overloading table
-    DBTable chtemplate = DB::Get()->GetTable("GEO", "drift_template");
-    chtemplate.SetIndexName(fName + "_" + chname);
-    chtemplate.Prefix("mother", fName + "_");
+    DBTable chtemplate = DBTable("GEO",fName + "_" + chname);
+    chtemplate.Set("mother", fName + "_volume");
+    chtemplate.Set("position_units", "m");
     chtemplate.Set("position", position);
     chtemplate.Set("rotation", rotation);
 
-    GeoBox* obj = new GeoBox(chtemplate);
+    AWEDriftChamber* obj = new AWEDriftChamber(chtemplate);
     fSubObjects.push_back(obj);
     fDriftObjects.push_back(obj);
   }
@@ -165,6 +166,7 @@ void HybridMuonTomographyDetector::Construct(DBTable table) {
     std::vector<double> rotation = {posrot[3], posrot[4], posrot[5]};
 
     // Create the target by overloading table
+
     DBTable chtemplate = DB::Get()->GetTable("GEO", "rpc_template");
     chtemplate.SetIndexName(fName + "_" + chname);
     chtemplate.Prefix("mother", fName + "_");
@@ -236,6 +238,10 @@ HybridMuonTomographyProcessor::HybridMuonTomographyProcessor(HybridMuonTomograph
     // Get Hit Info (e.g. X vs Y)
     std::string id = pr->GetID();
     int info = ConvertHitInfo( hitinfo[id] );
+    if (info == -1){
+      std::cout << "Cannot find hit info for : " << id << std::endl;
+      throw;
+    }
     fDriftHitInfo.push_back( info );
   }
 
@@ -246,7 +252,6 @@ int HybridMuonTomographyProcessor::ConvertHitInfo(std::string s){
   else if (s.compare("y") == 0) return kHitInfoY;
   else {
     std::cout << "Unknown hit info input : " << s << std::endl;
-    throw;
   }
   return -1;
 }

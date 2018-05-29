@@ -55,6 +55,8 @@ public:
   void Finalise();
 
   DBTable  GetTable (std::string tablename, std::string index);
+  DBTable  CreateTable (std::string tablename, std::string index);
+
   DBTable* GetLink  (std::string tablename, std::string index);
 
   std::vector<DBTable>  GetTableGroup (std::string tablename);
@@ -64,6 +66,10 @@ public:
 
   inline void SetOutputFile(std::string filename) { fOutputFile = filename; };
   inline std::string GetOutputFile() { return fOutputFile; };
+
+  static std::vector<double> RedColor();
+  static std::vector<double> BlueColor();
+
 
 protected:
 

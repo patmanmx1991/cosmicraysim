@@ -94,22 +94,13 @@
 // --------------------------------
 // --> Make Bristol RPCs (turn this into a templated function)
 {
-  name: "DETECTOR",
-  index: "rpc"
-  type: "bristolrpc",
-  efficiency: "rpc_efficiency",
-  resolution: "rpc_resolution"
-  processor: 0,
-}
-
-{
   name: "GEO",
   index: "rpc_template",
   type: "box",
   size: ["rpc_x","rpc_y","rpc_thickness"]
   material: "BRISTOL_GASMIX1",
   mother: "volume", 
-  sensitive: "rpc"
+  sensitive: "bristol_rpc_true"
   color: [0.0,0.5,0.0,0.5]
   drawstyle: "solid",
 }
@@ -127,16 +118,6 @@
 // Scintillator Panel
 // --> Make simple scintillator
 {
-  name: "DETECTOR",
-  index: "scintillator",
-  type:  "scintillator"
-  effiency: 1.0,
-  time_resolution: "30.0*ns",
-  processor: 0,
-}
-
-// --> Place plastic scintillator as one big panel
-{
   name: "GEO",
   index: "scintillator_template",
   type: "box",
@@ -150,7 +131,7 @@
   material: "AWE_SCINTMIX",
   //
   // Sensitive scintillator object
-  sensitive: "scintillator"
+  sensitive: "scint_true_save"
   //
   // Drawing options
   color: [0.,0.,1.,0.2],
@@ -164,49 +145,17 @@
   scintillator_1: ["0.0","0.0","-0.38*m","0.0","0.0","0.0"]
 }
 
-// -------------------------------------
-// Drift Chambers
-// --> Drift Detector : Only Y pos info
-{
-  name: "DETECTOR",
-  index: "longdrift",
-  type:  "awedrift"
-  processor: 0,
-  //
-  // Position resolution width
-  resolution: "2*mm",
-  //
-  // Wire offsets in XYZ
-  wire_position: "3.0*cm",
-  //
-  // 99% Efficieny
-  efficiency: 1.00,
-}
-
+// --------------------------------
 // --> drift template
 {
   name: "GEO",
   index: "drift_template",
   type: "box",
   mother: "volume"
-  //
-  // Dimensions
-  size: [1.80,0.60,0.07],
-  size_units: "m"
-  //
   // Set placement units for later
   position_units: "m",
-  //
-  // Fill with gas max above
   material: "AWE_GASMIX1",
-  //
-  // Make Drift Sensitive
-  sensitive: "longdrift"
-  //
-  // Draw options
-  color: [1.,0.,0.,0.3],
-  drawstyle: "wireframe"
-
+  size: ["1.8*m","0.6*m","5*cm"]
 }
 
 // --> drift placements
