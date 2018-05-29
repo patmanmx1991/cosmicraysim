@@ -12,6 +12,37 @@
    rpc_offset: "0.45*m",
 }
 
+{
+   name: "INFO"
+   index: "detectors",
+   rpc_0: "y",
+   rpc_1: "x",
+   rpc_2: "y",
+   rpc_3: "x",
+   rpc_4: "y",
+   rpc_5: "x",
+   
+   chamber_0: "y",
+   chamber_1: "y",
+   chamber_2: "y",
+   chamber_3: "x",
+   chamber_4: "x",
+   chamber_5: "x",
+   chamber_6: "y",
+   chamber_7: "y",
+   chamber_8: "y",
+   chamber_9: "x",
+   chamber_10: "x",
+   chamber_11: "x",
+   chamber_12: "y",
+   chamber_13: "y",
+   chamber_14: "y",
+   chamber_15: "x",
+   chamber_16: "x",
+   chamber_17: "x",
+}
+
+
 
 // --------------------------------
 // Materials
@@ -61,7 +92,7 @@
   sensitive: "truemuon",
 }
 // --------------------------------
-// --> Make Bristol RPCs
+// --> Make Bristol RPCs (turn this into a templated function)
 {
   name: "DETECTOR",
   index: "rpc"
@@ -73,25 +104,24 @@
 
 {
   name: "GEO",
-  index: "rpc_topy",
+  index: "rpc_template",
   type: "box",
   size: ["rpc_x","rpc_y","rpc_thickness"]
   material: "BRISTOL_GASMIX1",
   mother: "volume", 
   sensitive: "rpc"
-  position: ["0.0","0.0","rpc_offset"]
   color: [0.0,0.5,0.0,0.5]
   drawstyle: "solid",
 }
-{ 
-  name: "GEO", 
-  index: "rpc_topx", 
-  clone: "rpc_topy", 
-  position: ["0.0","0.0","rpc_offset+rpc_spacing"], 
-  rotation: [0.0,0.0,90.0] 
+
+{
+  name: "GEO",
+  index: "rpc_positions",
+  rpc_0: ["0.0","0.0","rpc_offset",              "0.0","0.0"," 0.0"],
+  rpc_1: ["0.0","0.0","rpc_offset+rpc_spacing",  "0.0","0.0","90.0"],
+  rpc_2: ["0.0","0.0","-rpc_offset",             "0.0","0.0"," 0.0"],
+  rpc_3: ["0.0","0.0","-rpc_offset-rpc_spacing", "0.0","0.0","90.0"],
 }
-{ name: "GEO", index: "rpc_bottomy", clone: "rpc_topy", position: ["0.0","0.0","-rpc_offset"] }
-{ name: "GEO", index: "rpc_bottomx", clone: "rpc_topx", position: ["0.0","0.0","-rpc_offset-rpc_spacing"] }
 
 // --------------------------------
 // Scintillator Panel
@@ -108,17 +138,13 @@
 // --> Place plastic scintillator as one big panel
 {
   name: "GEO",
-  index: "scintillator_top",
+  index: "scintillator_template",
   type: "box",
   mother: "volume",
   // 
   // Big ~2*2 slab 
   size: [1.9,1.9,0.05],
   size_units: "m"
-  //
-  // Place above drifts
-  position: [0.0,0.0,0.38],
-  position_units: "m",
   //
   // Made out of G4 plastic scintillator
   material: "AWE_SCINTMIX",
@@ -131,12 +157,11 @@
   drawstyle: "solid"
 }
 
-{ 
+{
   name: "GEO",
-  index: "scintillator_bottom",
-  clone: "scintillator_top",
-  position: [0.0,0.0,-0.38],
-  position_units: "m", 
+  index: "scintillator_positions"
+  scintillator_0: ["0.0","0.0"," 0.38*m","0.0","0.0","0.0"]
+  scintillator_1: ["0.0","0.0","-0.38*m","0.0","0.0","0.0"]
 }
 
 // -------------------------------------
@@ -161,7 +186,7 @@
 // --> drift template
 {
   name: "GEO",
-  index: "drift_chamber",
+  index: "drift_template",
   type: "box",
   mother: "volume"
   //
@@ -187,8 +212,9 @@
 // --> drift placements
 {
   name: "GEO",
-  index: "chamber_positions",
+  index: "drift_positions",
   //
+  // pos and rot [x,y,z,thx,thy,thz] 
   // pos and rot [x,y,z,thx,thy,thz] in m
   chamber_0: [0.0,-0.62,-0.25, 0.0, 0.0, 0.0],
   chamber_1: [0.0,0.0,-0.25, 0.0, 0.0, 0.0],

@@ -55,11 +55,13 @@ configure_file(cmake/setup.sh.in
 # Add the executable, and link it to the Geant4 libraries
 #
 add_executable(cosmicraysim ${PROJECT_SOURCE_DIR}/app/cosmicraysim.cc ${sources} ${headers})
-add_executable(bristol_trackfit ${PROJECT_SOURCE_DIR}/app/cosmicraysim.cc ${sources} ${headers})
+add_executable(bristol_trackfit ${PROJECT_SOURCE_DIR}/app/bristol_trackfit.cc ${sources} ${headers})
 #add_executable(pumas_example ${PROJECT_SOURCE_DIR}/app/pumas_example.cc ${sources} ${headers})
+add_executable(bristol_g4sim ${PROJECT_SOURCE_DIR}/app/bristol_g4sim.cc ${sources} ${headers})
 
 target_link_libraries(cosmicraysim ${Geant4_LIBRARIES} ${ROOT_LIBRARIES})
 target_link_libraries(bristol_trackfit ${Geant4_LIBRARIES} ${ROOT_LIBRARIES})
+target_link_libraries(bristol_g4sim ${Geant4_LIBRARIES} ${ROOT_LIBRARIES})
 #target_link_libraries(pumas_example ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} pumas)
 
 
