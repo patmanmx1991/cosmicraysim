@@ -179,7 +179,7 @@ bool AWEMuonTomographyProcessor::ProcessEvent(const G4Event* event) {
 
   // Get the processor from the scintillator
   fScintProc->ProcessEvent(event);
-  bool hasvalue = fScintProc->HasInfo();
+  // bool hasvalue = fScintProc->HasInfo();
   if (!fScintProc->HasInfo()) {
     return false;
   }
@@ -191,7 +191,7 @@ bool AWEMuonTomographyProcessor::ProcessEvent(const G4Event* event) {
 
   // No processors have been automatically handled for the drift chamber objects
   // We have to manually get the HitPosition from each
-  int fNHitPositions;
+  // int fNHitPositions;
 
   std::vector<double> fTimes;
   std::vector<G4ThreeVector> fHitPositions;
@@ -462,8 +462,8 @@ void AWEMuonTomographyProcessor::GetMXC(G4double& m, G4double& me,
   double variable[2] = {(maxy - miny) / (maxx - minx), (maxy + miny) / 2.0 };
   min->SetFunction(f);
 
-  double maxgrad = 20 * (maxy - miny) / (maxx - minx);
-  double maxc = 2 * (fabs(miny) + fabs(maxy));
+  // double maxgrad = 20 * (maxy - miny) / (maxx - minx);
+  // double maxc = 2 * (fabs(miny) + fabs(maxy));
 
   std::vector<std::vector<int>> pairwise;
   if (x.size() == 6) {

@@ -5,14 +5,6 @@
 #include "Math/Functor.h"
 #include "sd/LongDriftSD.hh"
 #include "sd/SimpleScintillatorSD.hh"
-#include "TH1.h"
-#include "TF1.h"
-#include "TRandom3.h"
-#include "TVirtualFitter.h"
-#include "TSystem.h"
-#include "TStopwatch.h"
-#include "TVector3.h"
-#include "Minuit2/MnPrint.h"
 
 namespace COSMIC {
 
@@ -355,7 +347,7 @@ void BristolPoCAFitter::FillSingleContainers(int drifttype) {
 
 	// RPC Hits First
 	if (fUseARPCX) {
-		for (int j = 0; j < above_rpc_xx->size(); j++) {
+		for (uint j = 0; j < above_rpc_xx->size(); j++) {
 			values_rx.push_back(above_rpc_xx->at(j));
 			values_re.push_back(above_rpc_xe->at(j));
 			values_rz.push_back(above_rpc_xz->at(j));
@@ -363,7 +355,7 @@ void BristolPoCAFitter::FillSingleContainers(int drifttype) {
 	}
 
 	if (fUseARPCY) {
-		for (int j = 0; j < above_rpc_yy->size(); j++) {
+		for (uint j = 0; j < above_rpc_yy->size(); j++) {
 			values_rx.push_back(above_rpc_yy->at(j));
 			values_re.push_back(above_rpc_ye->at(j));
 			values_rz.push_back(above_rpc_yz->at(j));
@@ -371,7 +363,7 @@ void BristolPoCAFitter::FillSingleContainers(int drifttype) {
 	}
 
 	if (fUseBRPCX) {
-		for (int j = 0; j < below_rpc_xx->size(); j++) {
+		for (uint j = 0; j < below_rpc_xx->size(); j++) {
 			values_rx.push_back(below_rpc_xx->at(j));
 			values_re.push_back(below_rpc_xe->at(j));
 			values_rz.push_back(below_rpc_xz->at(j));
@@ -379,7 +371,7 @@ void BristolPoCAFitter::FillSingleContainers(int drifttype) {
 	}
 
 	if (fUseBRPCY) {
-		for (int j = 0; j < below_rpc_yy->size(); j++) {
+		for (uint j = 0; j < below_rpc_yy->size(); j++) {
 			values_rx.push_back(below_rpc_yy->at(j));
 			values_re.push_back(below_rpc_ye->at(j));
 			values_rz.push_back(below_rpc_yz->at(j));
@@ -388,7 +380,7 @@ void BristolPoCAFitter::FillSingleContainers(int drifttype) {
 
 	// Now Drift Hits
 	if (fUseADriftX) {
-		for (int j = 0; j < above_drift_xx->size(); j++) {
+		for (uint j = 0; j < above_drift_xx->size(); j++) {
 			values_x.push_back(above_drift_xx->at(j));
 			values_e.push_back(above_drift_xe->at(j));
 			values_g.push_back(above_drift_xg->at(j));
@@ -397,7 +389,7 @@ void BristolPoCAFitter::FillSingleContainers(int drifttype) {
 	}
 
 	if (fUseADriftY) {
-		for (int j = 0; j < above_drift_yy->size(); j++) {
+		for (uint j = 0; j < above_drift_yy->size(); j++) {
 			values_x.push_back(above_drift_yy->at(j));
 			values_e.push_back(above_drift_ye->at(j));
 			values_g.push_back(above_drift_yg->at(j));
@@ -406,7 +398,7 @@ void BristolPoCAFitter::FillSingleContainers(int drifttype) {
 	}
 
 	if (fUseBDriftX) {
-		for (int j = 0; j < below_drift_xx->size(); j++) {
+		for (uint j = 0; j < below_drift_xx->size(); j++) {
 			values_x.push_back(below_drift_xx->at(j));
 			values_e.push_back(below_drift_xe->at(j));
 			values_g.push_back(below_drift_xg->at(j));
@@ -415,7 +407,7 @@ void BristolPoCAFitter::FillSingleContainers(int drifttype) {
 	}
 
 	if (fUseBDriftY) {
-		for (int j = 0; j < below_drift_yy->size(); j++) {
+		for (uint j = 0; j < below_drift_yy->size(); j++) {
 			values_x.push_back(below_drift_yy->at(j));
 			values_e.push_back(below_drift_ye->at(j));
 			values_g.push_back(below_drift_yg->at(j));
@@ -903,7 +895,7 @@ std::vector<bool> BristolPoCAFitter::GetBestComboForDriftHits(int drifttype) {
 }
 
 
-double BristolPoCAFitter::DoSingleTrackFitWithX(double* fitx, double* fitpx, double* fitz) {
+double BristolPoCAFitter::DoSingleTrackFitWithX(double* fitx, double* fitpx, double* /*fitz*/) {
 
 	// Create Minimizer Object
 	ROOT::Math::Minimizer* min = ROOT::Math::Factory::CreateMinimizer("Minuit2", "Migrad");
@@ -918,7 +910,7 @@ double BristolPoCAFitter::DoSingleTrackFitWithX(double* fitx, double* fitpx, dou
 	// Get start pos and grad from hits
 	double startx  = PredictStartX();
 	// double startz  = values_rz.at(0);
-	double startpx = PredictStartPX();
+	// double startpx = PredictStartPX();
 
 	// Run the fit
 	min->SetVariable(0, "x",   startx,  0.1);
@@ -1037,7 +1029,7 @@ void BristolPoCAFitter::PerformDoubleTrackPoCAFit(double* pocafitparams) {
     TVector3 poca = 0.5 * (posA + sc*momA + posB + tc*momB);
 
     // Get the distance between points of closest approach
-    double distance = (posA + sc*momB - posB - tc*momB).Mag();
+    // double distance = (posA + sc*momB - posB - tc*momB).Mag();
 
     // Get the scatter angles
     TVector3 grad1X(temp_above_px, 0., 1.);
@@ -1049,8 +1041,8 @@ void BristolPoCAFitter::PerformDoubleTrackPoCAFit(double* pocafitparams) {
     TVector3 grad1(temp_above_px, temp_above_py, 1.);
     TVector3 grad2(temp_below_px, temp_below_py, 1.);
 
-	double scatter_x  = grad1X.Angle(grad2X);
-	double scatter_y  = grad1Y.Angle(grad2Y); 
+	// double scatter_x  = grad1X.Angle(grad2X);
+	// double scatter_y  = grad1Y.Angle(grad2Y); 
     double scatter_3d = grad2.Angle(grad1);
 
 	// Fill variables and return

@@ -14,9 +14,6 @@
 #include <cmath>
 #include <iomanip>
 
-#include "TF1.h"
-#include "TMath.h"
-
 #include "G4Event.hh"
 #include "G4ParticleGun.hh"
 #include "globals.hh"
@@ -33,6 +30,7 @@
 #include "G4Types.hh"
 
 #include "db/DB.hh"
+#include "db/ROOTHeaders.hh"
 #include "analysis/Analysis.hh"
 #include "analysis/VFluxProcessor.hh"
 #include "geo/simple/GeoBox.hh"
@@ -113,7 +111,7 @@ private:
     bool fCheckTargetBoxes; ///< FLAG : Whether target boxes okay.
     std::vector<G4Box*> fTargetBoxes; ///< Geant4 Box Object for each target
     std::vector<G4ThreeVector> fTargetBoxPositions; ///< Position in world volume for each target
-    G4int fTargetBoxesRequireN; ///< Requires at least this number of hits in different target boxes
+    // G4int fTargetBoxesRequireN; ///< Requires at least this number of hits in different target boxes
 
     // Throws are tracked regardless of acceptance, so integrated time always correct.
     /// Current Integrated Exposure time. Derivide from NThrows and Integrated flux.

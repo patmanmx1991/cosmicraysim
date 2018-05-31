@@ -92,7 +92,7 @@ G4bool NeutronSD::ProcessHits(G4Step* step, G4TouchableHistory* /*touch*/) {
   // if(is_Alpha) if(edep>0) std::cout << " Alpha : " << edep << std::endl;
 
   G4StepPoint* steppoint = step->GetPostStepPoint();
-  G4double steptime = steppoint->GetGlobalTime();
+  // G4double steptime = steppoint->GetGlobalTime();
 
   // Get the unique id of this particle
   std::pair<G4int, G4int> this_particle_ids = std::make_pair( track->GetTrackID(), track->GetParentID() );

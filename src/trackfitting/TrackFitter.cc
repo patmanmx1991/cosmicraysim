@@ -5,12 +5,6 @@
 #include "Math/Functor.h"
 #include "sd/LongDriftSD.hh"
 #include "sd/SimpleScintillatorSD.hh"
-#include "TH1.h"
-#include "TF1.h"
-#include "TRandom3.h"
-#include "TVirtualFitter.h"
-#include "TSystem.h"
-#include "TStopwatch.h"
 
 namespace COSMIC {
 

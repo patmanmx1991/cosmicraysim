@@ -25,16 +25,6 @@
 #include "G4PhysicalConstants.hh"
 #include "G4SystemOfUnits.hh"
 
-#include "TH1.h"
-#include "TF1.h"
-#include "TRandom3.h"
-#include "TVirtualFitter.h"
-#include "TSystem.h"
-#include "TStopwatch.h"
-#include "Math/Minimizer.h"
-#include "Math/Factory.h"
-#include "Math/Functor.h"
-
 #include "db/ROOTHeaders.hh"
 #include "sd/LongDriftSD.hh"
 #include "sd/AWEDriftSD.hh"

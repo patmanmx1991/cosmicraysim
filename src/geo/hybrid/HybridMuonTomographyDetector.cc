@@ -347,7 +347,7 @@ bool HybridMuonTomographyProcessor::ProcessEvent(const G4Event* event) {
 
 
   // Saving
-  G4AnalysisManager* man = G4AnalysisManager::Instance();
+  // G4AnalysisManager* man = G4AnalysisManager::Instance();
 
   // Loop over Scintillators and save info
   for (uint i = 0; i < fScintProcs.size(); i++) {
