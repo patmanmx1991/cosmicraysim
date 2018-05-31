@@ -121,7 +121,7 @@
 #include "analysis/Analysis.hh"
 
 #include "trackfitting/TrackFitter.hh"
-#include "trackfitting/BristolPoCAFitter.hh"
+#include "chance/BristolPoCAFitter.hh"
 #include "TVector3.h"
 
 #include "TROOT.h"

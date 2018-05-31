@@ -7,6 +7,17 @@ cmake_minimum_required(VERSION 2.6 FATAL_ERROR)
 project(COSMO)
 
 #----------------------------------------------------------------------------
+# Set the build flags
+SET(CMAKE_CXX_FLAGS_RELEASE "-std=c++11 -Wno-shadow -Wno-reorder -O3")
+SET(CMAKE_CXX_FLAGS_DEBUG "-std=c++11 -Wno-shadow -Wno-reorder -gdb")
+
+if (CMAKE_BUILD_TYPE MATCHES RELEASE)
+  set(CURRENT_CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS_RELEASE})
+else()
+  set(CURRENT_CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS_DEBUG})
+endif()
+
+#----------------------------------------------------------------------------
 # Find Geant4 package, activating all available UI and Vis drivers by default
 # You can set WITH_GEANT4_UIVIS to OFF via the command line or ccmake/cmake-gui
 # to build a batch mode only executable
