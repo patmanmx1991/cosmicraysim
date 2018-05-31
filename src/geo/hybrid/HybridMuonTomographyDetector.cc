@@ -366,14 +366,14 @@ bool HybridMuonTomographyProcessor::ProcessEvent(const G4Event* event) {
     if (fRPCHitInfo[i] == kHitInfoY) {
       fRPCHits_XX.push_back((fRPCProcs[i]->GetWorldPosY() + 250*mm/1.5)/(mm));
       fRPCHits_XT.push_back((fRPCProcs[i]->GetWorldPosTrueY() + 250*mm/1.5)/(mm));
-      fRPCHits_XZ.push_back((fRPCProcs[i]->GetWorldPosZ() + 250*mm/1.5)/(mm));
-      fRPCHits_XE.push_back((fRPCProcs[i]->GetErrY() + 250*mm/1.5)/(mm));
+      fRPCHits_XZ.push_back((fRPCProcs[i]->GetWorldPosZ())/(mm));
+      fRPCHits_XE.push_back((fRPCProcs[i]->GetErrY())/(mm));
 
     } else if (fRPCHitInfo[i] == kHitInfoX){
       fRPCHits_YY.push_back((fRPCProcs[i]->GetWorldPosX() + 250*mm/1.5)/(mm));
       fRPCHits_YT.push_back((fRPCProcs[i]->GetWorldPosTrueX() + 250*mm/1.5)/(mm));
-      fRPCHits_YZ.push_back((fRPCProcs[i]->GetWorldPosZ() + 250*mm/1.5)/(mm));
-      fRPCHits_YE.push_back((fRPCProcs[i]->GetErrY() + 250*mm/1.5)/(mm));
+      fRPCHits_YZ.push_back((fRPCProcs[i]->GetWorldPosZ())/(mm));
+      fRPCHits_YE.push_back((fRPCProcs[i]->GetErrY())/(mm));
     }
   }
 
@@ -389,15 +389,15 @@ bool HybridMuonTomographyProcessor::ProcessEvent(const G4Event* event) {
       fDriftHits_XX.push_back((fDriftChamberProcs[i]->GetWorldPosY() + 250*mm/1.5)/(mm));
       fDriftHits_XG.push_back((fDriftChamberProcs[i]->GetGhostWorldPosY() + 250*mm/1.5)/(mm));
       fDriftHits_XT.push_back((fDriftChamberProcs[i]->GetWorldPosTrueY() + 250*mm/1.5)/(mm));
-      fDriftHits_XZ.push_back((fDriftChamberProcs[i]->GetWorldPosZ() + 250*mm/1.5)/(mm));
-      fDriftHits_XE.push_back((fDriftChamberProcs[i]->GetErrY() + 250*mm/1.5)/(mm));
+      fDriftHits_XZ.push_back((fDriftChamberProcs[i]->GetWorldPosZ())/(mm));
+      fDriftHits_XE.push_back((fDriftChamberProcs[i]->GetErrY())/(mm));
 
     } else if (fDriftHitInfo[i] == kHitInfoX) {
       fDriftHits_YY.push_back((fDriftChamberProcs[i]->GetWorldPosX() + 250*mm/1.5)/(mm));
       fDriftHits_YG.push_back((fDriftChamberProcs[i]->GetGhostWorldPosX() + 250*mm/1.5)/(mm));
       fDriftHits_YT.push_back((fDriftChamberProcs[i]->GetWorldPosTrueX() + 250*mm/1.5)/(mm));
-      fDriftHits_YZ.push_back((fDriftChamberProcs[i]->GetWorldPosZ() + 250*mm/1.5)/(mm));
-      fDriftHits_YE.push_back((fDriftChamberProcs[i]->GetErrY() + 250*mm/1.5)/(mm));
+      fDriftHits_YZ.push_back((fDriftChamberProcs[i]->GetWorldPosZ())/(mm));
+      fDriftHits_YE.push_back((fDriftChamberProcs[i]->GetErrY())/(mm));
     }
   }
 

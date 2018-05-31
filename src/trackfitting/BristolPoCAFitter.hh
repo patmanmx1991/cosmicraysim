@@ -43,10 +43,17 @@
 #include "sd/AWEDriftSD.hh"
 #include "sd/BristolRPCSD.hh"
 
+#include <cassert>
+#include "Minuit2/FCNBase.h"
+
+
+
 namespace COSMIC {
 
 
-class BristolPoCAFitter {
+
+
+class BristolPoCAFitter : public ROOT::Minuit2::FCNBase {
 public:
 
 	BristolPoCAFitter();
@@ -63,6 +70,11 @@ public:
 	double DoEval(const double* x) const;
 
 	virtual double operator()( const double* x ) const { return DoEval(x); };
+	virtual double operator()( const std::vector<double>& par ) const{
+		return DoEval( &par[0] );
+	};
+	virtual double Up() const { return 1.0; };
+
 
 	int GetStatus() {return fStatus;};
 

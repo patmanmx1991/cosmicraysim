@@ -12,6 +12,7 @@
 #include "TSystem.h"
 #include "TStopwatch.h"
 #include "TVector3.h"
+#include "Minuit2/MnPrint.h"
 
 namespace COSMIC {
 
@@ -186,21 +187,24 @@ double BristolPoCAFitter::DoEval(const double* x) const {
 	double pointy = x[1];
 	double pointz = x[2];
 	double momx1  = x[3];
-	double momy1  = x[4];
-	double momx2  = x[5];
+	double momx2  = x[4];
+	double momy1  = x[5];
 	double momy2  = x[6];
 
 	// std::cout << "Getting RPC Hits" << std::endl;
-	chi2 += GetChi2AboveRPCX( pointx, momx1, pointz );
-	chi2 += GetChi2AboveRPCY( pointy, momy1, pointz );
-	chi2 += GetChi2BelowRPCX( pointx, momx2, pointz );
-	chi2 += GetChi2BelowRPCY( pointy, momy2, pointz );
+	chi2 += GetChi2AboveRPCX( pointx, momx2, pointz );
+	chi2 += GetChi2AboveRPCY( pointy, momy2, pointz );
+	chi2 += GetChi2BelowRPCX( pointx, momx1, pointz );
+	chi2 += GetChi2BelowRPCY( pointy, momy1, pointz );
 
-	chi2 += GetChi2AboveDriftX( pointx, momx1, pointz );
-	chi2 += GetChi2AboveDriftY( pointy, momy1, pointz );
-	chi2 += GetChi2BelowDriftX( pointx, momx2, pointz );
-	chi2 += GetChi2BelowDriftY( pointy, momy2, pointz );
+	chi2 += GetChi2AboveDriftX( pointx, momx2, pointz );
+	chi2 += GetChi2AboveDriftY( pointy, momy2, pointz );
+	chi2 += GetChi2BelowDriftX( pointx, momx1, pointz );
+	chi2 += GetChi2BelowDriftY( pointy, momy1, pointz );
 
+	// std::cout << "Print Level : " << ROOT::Minuit2::MnPrint::Level() << std::endl;
+
+	// std::cout << " Total Chi2 = " << chi2 << std::endl;
 	return chi2;
 
 }
@@ -562,9 +566,12 @@ double BristolPoCAFitter::GetLowestZ() {
 		if ( minz == -999. || z < minz ) {
 			minx = x;
 			minz = z;
+			// std::cout << " New Lowest RPC Z " << minz << std::endl;
+
 		}
 	}
 
+	// std::cout << "Returning Lowest Z : " << minz << std::endl;
 	return minz;
 }
 
@@ -593,7 +600,7 @@ double BristolPoCAFitter::GetHighestX() {
 		double x = values_rx.at(i);
 		double z = values_rz.at(i);
 
-		if ( maxz == -999. || z < maxz ) {
+		if ( maxz == -999. || z > maxz ) {
 			maxx = x;
 			maxz = z;
 		}
@@ -627,7 +634,7 @@ double BristolPoCAFitter::GetHighestZ() {
 		double x = values_rx.at(i);
 		double z = values_rz.at(i);
 
-		if ( maxz == -999. || z < maxz ) {
+		if ( maxz == -999. || z > maxz ) {
 			maxx = x;
 			maxz = z;
 		}
@@ -903,7 +910,7 @@ double BristolPoCAFitter::DoSingleTrackFitWithX(double* fitx, double* fitpx, dou
 	min->SetPrintLevel(-1);
 
 	// Setup Functor for the fitter
-	int npars = 3;
+	int npars = 2;
 	BristolTrackFitterFCN* singlefcn = new BristolTrackFitterFCN(this);
 	ROOT::Math::Functor func(*singlefcn, npars);
 	min->SetFunction(func);
@@ -915,7 +922,7 @@ double BristolPoCAFitter::DoSingleTrackFitWithX(double* fitx, double* fitpx, dou
 
 	// Run the fit
 	min->SetVariable(0, "x",   startx,  0.1);
-	min->SetVariable(1, "px1", startpx, 0.1);
+	min->SetVariable(1, "px1", 0.0, 10);
 	// min->SetVariable(2, "z",   startz,  0.1);
 	// min->FixVariable(2);
 	min->Minimize();
@@ -925,7 +932,7 @@ double BristolPoCAFitter::DoSingleTrackFitWithX(double* fitx, double* fitpx, dou
 	double chi2 = DoSingleEvalWithX(xx);
 	if (fitx)   *fitx = xx[0];
 	if (fitpx) *fitpx = xx[1];
-	if (fitz)   *fitz = xx[2];
+	// if (fitz)   *fitz = xx[2];
 
 	delete min;
 
@@ -965,6 +972,8 @@ double BristolPoCAFitter::DoSingleEvalWithX(const double *x) const {
 	for (uint i = 0; i < values_rx.size(); i++) {
 		chi2 += pow( ( values_rx.at(i) - (pointx + momx * (pointz - values_rz.at(i)) / momz) ) / values_re.at(i), 2 );
 	}
+
+	// std::cout << " Single Chi2 = " << chi2 << std::endl;
 
 	return chi2;
 }
@@ -1031,19 +1040,18 @@ void BristolPoCAFitter::PerformDoubleTrackPoCAFit(double* pocafitparams) {
     double distance = (posA + sc*momB - posB - tc*momB).Mag();
 
     // Get the scatter angles
-    TVector3 grad1X(temp_above_px, 1., 1.);
-    TVector3 grad2X(temp_below_px, 1., 1.);
+    TVector3 grad1X(temp_above_px, 0., 1.);
+    TVector3 grad2X(temp_below_px, 0., 1.);
 
-    TVector3 grad1Y(1., temp_above_py, 1.);
-    TVector3 grad2Y(1., temp_below_py, 1.);
+    TVector3 grad1Y(0., temp_above_py, 1.);
+    TVector3 grad2Y(0., temp_below_py, 1.);
 
     TVector3 grad1(temp_above_px, temp_above_py, 1.);
     TVector3 grad2(temp_below_px, temp_below_py, 1.);
 
 	double scatter_x  = grad1X.Angle(grad2X);
 	double scatter_y  = grad1Y.Angle(grad2Y); 
-    double scatter_3d = grad1.Angle(grad2);
-
+    double scatter_3d = grad2.Angle(grad1);
 
 	// Fill variables and return
 	pocafitparams[0] = temp_above_x;
@@ -1055,8 +1063,8 @@ void BristolPoCAFitter::PerformDoubleTrackPoCAFit(double* pocafitparams) {
 	pocafitparams[6] = temp_below_y;
 	pocafitparams[7] = temp_below_py;
 
-	pocafitparams[8]  = scatter_x;
-	pocafitparams[9]  = scatter_y;
+	pocafitparams[8]  = atan( abs((temp_above_px - temp_below_px)/(1 + temp_above_px*temp_below_px)) );
+	pocafitparams[9]  = atan( abs((temp_above_py - temp_below_py)/(1 + temp_above_py*temp_below_py)) );
 	pocafitparams[10] = scatter_3d;
 
 	pocafitparams[11] = poca[0];
