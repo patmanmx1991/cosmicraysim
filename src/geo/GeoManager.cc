@@ -20,17 +20,21 @@
 #include "G4PhysicalConstants.hh"
 #include "G4SystemOfUnits.hh"
 
+#include "db/DB.hh"
+#include "db/DBTable.hh"
+
 #include "simple/GeoBox.hh"
 #include "simple/GeoTubs.hh"
 #include "simple/GeoCone.hh"
 #include "simple/GeoEllipticalTube.hh"
 #include "simple/GeoEllipticalTunnel.hh"
-#include "dsc/DryStorageCask_VSC24.hh"
-#include "awemuontom/AWEMuonTomographyDetector.hh"
-#include "awemuontom/AWEMuonTomographyDetectorSecond.hh"
+
+#include "nuclearwaste/DryStorageCask_VSC24.hh"
+#include "nuclearwaste/SmallSteelDrum.hh"
+#include "nuclearwaste/LargeSteelDrum.hh"
+
+
 #include "chance/HybridMuonTomographyDetector.hh"
-#include "db/DB.hh"
-#include "db/DBTable.hh"
 #include "chance/AWEDriftChamber.hh"
 #include <map>
 
@@ -48,10 +52,11 @@ GeoObject* GeoObjectFactory::Construct(DBTable table){
   else if (type.compare("eliptube")==0) return new GeoEllipticalTube(table);
   else if (type.compare("eliptunnel")==0) return new GeoEllipticalTunnel(table);
   else if (type.compare("DSC_VSC24") == 0) return new DryStorageCask_VSC24(table);
-  else if (type.compare("awe_muontom") == 0) return new AWEMuonTomographyDetector(table);
-  else if (type.compare("awe_muontom2") == 0) return new AWEMuonTomographyDetectorSecond(table);
   else if (type.compare("hybrid_muontom") == 0) return new HybridMuonTomographyDetector(table);
   else if (type.compare("awe_drift") == 0) return new AWEDriftChamber(table);
+  else if (type.compare("smallsteeldrum") == 0) return new SmallSteelDrum(table);
+  else if (type.compare("largesteeldrum") == 0) return new LargeSteelDrum(table);
+
   //  else if (type.compare("bristol_rpc") == 0) return new BristolRPC(table);
 
   std::cout << "Failed to Construct Geometry" << std::endl;

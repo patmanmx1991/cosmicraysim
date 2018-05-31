@@ -120,7 +120,6 @@
 #include "globals.hh"
 #include "analysis/Analysis.hh"
 
-#include "trackfitting/TrackFitter.hh"
 #include "chance/BristolPoCAFitter.hh"
 #include "TVector3.h"
 

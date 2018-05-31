@@ -40,7 +40,7 @@ public:
   void Construct(DBTable table);
 
   /// Create the solid volume for this objet. Children must implement.
-  virtual G4VSolid *ConstructSolidVolume(DBTable table) = 0;
+  virtual G4VSolid *ConstructSolidVolume(DBTable /*table*/){ return 0; };
   
   /// Construct logical volume given materials etc in a table
   virtual G4LogicalVolume *ConstructLogicalVolume(DBTable table, G4VSolid* solid);

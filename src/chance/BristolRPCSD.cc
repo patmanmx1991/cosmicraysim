@@ -220,22 +220,8 @@ bool BristolRPCProcessor::BeginOfRunAction(const G4Run* /*run*/) {
         G4AnalysisManager* man = G4AnalysisManager::Instance();
 
         fTimeIndex = man ->CreateNtupleDColumn(tableindex + "_t");
-
-        // fPosXIndex = man ->CreateNtupleDColumn(tableindex + "_lx");
         fPosYIndex = man ->CreateNtupleDColumn(tableindex + "_ly");
-        // fPosZIndex = man ->CreateNtupleDColumn(tableindex + "_lz");
-
-        // fErrXIndex = man ->CreateNtupleDColumn(tableindex + "_ex");
         fErrYIndex = man ->CreateNtupleDColumn(tableindex + "_ey");
-        // fErrZIndex = man ->CreateNtupleDColumn(tableindex + "_ez");
-
-        // fWorldPosXIndex = man ->CreateNtupleDColumn(tableindex + "_wx");
-        // fWorldPosYIndex = man ->CreateNtupleDColumn(tableindex + "_wy");
-        // fWorldPosZIndex = man ->CreateNtupleDColumn(tableindex + "_wz");
-
-        // fWorldErrXIndex = man ->CreateNtupleDColumn(tableindex + "_wex");
-        // fWorldErrYIndex = man ->CreateNtupleDColumn(tableindex + "_wey");
-        // fWorldErrZIndex = man ->CreateNtupleDColumn(tableindex + "_wez");
     }
 
     Reset();
@@ -339,44 +325,16 @@ bool BristolRPCProcessor::FillNTuples() {
     if (fHasInfo) {
 
         man->FillNtupleDColumn(fTimeIndex, fTime);
-
-        // man->FillNtupleDColumn(fPosXIndex, fPosX);
         man->FillNtupleDColumn(fPosYIndex, fPosY);
-        // man->FillNtupleDColumn(fPosZIndex, fPosZ);
-
-        // man->FillNtupleDColumn(fErrXIndex, fErrX);
         man->FillNtupleDColumn(fErrYIndex, fErrY);
-        // man->FillNtupleDColumn(fErrZIndex, fErrZ);
-
-        // man->FillNtupleDColumn(fWorldPosXIndex, fWorldPosX);
-        // man->FillNtupleDColumn(fWorldPosYIndex, fWorldPosY);
-        // man->FillNtupleDColumn(fWorldPosZIndex, fWorldPosZ);
-
-        // man->FillNtupleDColumn(fWorldErrXIndex, fWorldErrX);
-        // man->FillNtupleDColumn(fWorldErrYIndex, fWorldErrY);
-        // man->FillNtupleDColumn(fWorldErrZIndex, fWorldErrZ);
 
         return true;
 
     } else {
 
         man->FillNtupleDColumn(fTimeIndex, -999.);
-
-        // man->FillNtupleDColumn(fPosXIndex, -999.);
         man->FillNtupleDColumn(fPosYIndex, -999.);
-        // man->FillNtupleDColumn(fPosZIndex, -999.);
-
-        // man->FillNtupleDColumn(fErrXIndex, -999.);
         man->FillNtupleDColumn(fErrYIndex, -999.);
-        // man->FillNtupleDColumn(fErrZIndex, -999.);
-
-        // man->FillNtupleDColumn(fWorldPosXIndex, -999.);
-        // man->FillNtupleDColumn(fWorldPosYIndex, -999.);
-        // man->FillNtupleDColumn(fWorldPosZIndex, -999.);
-
-        // man->FillNtupleDColumn(fWorldErrXIndex, -999.);
-        // man->FillNtupleDColumn(fWorldErrYIndex, -999.);
-        // man->FillNtupleDColumn(fWorldErrZIndex, -999.);
 
         return false;
     }

@@ -248,34 +248,10 @@ bool AWEDriftProcessor::BeginOfRunAction(const G4Run* /*run*/)
 
         G4AnalysisManager* man = G4AnalysisManager::Instance();
 
-        // Fill index energy
         fTimeIndex = man ->CreateNtupleDColumn(tableindex + "_t");
-
-        // fPosXIndex = man ->CreateNtupleDColumn(tableindex + "_lx");
         fPosYIndex = man ->CreateNtupleDColumn(tableindex + "_ly");
-        // fPosZIndex = man ->CreateNtupleDColumn(tableindex + "_lz");
-
-        // fErrXIndex = man ->CreateNtupleDColumn(tableindex + "_ex");
         fErrYIndex = man ->CreateNtupleDColumn(tableindex + "_ey");
-        // fErrZIndex = man ->CreateNtupleDColumn(tableindex + "_ez");
-
-        // fWorldPosXIndex = man ->CreateNtupleDColumn(tableindex + "_wx");
-        // fWorldPosYIndex = man ->CreateNtupleDColumn(tableindex + "_wy");
-        // fWorldPosZIndex = man ->CreateNtupleDColumn(tableindex + "_wz");
-
-        // fWorldErrXIndex = man ->CreateNtupleDColumn(tableindex + "_wex");
-        // fWorldErrYIndex = man ->CreateNtupleDColumn(tableindex + "_wey");
-        // fWorldErrZIndex = man ->CreateNtupleDColumn(tableindex + "_wez");
-
-        // fGhostPosXIndex = man ->CreateNtupleDColumn(tableindex + "_glx");
         fGhostPosYIndex = man ->CreateNtupleDColumn(tableindex + "_gly");
-        // fGhostPosZIndex = man ->CreateNtupleDColumn(tableindex + "_glz");
-
-        // fGhostWorldPosXIndex = man ->CreateNtupleDColumn(tableindex + "_gwx");
-        // fGhostWorldPosYIndex = man ->CreateNtupleDColumn(tableindex + "_gwy");
-        // fGhostWorldPosZIndex = man ->CreateNtupleDColumn(tableindex + "_gwz");
-
-        std::cout << "Registering AWEDriftSD NTuples " << tableindex << " : " << fTimeIndex << std::endl;
 
     }
     Reset();
@@ -407,60 +383,18 @@ bool AWEDriftProcessor::FillNTuples() {
     if (fHasInfo) {
 
         man->FillNtupleDColumn(fTimeIndex, fTime);
-
-        // man->FillNtupleDColumn(fPosXIndex, fPosX);
         man->FillNtupleDColumn(fPosYIndex, fPosY);
-        // man->FillNtupleDColumn(fPosZIndex, fPosZ);
-
-        // man->FillNtupleDColumn(fErrXIndex, fErrX);
         man->FillNtupleDColumn(fErrYIndex, fErrY);
-        // man->FillNtupleDColumn(fErrZIndex, fErrZ);
-
-        // man->FillNtupleDColumn(fWorldPosXIndex, fWorldPosX);
-        // man->FillNtupleDColumn(fWorldPosYIndex, fWorldPosY);
-        // man->FillNtupleDColumn(fWorldPosZIndex, fWorldPosZ);
-
-        // man->FillNtupleDColumn(fWorldErrXIndex, fWorldErrX);
-        // man->FillNtupleDColumn(fWorldErrYIndex, fWorldErrY);
-        // man->FillNtupleDColumn(fWorldErrZIndex, fWorldErrZ);
-
-        // man->FillNtupleDColumn(fGhostPosXIndex, fGhostPosX);
         man->FillNtupleDColumn(fGhostPosYIndex, fGhostPosY);
-        // man->FillNtupleDColumn(fGhostPosZIndex, fGhostPosZ);
-
-        // man->FillNtupleDColumn(fGhostWorldPosXIndex, fGhostWorldPosX);
-        // man->FillNtupleDColumn(fGhostWorldPosYIndex, fGhostWorldPosY);
-        // man->FillNtupleDColumn(fGhostWorldPosZIndex, fGhostWorldPosZ);
 
         return true;
 
     } else {
 
         man->FillNtupleDColumn(fTimeIndex, -999.);
-
-        // man->FillNtupleDColumn(fPosXIndex, -999.);
         man->FillNtupleDColumn(fPosYIndex, -999.);
-        // man->FillNtupleDColumn(fPosZIndex, -999.);
-
-        // man->FillNtupleDColumn(fErrXIndex, -999.);
         man->FillNtupleDColumn(fErrYIndex, -999.);
-        // man->FillNtupleDColumn(fErrZIndex, -999.);
-
-        // man->FillNtupleDColumn(fWorldPosXIndex, -999.);
-        // man->FillNtupleDColumn(fWorldPosYIndex, -999.);
-        // man->FillNtupleDColumn(fWorldPosZIndex, -999.);
-
-        // man->FillNtupleDColumn(fWorldErrXIndex, -999.);
-        // man->FillNtupleDColumn(fWorldErrYIndex, -999.);
-        // man->FillNtupleDColumn(fWorldErrZIndex, -999.);
-
-        // man->FillNtupleDColumn(fGhostPosXIndex, -999.);
         man->FillNtupleDColumn(fGhostPosYIndex, -999.);
-        // man->FillNtupleDColumn(fGhostPosZIndex, -999.);
-
-        // man->FillNtupleDColumn(fGhostWorldPosXIndex, -999.);
-        // man->FillNtupleDColumn(fGhostWorldPosYIndex, -999.);
-        // man->FillNtupleDColumn(fGhostWorldPosZIndex, -999.);
 
         return false;
     }
