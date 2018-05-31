@@ -15,8 +15,6 @@
 #include "G4VisAttributes.hh"
 #include "G4PhysicalConstants.hh"
 #include "G4SystemOfUnits.hh"
-
-
 #include "G4VVisManager.hh"
 #include "G4VisAttributes.hh"
 #include "G4Circle.hh"
@@ -31,18 +29,17 @@
 #include "G4ios.hh"
 #include "G4Box.hh"
 #include "G4Polyline.hh"
-#include "Math/Functor.h"
 
 #include "db/ROOTHeaders.hh"
 #include "geo/GeoObject.hh"
 #include "geo/GeoUtils.hh"
-#include "sd/DetectorManager.hh"
 #include "geo/simple/GeoBox.hh"
 #include "geo/simple/GeoTubs.hh"
+#include "sd/DetectorManager.hh"
 #include "sd/LongDriftSD.hh"
-#include "sd/AWEDriftSD.hh"
-#include "sd/BristolRPCSD.hh"
-#include "geo/chance/AWEDriftChamber.hh"
+#include "chance/AWEDriftSD.hh"
+#include "chance/BristolRPCSD.hh"
+#include "chance/AWEDriftChamber.hh"
 
 namespace COSMIC {
 
@@ -52,6 +49,7 @@ void HybridMuonTomographyDetector::Construct(DBTable table) {
   SetType(table.GetS("type"));
   std::string fName = table.GetIndexName();
   std::string fMotherName = table.GetS("mother");
+
 
   // -----------------------------------------------------------------
   // Load the temporary DB from geo file
@@ -223,7 +221,6 @@ HybridMuonTomographyProcessor::HybridMuonTomographyProcessor(HybridMuonTomograph
 
     // Get Hit Info (e.g. X vs Y)
     std::string id = pr->GetID();
-    // std::cout << "Getting hit info for " << id << " " << hitinfo[id] << std::endl;
     int info = ConvertHitInfo( hitinfo[id] );
     fRPCHitInfo.push_back( info );
   }
@@ -238,10 +235,6 @@ HybridMuonTomographyProcessor::HybridMuonTomographyProcessor(HybridMuonTomograph
     // Get Hit Info (e.g. X vs Y)
     std::string id = pr->GetID();
     int info = ConvertHitInfo( hitinfo[id] );
-    if (info == -1){
-      std::cout << "Cannot find hit info for : " << id << std::endl;
-      throw;
-    }
     fDriftHitInfo.push_back( info );
   }
 

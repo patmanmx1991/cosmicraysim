@@ -1,7 +1,7 @@
 #include "AWEDriftSD.hh"
 #include "analysis/Analysis.hh"
 #include "db/DBTable.hh"
-#include "DriftHit.hh"
+#include "sd/DriftHit.hh"
 
 #include "G4VVisManager.hh"
 #include "G4VisAttributes.hh"

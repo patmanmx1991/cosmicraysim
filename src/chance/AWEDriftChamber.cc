@@ -40,8 +40,8 @@
 #include "geo/simple/GeoBox.hh"
 #include "geo/simple/GeoTubs.hh"
 #include "sd/LongDriftSD.hh"
-#include "sd/AWEDriftSD.hh"
-#include "sd/BristolRPCSD.hh"
+#include "chance/AWEDriftSD.hh"
+#include "chance/BristolRPCSD.hh"
 
 namespace COSMIC {
 

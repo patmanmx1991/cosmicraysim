@@ -38,7 +38,7 @@
 #include "Math/Factory.h"
 #include "Math/Functor.h"
 #include "sd/LongDriftSD.hh"
-#include "sd/AWEDriftSD.hh"
+#include "chance/AWEDriftSD.hh"
 
 #include "sd/SimpleScintillatorSD.hh"
 

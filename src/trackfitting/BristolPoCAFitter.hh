@@ -40,8 +40,8 @@
 #include "geo/simple/GeoTubs.hh"
 #include "sd/DetectorManager.hh"
 #include "sd/LongDriftSD.hh"
-#include "sd/AWEDriftSD.hh"
-#include "sd/BristolRPCSD.hh"
+//#include "sd/AWEDriftSD.hh"
+//#include "sd/BristolRPCSD.hh"
 
 #include <cassert>
 #include "Minuit2/FCNBase.h"

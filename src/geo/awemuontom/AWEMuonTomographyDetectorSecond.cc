@@ -38,7 +38,7 @@
 #include "geo/simple/GeoBox.hh"
 #include "geo/simple/GeoTubs.hh"
 #include "sd/LongDriftSD.hh"
-#include "sd/AWEDriftSD.hh"
+//#include "sd/AWEDriftSD.hh"
 namespace COSMIC {
 
 // --------------------------------------------------------------------------

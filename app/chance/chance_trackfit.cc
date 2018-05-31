@@ -77,8 +77,8 @@
 #include "geo/simple/GeoTubs.hh"
 #include "sd/DetectorManager.hh"
 #include "sd/LongDriftSD.hh"
-#include "sd/AWEDriftSD.hh"
-#include "sd/BristolRPCSD.hh"
+#include "chance/AWEDriftSD.hh"
+#include "chance/BristolRPCSD.hh"
 
 
 

@@ -27,8 +27,8 @@
 
 #include "db/ROOTHeaders.hh"
 #include "sd/LongDriftSD.hh"
-#include "sd/AWEDriftSD.hh"
-#include "sd/BristolRPCSD.hh"
+#include "chance/AWEDriftSD.hh"
+#include "chance/BristolRPCSD.hh"
 #include "geo/GeoObject.hh"
 #include "geo/GeoUtils.hh"
 #include "analysis/VProcessor.hh"

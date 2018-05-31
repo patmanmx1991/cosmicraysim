@@ -6,8 +6,8 @@
 #include "TrueMuonTracker.hh"
 #include "SimpleScintillatorSD.hh"
 #include "LongDriftSD.hh"
-#include "AWEDriftSD.hh"
-#include "BristolRPCSD.hh"
+#include "chance/AWEDriftSD.hh"
+#include "chance/BristolRPCSD.hh"
 #include "TargetMuonInOutTracker.hh"
 #include "NeutronSD.hh"
 

@@ -25,7 +25,7 @@
 #include "g4root.hh"
 #include "analysis/VProcessor.hh"
 #include "analysis/VDetector.hh"
-#include "DriftHit.hh"
+#include "sd/DriftHit.hh"
 
 namespace COSMIC {
 
