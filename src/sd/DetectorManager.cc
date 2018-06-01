@@ -10,7 +10,7 @@
 #include "chance/BristolRPCSD.hh"
 #include "TargetMuonInOutTracker.hh"
 #include "NeutronSD.hh"
-
+#include "TrueInTracker.hh"
 
 namespace COSMIC {
 
@@ -27,9 +27,10 @@ VDetector* DetectorObjectFactory::CreateSD(DBTable tbl) {
   else if (type.compare("awedrift") == 0) return new AWEDriftSD(tbl);
   else if (type.compare("bristolrpc") == 0) return new BristolRPCSD(tbl);
   else if (type.compare("muoninouttracker") == 0) return new TargetMuonInOutTracker(tbl);
+  else if (type.compare("trueinabsorber") == 0) return new TrueInAbsorber(tbl);
 
   // Check we didn't get to here
-  std::cout << "Failed to Create SD : " << type << std::endl;
+  std::cout << "Failed to Create New SD : '" << type << "'" << std::endl;
   throw;  
   return 0;
 }

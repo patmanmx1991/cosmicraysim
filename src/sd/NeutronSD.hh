@@ -39,9 +39,9 @@ public:
   /// Main constructor from a database table
   NeutronSD(DBTable table);
   /// Simple C++ constructor
-  NeutronSD(std::string name, std::string id, bool autoprocess=true, bool autosave=true);
+  NeutronSD(std::string name, std::string id, bool autoprocess = true, bool autosave = true);
   /// Destructor
-  ~NeutronSD(){};
+  ~NeutronSD() {};
 
   /// Main processing
   G4bool ProcessHits(G4Step*, G4TouchableHistory*);
@@ -51,41 +51,41 @@ public:
 
   // Getter Functions
   // - Return the number of unique track/parent ids
-  inline int GetMultiplicity(){ return fNeutronEnergyMapped.size(); };
+  inline int GetMultiplicity() { return fNeutronEnergyMapped.size(); };
 
-  inline double      GetTotalEnergyDep(){
-      double total_energy=0;
-      for ( std::map< std::pair<G4int, G4int> , double >::iterator  it = fNeutronEnergyMapped.begin(); it != fNeutronEnergyMapped.end(); it++ ) total_energy+= (it->second);
-      return total_energy;
-    };
+  inline double      GetTotalEnergyDep() {
+    double total_energy = 0;
+    for ( std::map< std::pair<G4int, G4int> , double >::iterator  it = fNeutronEnergyMapped.begin(); it != fNeutronEnergyMapped.end(); it++ ) total_energy += (it->second);
+    return total_energy;
+  };
 
-  inline G4ThreeVector GetAverageMomentum(){
-    G4ThreeVector mom(0,0,0);
-    for ( std::map< std::pair<G4int, G4int> , G4ThreeVector >::iterator  it = fNeutronMomMapped.begin(); it != fNeutronMomMapped.end(); it++ ) mom+=it->second;
-    mom/=fHits;
+  inline G4ThreeVector GetAverageMomentum() {
+    G4ThreeVector mom(0, 0, 0);
+    for ( std::map< std::pair<G4int, G4int> , G4ThreeVector >::iterator  it = fNeutronMomMapped.begin(); it != fNeutronMomMapped.end(); it++ ) mom += it->second;
+    mom /= fHits;
     return mom;
   };
 
-      inline double GetAverageTime(){
-        double t = 0;
-        for ( std::map< std::pair<G4int, G4int> , double >::iterator  it = fNeutronTimeMapped.begin(); it != fNeutronTimeMapped.end(); it++ ) t+=it->second;
-        t/=fHits;
-        return t;
-      };
+  inline double GetAverageTime() {
+    double t = 0;
+    for ( std::map< std::pair<G4int, G4int> , double >::iterator  it = fNeutronTimeMapped.begin(); it != fNeutronTimeMapped.end(); it++ ) t += it->second;
+    t /= fHits;
+    return t;
+  };
 
-          inline G4ThreeVector GetAveragePosition(){
-            G4ThreeVector p(0,0,0);
-            for ( std::map< std::pair<G4int, G4int> , G4ThreeVector >::iterator  it = fNeutronPosMapped.begin(); it != fNeutronPosMapped.end(); it++ ) p+=it->second;
-            p/=fHits;
-            return p;
-          };
+  inline G4ThreeVector GetAveragePosition() {
+    G4ThreeVector p(0, 0, 0);
+    for ( std::map< std::pair<G4int, G4int> , G4ThreeVector >::iterator  it = fNeutronPosMapped.begin(); it != fNeutronPosMapped.end(); it++ ) p += it->second;
+    p /= fHits;
+    return p;
+  };
 
-      inline double GetAverageKE(){
-        double ke = 0;
-        for ( std::map< std::pair<G4int, G4int> , double >::iterator  it = fNeutronKEMapped.begin(); it != fNeutronKEMapped.end(); it++ ) ke+=it->second;
-        ke/=fHits;
-        return ke;
-      };
+  inline double GetAverageKE() {
+    double ke = 0;
+    for ( std::map< std::pair<G4int, G4int> , double >::iterator  it = fNeutronKEMapped.begin(); it != fNeutronKEMapped.end(); it++ ) ke += it->second;
+    ke /= fHits;
+    return ke;
+  };
 
 
 protected:
@@ -95,11 +95,11 @@ protected:
   // Need to know about unqiue particles so keep a map data structure
   // Key : A pair of unique track and parent IDs
   // Value : Energy deposited, time
-  std::map< std::pair<G4int,G4int>, double > fNeutronEnergyMapped;// Summed
-  std::map< std::pair<G4int,G4int>, double > fNeutronTimeMapped;// Averaged
-  std::map< std::pair<G4int,G4int>, G4ThreeVector > fNeutronPosMapped;// Averaged
-  std::map< std::pair<G4int,G4int>, G4ThreeVector > fNeutronMomMapped;// Averaged within event
-  std::map< std::pair<G4int,G4int>, G4double > fNeutronKEMapped;// Averaged within event
+  std::map< std::pair<G4int, G4int>, double > fNeutronEnergyMapped; // Summed
+  std::map< std::pair<G4int, G4int>, double > fNeutronTimeMapped; // Averaged
+  std::map< std::pair<G4int, G4int>, G4ThreeVector > fNeutronPosMapped; // Averaged
+  std::map< std::pair<G4int, G4int>, G4ThreeVector > fNeutronMomMapped; // Averaged within event
+  std::map< std::pair<G4int, G4int>, G4double > fNeutronKEMapped; // Averaged within event
 
 };
 
@@ -112,9 +112,9 @@ public:
 
   /// Processor can only be created with an associated
   /// tracker object.
-  NeutronProcessor(NeutronSD* trkr, bool autosave=true);
+  NeutronProcessor(NeutronSD* trkr, bool autosave = true);
   /// Destructor
-  ~NeutronProcessor(){};
+  ~NeutronProcessor() {};
 
   /// Setup Ntuple entries
   bool BeginOfRunAction(const G4Run* run);

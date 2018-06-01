@@ -43,21 +43,13 @@
 #include "G4SystemOfUnits.hh"
 #include "G4ios.hh"
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
 G4ThreadLocal G4Allocator<ScintillatorHit>* ScintillatorHitAllocator = 0;
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 ScintillatorHit::ScintillatorHit() : G4VHit()
 {}
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
 ScintillatorHit::~ScintillatorHit()
 {}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 ScintillatorHit::ScintillatorHit(const ScintillatorHit &right)
     : G4VHit() {
@@ -69,8 +61,6 @@ ScintillatorHit::ScintillatorHit(const ScintillatorHit &right)
     fRot = right.fRot;
     // fPLogV = right.fPLogV;
 }
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 const ScintillatorHit& ScintillatorHit::operator=(const ScintillatorHit &right)
 {
@@ -84,14 +74,15 @@ const ScintillatorHit& ScintillatorHit::operator=(const ScintillatorHit &right)
     return *this;
 }
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+void ScintillatorHit::SetAngles(G4ThreeVector dir) {
+    fThetaXZ = std::atan2(dir.getZ(), dir.getX());
+    fThetaYZ = std::atan2(dir.getZ(), dir.getY());
+}
 
 int ScintillatorHit::operator==(const ScintillatorHit &/*right*/) const
 {
     return 0;
 }
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void ScintillatorHit::Draw()
 {
@@ -108,61 +99,9 @@ void ScintillatorHit::Draw()
     }
 }
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-/*
-const std::map<G4String,G4AttDef>* ScintillatorHit::GetAttDefs() const
-{
-    G4bool isNew;
-    std::map<G4String,G4AttDef>* store
-    = G4AttDefStore::GetInstance("B5ScintillatorHit",isNew);
-
-    if (isNew) {
-        (*store)["HitType"]
-          = G4AttDef("HitType","Hit Type","Physics","","G4String");
-
-        (*store)["ID"]
-          = G4AttDef("ID","ID","Physics","","G4int");
-
-        (*store)["Time"]
-          = G4AttDef("Time","Time","Physics","G4BestUnit","G4double");
-
-        (*store)["Pos"]
-          = G4AttDef("Pos","Position","Physics","G4BestUnit","G4ThreeVector");
-
-        (*store)["LVol"]
-          = G4AttDef("LVol","Logical Volume","Physics","","G4String");
-    }
-    return store;
-}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-std::vector<G4AttValue>* ScintillatorHit::CreateAttValues() const
-{
-    std::vector<G4AttValue>* values = new std::vector<G4AttValue>;
-
-    values
-      ->push_back(G4AttValue("HitType","ScintillatorHit",""));
-    values
-      ->push_back(G4AttValue("ID",G4UIcommand::ConvertToString(fId),""));
-    values
-      ->push_back(G4AttValue("Time",G4BestUnit(fTime,"Time"),""));
-    values
-      ->push_back(G4AttValue("Pos",G4BestUnit(fPos,"Length"),""));
-
-    if (fPLogV)
-        values->push_back(G4AttValue("LVol",fPLogV->GetName(),""));
-    else
-        values->push_back(G4AttValue("LVol"," ",""));
-
-    return values;
-}
-*/
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
 void ScintillatorHit::Print()
 {
-//    G4cout << "  Hodoscope[" << fId << "] " << fTime/ns << " (nsec)" << G4endl;
+    G4cout << "  Hodoscope[" << fId << "] " << fTime / ns << " (nsec)" << G4endl;
     G4cout << G4endl;
     G4cout << G4endl;
     G4cout << G4endl;
@@ -171,6 +110,3 @@ void ScintillatorHit::Print()
     G4cout << G4endl;
     G4cout << G4endl;
 }
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-

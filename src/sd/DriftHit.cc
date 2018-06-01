@@ -44,28 +44,18 @@
 #include "G4ios.hh"
 #include "G4Box.hh"
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
 G4ThreadLocal G4Allocator<DriftChamberHit>* DriftChamberHitAllocator = 0;
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
 DriftChamberHit::DriftChamberHit()
-  : G4VHit(), fLayerID(-1), fTime(0.), fLocalPos(0), fWorldPos(0), fGhost(0), fDrawOption(0)
+    : G4VHit(), fLayerID(-1), fTime(0.), fLocalPos(0), fWorldPos(0), fGhost(0), fDrawOption(0)
 {}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 DriftChamberHit::DriftChamberHit(G4int z)
-  : G4VHit(), fLayerID(z), fTime(0.), fLocalPos(0), fWorldPos(0), fGhost(0), fDrawOption(0)
+    : G4VHit(), fLayerID(z), fTime(0.), fLocalPos(0), fWorldPos(0), fGhost(0), fDrawOption(0)
 {}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 DriftChamberHit::~DriftChamberHit()
 {}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 DriftChamberHit::DriftChamberHit(const DriftChamberHit &right)
     : G4VHit() {
@@ -74,8 +64,6 @@ DriftChamberHit::DriftChamberHit(const DriftChamberHit &right)
     fLocalPos = right.fLocalPos;
     fTime = right.fTime;
 }
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 const DriftChamberHit& DriftChamberHit::operator=(const DriftChamberHit &right)
 {
@@ -86,43 +74,10 @@ const DriftChamberHit& DriftChamberHit::operator=(const DriftChamberHit &right)
     return *this;
 }
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
 int DriftChamberHit::operator==(const DriftChamberHit &/*right*/) const
 {
     return 0;
 }
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-void DriftChamberHit::Draw()
-{
-    G4VVisManager* pVVisManager = G4VVisManager::GetConcreteInstance();
-    if (pVVisManager)
-    {
-        if (fDrawOption == 0){
-        // Build G4Box from Errors
-        G4Box hitbox =  G4Box("hitbox", fabs(fWorldPosErr[0]), fabs(fWorldPosErr[1]), fabs(fWorldPosErr[2]));
-        G4Transform3D tr = G4Transform3D(G4RotationMatrix(), fWorldPos);
-        G4Colour colour(0., 1., 0.);
-    	if (fGhost){
-    	  colour = G4Colour(0.7, 1., 0.);
-    	}
-        G4VisAttributes attribs(colour);
-        pVVisManager->Draw(hitbox, attribs, tr);
-    } else {
-        G4Square square(fWorldPos);
-        square.SetScreenSize(6);
-        square.SetFillStyle(G4Square::filled);
-        G4Colour colour(0., 1., 0.);
-        G4VisAttributes attribs(colour);
-        square.SetVisAttributes(attribs);
-        pVVisManager->Draw(square);
-    }
-    }
-}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 const std::map<G4String, G4AttDef>* DriftChamberHit::GetAttDefs() const
 {
@@ -146,8 +101,6 @@ const std::map<G4String, G4AttDef>* DriftChamberHit::GetAttDefs() const
     return store;
 }
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
 std::vector<G4AttValue>* DriftChamberHit::CreateAttValues() const
 {
     std::vector<G4AttValue>* values = new std::vector<G4AttValue>;
@@ -164,13 +117,32 @@ std::vector<G4AttValue>* DriftChamberHit::CreateAttValues() const
     return values;
 }
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-// void DriftChamberHit::Print() const
-// {
-//     G4cout << "  Layer[" << fLayerID << "] : time " << fTime / ns
-//            << " (nsec) --- local (x,y) " << fLocalPos.x()
-//            << ", " << fLocalPos.y() << G4endl;
-// }
+void DriftChamberHit::Draw()
+{
+    G4VVisManager* pVVisManager = G4VVisManager::GetConcreteInstance();
+    if (pVVisManager)
+    {
+        if (fDrawOption == 0) {
+            // Build G4Box from Errors
+            G4Box hitbox =  G4Box("hitbox", fabs(fWorldPosErr[0]), fabs(fWorldPosErr[1]), fabs(fWorldPosErr[2]));
+            G4Transform3D tr = G4Transform3D(G4RotationMatrix(), fWorldPos);
+            G4Colour colour(0., 1., 0.);
+            if (fGhost) {
+                colour = G4Colour(0.7, 1., 0.);
+            }
+            G4VisAttributes attribs(colour);
+            pVVisManager->Draw(hitbox, attribs, tr);
+        } else {
+            G4Square square(fWorldPos);
+            square.SetScreenSize(6);
+            square.SetFillStyle(G4Square::filled);
+            G4Colour colour(0., 1., 0.);
+            G4VisAttributes attribs(colour);
+            square.SetVisAttributes(attribs);
+            pVVisManager->Draw(square);
+        }
+    }
+}
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+

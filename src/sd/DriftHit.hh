@@ -42,76 +42,58 @@
 class G4AttDef;
 class G4AttValue;
 
-/// Drift chamber hit
-///
-/// It records:
-/// - the layer ID
-/// - the particle time
-/// - the particle local and global positions
-
+// ----------------------------------------------------------------------
+// Drift Hit Object
 class DriftChamberHit : public G4VHit
 {
 public:
+
+    // COnstructors
     DriftChamberHit();
     DriftChamberHit(G4int z);
     DriftChamberHit(const DriftChamberHit &right);
     virtual ~DriftChamberHit();
 
+    // Allocators
     const DriftChamberHit& operator=(const DriftChamberHit &right);
     int operator==(const DriftChamberHit &right) const;
-
     inline void *operator new(size_t);
     inline void operator delete(void *aHit);
 
-    void Draw();
+    // Attributes
     virtual const std::map<G4String, G4AttDef>* GetAttDefs() const;
     virtual std::vector<G4AttValue>* CreateAttValues() const;
-    // virtual void Print() const;
 
+    // Vis Options
+    void Draw();
+
+    // Set functions
+    void SetGhost(bool ghost) { fGhost = ghost; };
+    void SetDrawOption(int i) { fDrawOption = i; };
     void SetLayerID(G4int z) { fLayerID = z; }
-    G4int GetLayerID() const { return fLayerID; }
-
     void SetTime(G4double t) { fTime = t; }
-    G4double GetTime() const { return fTime; }
-
     void SetLocalPos(G4ThreeVector xyz) { fLocalPos = xyz; }
     void SetLocalPosErr(G4ThreeVector xyz) { fLocalPosErr = xyz; }
-
     void SetWorldPos(G4ThreeVector xyz) { fWorldPos = xyz; }
     void SetWorldPosErr(G4ThreeVector xyz) { fWorldPosErr = xyz; }
-  //<<<<<<< HEAD
-
     void SetLocalPosTrue(G4ThreeVector xyz) { fLocalPosTrue = xyz; }
     void SetWorldPosTrue(G4ThreeVector xyz) { fWorldPosTrue = xyz; }
 
-    void SetGhost(bool ghost) { fGhost = ghost; };
-    void SetDrawOption(int i){ fDrawOption = i; };
+    // Get Functions
+    inline bool IsGhost() { return fGhost; };
+    inline G4double GetTime() const { return fTime; }
+    inline G4int GetLayerID() const { return fLayerID; }
+    inline G4ThreeVector GetPos() const { return fWorldPos; }
+    inline G4ThreeVector GetPosErr() const { return fWorldPosErr; }
+    inline G4ThreeVector GetLocalPos() const { return fLocalPos; }
+    inline G4ThreeVector GetLocalPosErr() const { return fLocalPosErr; }
+    inline G4ThreeVector GetWorldPos() const { return fWorldPos; }
+    inline G4ThreeVector GetWorldPosErr() const { return fWorldPosErr; }
+    inline G4ThreeVector GetLocalPosTrue() const { return fLocalPosTrue; }
+    inline G4ThreeVector GetWorldPosTrue() const { return fWorldPosTrue; }
 
-    bool IsGhost() { return fGhost; };
-  //=======
-	//    G4ThreeVector GetWorldPos() const { return fWorldPos; }
-  //    G4ThreeVector GetWorldPosErr() const { return fWorldPosErr; }
-  //>>>>>>> chrisfork/new
-
-    G4ThreeVector GetPos() const { return fWorldPos; }
-    G4ThreeVector GetPosErr() const { return fWorldPosErr; }
-
-  //<<<<<<< HEAD
-    G4ThreeVector GetLocalPos() const { return fLocalPos; }
-    G4ThreeVector GetLocalPosErr() const { return fLocalPosErr; }
-
-    G4ThreeVector GetWorldPos() const { return fWorldPos; }
-    G4ThreeVector GetWorldPosErr() const { return fWorldPosErr; }
-
-    G4ThreeVector GetLocalPosTrue() const { return fLocalPosTrue; }
-    G4ThreeVector GetWorldPosTrue() const { return fWorldPosTrue; }
-
-
-  //=======
-  //    void SetGhost(bool g) { fGhost = g; };
-  //    bool IsGhost() { return fGhost; };
-  //>>>>>>> chrisfork/new
 private:
+
     G4int fLayerID;
     G4double fTime;
 
@@ -128,6 +110,8 @@ private:
 
 };
 
+// ----------------------------------------------------------------------
+// Allocators
 typedef G4THitsCollection<DriftChamberHit> DriftChamberHitsCollection;
 
 extern G4ThreadLocal G4Allocator<DriftChamberHit>* DriftChamberHitAllocator;
@@ -143,7 +127,5 @@ inline void DriftChamberHit::operator delete(void* aHit)
 {
     DriftChamberHitAllocator->FreeSingle((DriftChamberHit*) aHit);
 }
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
+// ----------------------------------------------------------------------
 #endif

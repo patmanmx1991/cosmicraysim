@@ -31,6 +31,8 @@
 #ifndef ScintillatorHit_h
 #define ScintillatorHit_h
 
+#include <math.h>
+
 #include "G4VHit.hh"
 #include "G4THitsCollection.hh"
 #include "G4Allocator.hh"
@@ -40,75 +42,59 @@
 #include "G4RotationMatrix.hh"
 #include "G4ParticleDefinition.hh"
 
-#include <math.h>
-
 class G4AttDef;
 class G4AttValue;
 
+// ----------------------------------------------------------------------
 /// Hodoscope hit
 ///
 /// It records:
 /// - the strip ID
 /// - the particle time
 /// - the strip logical volume, its position and rotation
-
 class ScintillatorHit : public G4VHit
 {
 public:
 
+    // Constructors
     ScintillatorHit();
     ScintillatorHit(const ScintillatorHit &right);
     virtual ~ScintillatorHit();
 
+    // Allocators
     const ScintillatorHit& operator=(const ScintillatorHit &right);
     int operator==(const ScintillatorHit &right) const;
-
     inline void *operator new(size_t);
     inline void operator delete(void*aHit);
 
-   void Draw();
-   // virtual const std::map<G4String,G4AttDef>* GetAttDefs() const;
-   // virtual std::vector<G4AttValue>* CreateAttValues() const;
+    // Draw and print
+    void Draw();
     void Print();
 
+    // Set values
+    inline void SetType(G4int val) {fType = val; }
+    inline void SetTime(G4double val) { fTime = val; }
+    inline void SetEdep(G4double val) {  fEdep = val; }
+    inline void AddEdep(G4double val) { fEdep += val; }
+    inline void SetKinE(G4double val) {  fKinE = val; }
+    inline void SetPos(G4ThreeVector xyz) { fPos = xyz; }
+    inline void SetVolPos(G4ThreeVector xyz) { fVolPos = xyz; }
+    inline void SetRot(G4RotationMatrix rmat) { fRot = rmat; }
+    inline void SetParticleType(G4int ptype) {particle_type = ptype;}
+    void SetAngles(G4ThreeVector dir);
 
-
-    G4int GetID() const { return fId; }
-    G4int GetType() const { return fType; }
-    void SetType(G4int val){fType=val; }
-
-    void SetTime(G4double val) { fTime = val; }
-    G4double GetTime() const { return fTime; }
-
-    void SetEdep(G4double val) {  fEdep=val; }
-    void AddEdep(G4double val) { fEdep += val; }
-    G4double GetEdep() const { return fEdep; }
-
-    void SetKinE(G4double val) {  fKinE=val; }
-    G4double GetKinE() const { return fKinE; }
-
-    void SetAngles(G4ThreeVector dir) {
-        fThetaXZ = std::atan2(dir.getZ(),dir.getX());
-        fThetaYZ = std::atan2(dir.getZ(),dir.getY());
-    }
-
-    G4double GetThetaXZ() const { return fThetaXZ; }
-    G4double GetThetaYZ() const { return fThetaYZ; }
-
-    void SetPos(G4ThreeVector xyz) { fPos = xyz; }
-    G4ThreeVector GetPos() const { return fPos; }
-
-    void SetVolPos(G4ThreeVector xyz) { fVolPos = xyz; }
-    G4ThreeVector GetVolPos() const { return fVolPos; }
-
-    void SetRot(G4RotationMatrix rmat) { fRot = rmat; }
-    G4RotationMatrix GetRot() const { return fRot; }
-
-    //void SetLogV(G4LogicalVolume* val) { fPLogV = val; }
-    //const G4LogicalVolume* GetLogV() const { return fPLogV; }
-
-    void SetParticleType(G4int ptype){particle_type = ptype;}
-    G4int GetParticlePDGEncoding(){return particle_type;}
+    // Get all the values
+    inline G4int GetID() const { return fId; }
+    inline G4int GetType() const { return fType; }
+    inline G4double GetTime() const { return fTime; }
+    inline G4double GetEdep() const { return fEdep; }
+    inline G4double GetKinE() const { return fKinE; }
+    inline G4double GetThetaXZ() const { return fThetaXZ; }
+    inline G4double GetThetaYZ() const { return fThetaYZ; }
+    inline G4ThreeVector GetPos() const { return fPos; }
+    inline G4ThreeVector GetVolPos() const { return fVolPos; }
+    inline G4RotationMatrix GetRot() const { return fRot; }
+    inline G4int GetParticlePDGEncoding() {return particle_type;}
 
 private:
     G4int fId;
@@ -125,9 +111,10 @@ private:
     G4ThreeVector fPos;
     G4ThreeVector fVolPos;
     G4RotationMatrix fRot;
-    //const G4LogicalVolume* fPLogV;
 };
 
+// ----------------------------------------------------------------------
+// Allocators
 typedef G4THitsCollection<ScintillatorHit> ScintillatorHitsCollection;
 
 extern G4ThreadLocal G4Allocator<ScintillatorHit>* ScintillatorHitAllocator;
@@ -142,9 +129,7 @@ inline void* ScintillatorHit::operator new(size_t)
 
 inline void ScintillatorHit::operator delete(void*aHit)
 {
-   ScintillatorHitAllocator->FreeSingle((ScintillatorHit*) aHit);
+    ScintillatorHitAllocator->FreeSingle((ScintillatorHit*) aHit);
 }
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
+// ----------------------------------------------------------------------
 #endif
