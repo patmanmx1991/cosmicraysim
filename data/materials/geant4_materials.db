@@ -1,0 +1,22 @@
+{
+  name: "MATERIAL",
+  index: "G4_C",
+  color: [0.5,0.5,0.5,0.5],
+  drawstyle: "solid"
+}
+
+{
+  name: "MATERIAL",
+  index: "G4_Pb",
+  color: [0.1,0.1,0.6,0.5],
+  drawstyle: "solid"
+}
+
+{
+  name: "MATERIAL",
+  index: "G4_U",
+  color: [0.0,1.0,0.0,0.5],
+  drawstyle: "solid"
+}
+
+

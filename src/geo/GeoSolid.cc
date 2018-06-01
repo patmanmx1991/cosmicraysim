@@ -66,35 +66,14 @@ G4LogicalVolume* GeoSolid::ConstructLogicalVolume(DBTable table, G4VSolid* solid
   G4LogicalVolume* geo_logic = new G4LogicalVolume(solid, geo_material, name);
 
 
-  // Optional visualization parts
-  G4VisAttributes *vis = new G4VisAttributes();
-  if (table.Has("color")) {
-    std::vector<double> color = table.GetVecD("color");
-    if (color.size() == 3) // RGB
-      vis->SetColour(G4Colour(color[0], color[1], color[2]));
-    else if (color.size() == 4) // RGBA
-      vis->SetColour(G4Colour(color[0], color[1], color[2], color[3]));
-  }
-
+  // Construct visual attributes from the materials table first
+  // Then override from this table if necessary.
   if (table.Has("optimize")) {
     int optimize = table.GetI("optimize");
     if (optimize == 0) geo_logic->SetOptimisation(false);
   }
 
-  if (table.Has("drawstyle")) {
-    std::string drawstyle = table.GetS("drawstyle");
-    if (drawstyle == "wireframe")
-      vis->SetForceWireframe(true);
-    else if (drawstyle == "solid")
-      vis->SetForceSolid(true);
-    else throw;
-  }
-
-  if (table.Has("force_auxedge")) {
-    int force_auxedge = table.GetI("force_auxedge");
-    vis->SetForceAuxEdgeVisible(force_auxedge == 1);
-  }
-
+  G4VisAttributes* vis = MaterialFactory::GetVisForMaterial(table);
   geo_logic->SetVisAttributes(vis);
 
   // Check for invisible flag last

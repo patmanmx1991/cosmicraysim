@@ -3,6 +3,8 @@
 
 #include <iostream>
 
+#include "db/DBTable.hh"
+
 class G4Material;
 class G4Element;
 
@@ -16,6 +18,14 @@ G4Element* GetElement(std::string name);
 
 /// Function to create detector objects from tables
 G4Material* GetMaterial(std::string name);
+
+/// Get some logical visualisation attributes depending on
+/// material defaults
+G4VisAttributes* GetVisForMaterial(DBTable table);
+
+/// Get vis just based on material database name
+G4VisAttributes* GetVisForMaterial(std::string name);
+
 
 } // - namespace MaterialFactory
 } // - namespace COSMIC

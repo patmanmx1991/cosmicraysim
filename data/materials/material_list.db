@@ -1,5 +1,14 @@
 {
   name: "MATERIAL",
+  index: "G4_C",
+  color: [0.0,0.9,0.2,0.5],
+  drawstyle: "solid"
+}
+
+
+
+{
+  name: "MATERIAL",
   index: "AWE_GASMIX1",
   element_names: ["Ar","C","O","H"],
   element_counts: [0.925,0.75,0.100,0.100],
@@ -31,6 +40,8 @@
   element_counts: [0.98, 0.02],
   density: 8.05,
   density_units: "g/cm3"
+    color: [0.0,0.3,0.8,0.5],
+  drawstyle: "solid"
 }
 
 {
