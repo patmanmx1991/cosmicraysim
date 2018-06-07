@@ -106,6 +106,8 @@ void BristolPoCAFitter::ReadInputTTree(TTree* t, std::string prefixa, std::strin
 	t->SetBranchAddress( (prefixb + "_drift_yz").c_str(), &below_drift_yz);
 	t->SetBranchAddress( (prefixb + "_drift_ye").c_str(), &below_drift_ye);
 
+	ClearRPCVectors();
+	ClearDriftVectors();
 }
 
 void BristolPoCAFitter::DeleteContainers() {
@@ -156,6 +158,45 @@ void BristolPoCAFitter::DeleteContainers() {
 
 }
 
+void BristolPoCAFitter::ApplyVectorOffset(std::vector<double>* vec){
+	if (!vec) return;
+	for (int i = 0; i < vec->size(); i++){
+		(*vec)[i] = (*vec)[i] - 250.0/1.5 + 250.0; 
+	}
+}
+
+void BristolPoCAFitter::ApplyOffsets() {
+
+	if (above_rpc_xx) ApplyVectorOffset(above_rpc_xx);
+	if (above_rpc_xt) ApplyVectorOffset(above_rpc_xt);
+
+	if (above_rpc_yy) ApplyVectorOffset(above_rpc_yy);
+	if (above_rpc_yt) ApplyVectorOffset(above_rpc_yt);
+
+	if (above_drift_xx) ApplyVectorOffset(above_drift_xx);
+	if (above_drift_xg) ApplyVectorOffset(above_drift_xg);
+	if (above_drift_xt) ApplyVectorOffset(above_drift_xt);
+
+	if (above_drift_yy) ApplyVectorOffset(above_drift_yy);
+	if (above_drift_yg) ApplyVectorOffset(above_drift_yg);
+	if (above_drift_yt) ApplyVectorOffset(above_drift_yt);
+
+	if (below_rpc_xx) ApplyVectorOffset(below_rpc_xx);
+	if (below_rpc_xt) ApplyVectorOffset(below_rpc_xt);
+
+	if (below_rpc_yy) ApplyVectorOffset(below_rpc_yy);
+	if (below_rpc_yt) ApplyVectorOffset(below_rpc_yt);
+
+	if (below_drift_xx) ApplyVectorOffset(below_drift_xx);
+	if (below_drift_xg) ApplyVectorOffset(below_drift_xg);
+	if (below_drift_xt) ApplyVectorOffset(below_drift_xt);
+
+	if (below_drift_yy) ApplyVectorOffset(below_drift_yy);
+	if (below_drift_yg) ApplyVectorOffset(below_drift_yg);
+	if (below_drift_yt) ApplyVectorOffset(below_drift_yt);
+
+}
+
 
 // ------------------------------------------------------------------------
 // Main Fit Evaluator
@@ -189,6 +230,8 @@ double BristolPoCAFitter::DoEval(const double* x) const {
 	chi2 += GetChi2BelowRPCX( pointx, momx1, pointz );
 	chi2 += GetChi2BelowRPCY( pointy, momy1, pointz );
 
+	// std::cout << " Total Chi2 After RPC = " << chi2 << " " << GetChi2AboveRPCX( pointx, momx2, pointz ) << " " << GetChi2AboveRPCY( pointy, momy2, pointz ) << " " << GetChi2BelowRPCX( pointx, momx1, pointz ) << " " << GetChi2BelowRPCY( pointy, momy1, pointz ) << std::endl;
+
 	chi2 += GetChi2AboveDriftX( pointx, momx2, pointz );
 	chi2 += GetChi2AboveDriftY( pointy, momy2, pointz );
 	chi2 += GetChi2BelowDriftX( pointx, momx1, pointz );
@@ -196,17 +239,22 @@ double BristolPoCAFitter::DoEval(const double* x) const {
 
 	// std::cout << "Print Level : " << ROOT::Minuit2::MnPrint::Level() << std::endl;
 
-	// std::cout << " Total Chi2 = " << chi2 << std::endl;
+	// std::cout << " Total Chi2 After Drift Too = " << chi2 << std::endl;
 	return chi2;
 
 }
 
 double BristolPoCAFitter::GetChi2AboveRPCX( double pointx, double momx1, double pointz ) const {
 
+	if (!fUseRPC)   return 0.0;
 	if (!fUseARPCX) return 0.0;
 
 	double chi2 = 0.0;
 	for (uint i = 0; i < above_rpc_xx->size(); i++) {
+		// double t = pointz - above_rpc_xz->at(i);
+		// t*=-1;
+		// double d = pow(  above_rpc_xx->at(i) - (pointx + momx1*t), 2);
+		// chi2 += d / pow(above_rpc_xe->at(i), 2);
 		chi2 += pow( ( above_rpc_xx->at(i) - (pointx + momx1 * (pointz - above_rpc_xz->at(i))) ) / above_rpc_xe->at(i), 2 );
 	}
 
@@ -215,10 +263,15 @@ double BristolPoCAFitter::GetChi2AboveRPCX( double pointx, double momx1, double 
 
 double BristolPoCAFitter::GetChi2AboveRPCY( double pointy, double momy1, double pointz ) const {
 
+	if (!fUseRPC)   return 0.0;
 	if (!fUseARPCY) return 0.0;
 
 	double chi2 = 0.0;
 	for (uint i = 0; i < above_rpc_yy->size(); i++) {
+		// double t = pointz - above_rpc_yz->at(i);
+		// t*=-1;
+		// double d = pow(  above_rpc_yy->at(i) - (pointy + momy1*t), 2);
+		// chi2 += d / pow(above_rpc_ye->at(i), 2);
 		chi2 += pow( ( above_rpc_yy->at(i) - (pointy + momy1 * (pointz - above_rpc_yz->at(i))) ) / above_rpc_ye->at(i), 2 );
 	}
 
@@ -228,6 +281,7 @@ double BristolPoCAFitter::GetChi2AboveRPCY( double pointy, double momy1, double 
 
 double BristolPoCAFitter::GetChi2AboveDriftX( double pointx, double momx1, double pointz ) const {
 
+	if (!fUseDrift) return 0.0;
 	if (!fUseADriftX) return 0.0;
 
 	double chi2 = 0.0;
@@ -246,6 +300,7 @@ double BristolPoCAFitter::GetChi2AboveDriftX( double pointx, double momx1, doubl
 
 double BristolPoCAFitter::GetChi2AboveDriftY( double pointy, double momy1, double pointz ) const {
 
+	if (!fUseDrift) return 0.0;
 	if (!fUseADriftY) return 0.0;
 
 	double chi2 = 0.0;
@@ -263,10 +318,15 @@ double BristolPoCAFitter::GetChi2AboveDriftY( double pointy, double momy1, doubl
 
 double BristolPoCAFitter::GetChi2BelowRPCX( double pointx, double momx2, double pointz ) const {
 
+	if (!fUseRPC)   return 0.0;
 	if (!fUseBRPCX) return 0.0;
 
 	double chi2 = 0.0;
 	for (uint i = 0; i < below_rpc_xx->size(); i++) {
+		// double t = pointz - below_rpc_xz->at(i);
+		// t*=-1;
+		// double d = pow(  below_rpc_xx->at(i) - (pointx + momx2*t), 2);
+		// chi2 += d / pow(below_rpc_xe->at(i), 2);
 		chi2 += pow( ( below_rpc_xx->at(i) - (pointx + momx2 * (pointz - below_rpc_xz->at(i))) ) / below_rpc_xe->at(i), 2 );
 	}
 
@@ -275,10 +335,15 @@ double BristolPoCAFitter::GetChi2BelowRPCX( double pointx, double momx2, double 
 
 double BristolPoCAFitter::GetChi2BelowRPCY( double pointy, double momy2, double pointz ) const {
 
+	if (!fUseRPC)   return 0.0;
 	if (!fUseBRPCY) return 0.0;
 
 	double chi2 = 0.0;
 	for (uint i = 0; i < below_rpc_yy->size(); i++) {
+		// double t = pointz - below_rpc_yz->at(i);
+		// t*=-1;
+		// double d = pow(  below_rpc_yy->at(i) - (pointy + momy2*t), 2);
+		// chi2 += d / pow(below_rpc_ye->at(i), 2);
 		chi2 += pow( ( below_rpc_yy->at(i) - (pointy + momy2 * (pointz - below_rpc_yz->at(i))) ) / below_rpc_ye->at(i), 2 );
 	}
 
@@ -288,6 +353,7 @@ double BristolPoCAFitter::GetChi2BelowRPCY( double pointy, double momy2, double 
 
 double BristolPoCAFitter::GetChi2BelowDriftX( double pointx, double momx2, double pointz ) const {
 
+	if (!fUseDrift) return 0.0;
 	if (!fUseBDriftX) return 0.0;
 
 	double chi2 = 0.0;
@@ -306,6 +372,7 @@ double BristolPoCAFitter::GetChi2BelowDriftX( double pointx, double momx2, doubl
 
 double BristolPoCAFitter::GetChi2BelowDriftY( double pointy, double momy2, double pointz ) const {
 
+	if (!fUseDrift) return 0.0;
 	if (!fUseBDriftY) return 0.0;
 
 	double chi2 = 0.0;
@@ -346,7 +413,7 @@ void BristolPoCAFitter::FillSingleContainers(int drifttype) {
 	SetHitUsage(drifttype);
 
 	// RPC Hits First
-	if (fUseARPCX) {
+	if (fUseARPCX and fUseRPC) {
 		for (uint j = 0; j < above_rpc_xx->size(); j++) {
 			values_rx.push_back(above_rpc_xx->at(j));
 			values_re.push_back(above_rpc_xe->at(j));
@@ -354,7 +421,7 @@ void BristolPoCAFitter::FillSingleContainers(int drifttype) {
 		}
 	}
 
-	if (fUseARPCY) {
+	if (fUseARPCY and fUseRPC) {
 		for (uint j = 0; j < above_rpc_yy->size(); j++) {
 			values_rx.push_back(above_rpc_yy->at(j));
 			values_re.push_back(above_rpc_ye->at(j));
@@ -362,7 +429,7 @@ void BristolPoCAFitter::FillSingleContainers(int drifttype) {
 		}
 	}
 
-	if (fUseBRPCX) {
+	if (fUseBRPCX and fUseRPC) {
 		for (uint j = 0; j < below_rpc_xx->size(); j++) {
 			values_rx.push_back(below_rpc_xx->at(j));
 			values_re.push_back(below_rpc_xe->at(j));
@@ -370,7 +437,7 @@ void BristolPoCAFitter::FillSingleContainers(int drifttype) {
 		}
 	}
 
-	if (fUseBRPCY) {
+	if (fUseBRPCY and fUseRPC) {
 		for (uint j = 0; j < below_rpc_yy->size(); j++) {
 			values_rx.push_back(below_rpc_yy->at(j));
 			values_re.push_back(below_rpc_ye->at(j));
@@ -379,7 +446,7 @@ void BristolPoCAFitter::FillSingleContainers(int drifttype) {
 	}
 
 	// Now Drift Hits
-	if (fUseADriftX) {
+	if (fUseADriftX and fUseDrift) {
 		for (uint j = 0; j < above_drift_xx->size(); j++) {
 			values_x.push_back(above_drift_xx->at(j));
 			values_e.push_back(above_drift_xe->at(j));
@@ -388,7 +455,7 @@ void BristolPoCAFitter::FillSingleContainers(int drifttype) {
 		}
 	}
 
-	if (fUseADriftY) {
+	if (fUseADriftY and fUseDrift) {
 		for (uint j = 0; j < above_drift_yy->size(); j++) {
 			values_x.push_back(above_drift_yy->at(j));
 			values_e.push_back(above_drift_ye->at(j));
@@ -397,7 +464,7 @@ void BristolPoCAFitter::FillSingleContainers(int drifttype) {
 		}
 	}
 
-	if (fUseBDriftX) {
+	if (fUseBDriftX and fUseDrift) {
 		for (uint j = 0; j < below_drift_xx->size(); j++) {
 			values_x.push_back(below_drift_xx->at(j));
 			values_e.push_back(below_drift_xe->at(j));
@@ -406,7 +473,7 @@ void BristolPoCAFitter::FillSingleContainers(int drifttype) {
 		}
 	}
 
-	if (fUseBDriftY) {
+	if (fUseBDriftY and fUseDrift) {
 		for (uint j = 0; j < below_drift_yy->size(); j++) {
 			values_x.push_back(below_drift_yy->at(j));
 			values_e.push_back(below_drift_ye->at(j));
@@ -1112,6 +1179,59 @@ double BristolPoCAFitter::GetHighestYZBelow(){
 	FillSingleContainers(kFitAllBelowY);
 	SetVectorC( below_drift_yc );
 	return GetHighestZ();
+}
+
+
+void BristolPoCAFitter::ClearRPCVectors(){
+
+	if (above_rpc_xx) above_rpc_xx->clear();
+	if (above_rpc_xt) above_rpc_xt->clear();
+	if (above_rpc_xz) above_rpc_xz->clear();
+	if (above_rpc_xe) above_rpc_xe->clear();
+
+	if (above_rpc_yy) above_rpc_yy->clear();
+	if (above_rpc_yt) above_rpc_yt->clear();
+	if (above_rpc_yz) above_rpc_yz->clear();
+	if (above_rpc_ye) above_rpc_ye->clear();
+
+	if (below_rpc_xx) below_rpc_xx->clear();
+	if (below_rpc_xt) below_rpc_xt->clear();
+	if (below_rpc_xz) below_rpc_xz->clear();
+	if (below_rpc_xe) below_rpc_xe->clear();
+
+	if (below_rpc_yy) below_rpc_yy->clear();
+	if (below_rpc_yt) below_rpc_yt->clear();
+	if (below_rpc_yz) below_rpc_yz->clear();
+	if (below_rpc_ye) below_rpc_ye->clear();
+
+}
+
+void BristolPoCAFitter::ClearDriftVectors(){
+
+	if (above_drift_xx) above_drift_xx->clear();
+	if (above_drift_xg) above_drift_xg->clear();
+	if (above_drift_xt) above_drift_xt->clear();
+	if (above_drift_xz) above_drift_xz->clear();
+	if (above_drift_xe) above_drift_xe->clear();
+
+	if (above_drift_yy) above_drift_yy->clear();
+	if (above_drift_yg) above_drift_yg->clear();
+	if (above_drift_yt) above_drift_yt->clear();
+	if (above_drift_yz) above_drift_yz->clear();
+	if (above_drift_ye) above_drift_ye->clear();
+
+	if (below_drift_xx) below_drift_xx->clear();
+	if (below_drift_xg) below_drift_xg->clear();
+	if (below_drift_xt) below_drift_xt->clear();
+	if (below_drift_xz) below_drift_xz->clear();
+	if (below_drift_xe) below_drift_xe->clear();
+
+	if (below_drift_yy) below_drift_yy->clear();
+	if (below_drift_yg) below_drift_yg->clear();
+	if (below_drift_yt) below_drift_yt->clear();
+	if (below_drift_yz) below_drift_yz->clear();
+	if (below_drift_ye) below_drift_ye->clear();
+
 }
 
 }

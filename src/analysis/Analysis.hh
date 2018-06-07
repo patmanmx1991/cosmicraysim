@@ -107,7 +107,6 @@ public:
   /// Return current exposure from flux processor
   inline G4double GetExposureTime() { return fFluxProcessor->GetExposureTime(); };
 
-
   /// Set the id for output files
   void SetOutputTag(std::string s) { fOutputTag = s; };
   void SetOutputRun(int i) { fRunID = i; };
@@ -118,10 +117,32 @@ public:
   int GetNEvents() { return fGeneratedEvents; };
   int GetNSavedEvents() { return fSavedEvents; };
 
-
   void SetChunkSize(int i) { fChunkSize = i; };
   int GetChunkSize() { return fChunkSize; };
 
+  void ResetCounters();
+  double GetEventRate();
+
+  void SetRequiredExposure(double d){ fRequiredExposure = d; };
+  void SetRequiredTriggers(int i){ fRequiredTriggers = i; };
+
+  double GetRequiredExposure(){ return fRequiredExposure; };
+  double GetRequiredTriggers(){ return fRequiredTriggers; };
+
+  void CheckAbortState();
+
+  enum RunMode {
+    kEventMode,
+    kTimeExposureMode,
+    kTriggerMode
+  };
+
+  void SetMode(int i){ fRunMode = i;};
+
+  void PrintProgress(int curcount, int totalcount);
+
+
+  void StartTheClock(){ fStartTime = time(0); };
 protected:
 
   static Analysis *fPrimary; ///< Singleton Object
@@ -147,8 +168,14 @@ protected:
   std::string fOutputTag;
   int fRunID;
   int fSubRunID;
-
+  int fRunMode;
   int fChunkSize;
+
+  long int fStartTime;
+  double fLastCount;
+  
+  G4double fRequiredExposure;
+  G4int fRequiredTriggers;
 
 };
 

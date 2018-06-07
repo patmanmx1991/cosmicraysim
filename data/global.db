@@ -1,7 +1,7 @@
 {
   name: "GLOBAL",
   index: "config",
-  flux: "shukla",
+  flux: "cry",
   physics: "QGSP_BERT_HP",
   batchcommands: "",
 }

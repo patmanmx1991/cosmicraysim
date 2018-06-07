@@ -100,7 +100,7 @@
   size: ["rpc_x","rpc_y","rpc_thickness"]
   material: "BRISTOL_GASMIX1",
   mother: "volume", 
-  sensitive: "bristol_rpc_true"
+  sensitive: "bristol_rpc_rec"
   color: [0.0,0.5,0.0,0.5]
   drawstyle: "solid",
 }

@@ -18,6 +18,7 @@
 #include <unistd.h>
 #include <sys/time.h>
 #include <sys/resource.h>
+#include <math.h>
 
 #include <G4UImanager.hh>
 #include <G4UIterminal.hh>
@@ -175,6 +176,14 @@ int gProcessingChunks = 10000; ///< By default what the chunk size should be
 std::string gInputFile;
 std::string gOutputTag = "trackfit";
 
+enum {
+  kUseAll,
+  kUseRPC,
+  kUseDrift
+};
+
+int gInputMode = kUseAll;
+
 // User Defined Geometry files
 std::vector<std::string> gGeomtryFiles;
 
@@ -233,6 +242,12 @@ int main(int argc, char** argv) {
     } else if (std::strcmp(argv[i], "-o") == 0) {
       gOutputTag = std::string(argv[++i]);
 
+    } else if (std::strcmp(argv[i], "--rpc-only") == 0) {
+      gInputMode = kUseRPC;
+
+    } else if (std::strcmp(argv[i], "--drift-only") == 0) {
+      gInputMode = kUseDrift;
+
       // Print Splash Screen
     } else if (std::strcmp(argv[i], "-h") == 0) {
       PrintHelpScreen();
@@ -272,6 +287,15 @@ int main(int argc, char** argv) {
 
   BristolPoCAFitter* pocafit = new BristolPoCAFitter();
   pocafit->ReadInputTTree(t, prefixa, prefixb);
+
+
+  // Read Truth Trees
+  TBranch* truthbranch = NULL ; //(TBranch*) t->GetBranch(prefixa + "_volume_t".c_str());
+  if (truthbranch){
+    std::cout << "========================================= " << std::endl;
+    std::cout << "APP: Reading Truth Inputs" << std::endl;
+  }
+
 
   // Make output File
   std::cout << "========================================= " << std::endl;
@@ -333,6 +357,7 @@ int main(int argc, char** argv) {
   std::cout << "APP: Creating Minimizer" << std::endl;
 
   ROOT::Minuit2::MnPrint::SetLevel(-1);
+  gErrorIgnoreLevel = 1001;
 
   std::vector<bool> combobx;
   std::vector<bool> comboby;
@@ -350,15 +375,43 @@ int main(int argc, char** argv) {
 
     if (i % 10000 == 0) std::cout << "Processed " << i << "/" << n << " events. Saved : " << savecount << std::endl;
 
+    // Clear vectors if not using certain components
+    if (gInputMode == kUseRPC) {
+      pocafit->ClearDriftVectors();
+      pocafit->SetUseRPC(true);
+      pocafit->SetUseDrift(false);
+
+    }
+    if (gInputMode == kUseDrift) {
+      pocafit->ClearRPCVectors();
+      pocafit->SetUseRPC(false);
+      pocafit->SetUseDrift(true);
+    }
+
+    pocafit->ApplyOffsets();
+
+
+    // std::cout << " NDrift : " << pocafit->GetNAboveDriftX()<< " " << pocafit->GetNAboveDriftY()<< " " << pocafit->GetNBelowDriftX()<< " " << pocafit->GetNBelowDriftY() << std::endl;
+
+
     // Apply NHit cuts
-    if (pocafit->GetNAboveRPCX()   < fMinARPCX) continue;
-    if (pocafit->GetNAboveRPCY()   < fMinARPCY) continue;
-    if (pocafit->GetNBelowRPCX()   < fMinBRPCX) continue;
-    if (pocafit->GetNBelowRPCY()   < fMinBRPCY) continue;
-    if (pocafit->GetNAboveDriftX() < fMinADriftX) continue;
-    if (pocafit->GetNAboveDriftY() < fMinADriftY) continue;
-    if (pocafit->GetNBelowDriftX() < fMinBDriftX) continue;
-    if (pocafit->GetNBelowDriftY() < fMinBDriftY) continue;
+    if (gInputMode == kUseRPC || gInputMode == kUseAll) {
+      if (pocafit->GetNAboveRPCX()   < fMinARPCX) continue;
+      if (pocafit->GetNAboveRPCY()   < fMinARPCY) continue;
+      if (pocafit->GetNBelowRPCX()   < fMinBRPCX) continue;
+      if (pocafit->GetNBelowRPCY()   < fMinBRPCY) continue;
+    }
+
+    if (gInputMode == kUseDrift || gInputMode == kUseAll) {
+      if (pocafit->GetNAboveDriftX() < fMinADriftX) continue;
+      if (pocafit->GetNAboveDriftY() < fMinADriftY) continue;
+      if (pocafit->GetNBelowDriftX() < fMinBDriftX) continue;
+      if (pocafit->GetNBelowDriftY() < fMinBDriftY) continue;
+    }
+    // std::cout << "Got Hits " << std::endl;
+    // std::cout << " NDrift : Below : " << pocafit->GetNBelowDriftX() << " " << pocafit->GetNBelowDriftY() << std::endl;
+    // std::cout << " NDrift : Above : " << pocafit->GetNAboveDriftX() << " " << pocafit->GetNAboveDriftY() << std::endl;
+    
 
     // Get the best fit drift combinations for this event
     if (pocafit->GetNAboveDriftX()) {
@@ -377,6 +430,7 @@ int main(int argc, char** argv) {
       comboby = pocafit->GetBestComboForDriftHits(BristolPoCAFitter::kFitAllBelowY);
       pocafit->SetBelowComboY(&comboby);
     }
+
 
     // Get the starting track values for above and below
     pocafit->SetUseAll();
@@ -430,6 +484,7 @@ int main(int argc, char** argv) {
     double chi2adrifty = pocafit->GetChi2AboveDriftY( stf_above_y, stf_above_py, 0.0 );
     double chi2bdriftx = pocafit->GetChi2BelowDriftX( stf_below_x, stf_below_px, 0.0 );
     double chi2bdrifty = pocafit->GetChi2BelowDriftY( stf_below_y, stf_below_py, 0.0 );
+    pocafit->SetUseAll();
 
     fScattering[18] = chi2arpcx + chi2adriftx; // event.xUchi2;
     fScattering[19] = chi2arpcy + chi2adrifty; // event.yUchi2;
@@ -439,71 +494,148 @@ int main(int argc, char** argv) {
     fScattering[23] = chi2arpcy + chi2adrifty + chi2brpcy + chi2bdrifty; // event.ychi2;
     fScattering[24] = fMinuitParams[0]; // chi2
 
-    double ChiSquareCut3Points = 1000;
-    if (fScattering[18] > ChiSquareCut3Points) continue;
-    if (fScattering[19] > ChiSquareCut3Points) continue;
-    if (fScattering[20] > ChiSquareCut3Points) continue;
-    if (fScattering[21] > ChiSquareCut3Points) continue;
+    // std::cout << "X Chi2 : " << fScattering[18] << " + " << fScattering[20] << " = " << fScattering[22] << std::endl;
 
-    // Create Minimizer Object
-    ROOT::Math::Minimizer* min = ROOT::Math::Factory::CreateMinimizer("Minuit2", "Migrad");
-    min->SetPrintLevel(-1);
-    min->SetMaxIterations(int(1E15));
-    min->SetMaxFunctionCalls(int(1E20));
-    min->SetTolerance(0.001);
-    min->SetStrategy(2);
+    // double ChiSquareCut3Points = 2000;
+    // if (gInputMode != kUseAll) ChiSquareCut3Points = 1000;
 
-    // Setup Functor for the fitter
+    // if (fScattering[18] > ChiSquareCut3Points || 
+    //     fScattering[19] > ChiSquareCut3Points ||
+    //     fScattering[20] > ChiSquareCut3Points ||
+    //     fScattering[21] > ChiSquareCut3Points) {
+
+    //   // std::cout << "Bad Chi2 : " << fScattering[18] << " " << fScattering[19] << " " << fScattering[20] << " " << fScattering[21] << std::endl;
+    //   continue;
+    // }
+
     int npars = 7;
-    BristolPoCAFitterFCN* fcn = new BristolPoCAFitterFCN(pocafit);
-    ROOT::Math::Functor func(*fcn, npars);
-    min->SetFunction(func);
+    ROOT::Minuit2::MnUserParameters mn_param;
 
-    // Tell Minuit the variables
-    min->SetVariable(0, "rx",  pocafitparams[11],   10.0);
-    min->SetVariable(1, "ry",  pocafitparams[12],   10.0);
-    min->SetVariable(2, "rz",  pocafitparams[13],   10.0);
-    min->SetVariable(3, "px1", stf_below_px,        10.0);
-    min->SetVariable(4, "px2", stf_above_px,        10.0);
-    min->SetVariable(5, "py1", stf_below_py,        10.0);
-    min->SetVariable(6, "py2", stf_above_py,        10.0);
+    mn_param.Add("vx", 250.0, 10);
+    mn_param.Add("vy", 250.0, 10);
+    mn_param.Add("vz", 0.0, 10);
+    mn_param.Add("px1", 0.0, 10);
+    mn_param.Add("px2", 0.0, 10);
+    mn_param.Add("py1", 0.0, 10);
+    mn_param.Add("py2", 0.0, 10);
 
-    // Run the fit
-    min->Minimize();
+    // mn_param.Add("vx", 250.0, 10);
+    // mn_param.Add("vy", 250.0, 10);
+    // mn_param.Add("vz", 0.0, 10);
+    // mn_param.Add("px1", stf_below_x, 10);
+    // mn_param.Add("px2", stf_above_x, 10);
+    // mn_param.Add("py1", stf_below_y, 10);
+    // mn_param.Add("py2", stf_above_y, 10);
+    pocafit->SetUseAll();
 
-    // Get results
-    const double* xx = min->X();
-    for (int j = 0; j < npars; j++) {
-      fBestFitPars[j] = xx[j];
+    // Minimisation
+    ROOT::Minuit2::MnMigrad migrad( *pocafit, mn_param, 2 ); //Strategy 2
+    ROOT::Minuit2::FunctionMinimum min = migrad();
+
+    ROOT::Minuit2::MnAlgebraicSymMatrix MinCovarMatrix = min.Error().Matrix();
+    ROOT::Minuit2::MnAlgebraicVector MinParams = min.Parameters().Vec();
+
+    for (int j = 0; j < npars; j++){
+      fBestFitPars[j] = MinParams[j];
     }
 
-    // Get Minuit Params
+    // end Minuit2
     Double_t istat = 0;
-    if (min->CovMatrixStatus() > 0) istat = 3;
-    fMinuitParams[0] = pocafit->DoEval(xx);
-    fMinuitParams[1] = min->Edm();
-    fMinuitParams[2] = min->ErrorDef();
+    if (min.HasPosDefCovar()) istat = 3;
+
+    fMinuitParams[0] = pocafit->DoEval(fBestFitPars);
+    fMinuitParams[1] = min.Edm();
+    fMinuitParams[2] = min.Up();
     fMinuitParams[3] = 7;
     fMinuitParams[4] = 7;
     fMinuitParams[5] = istat;
 
-    // Cut on Chi2
-    double CombinedChi2Cut = 1000;
-    if (fMinuitParams[0] > CombinedChi2Cut) continue;
+
+
+    for (Int_t i = 0; i < 7; ++i) {
+      for (Int_t j = 0; j < 7; ++j) {
+        Int_t pos = (i * 7) + j;
+        fCovarMatrix[pos] = MinCovarMatrix(i, j);
+      }
+    }
+
+    pocafit->SetUseAll();
+
+
+
+    // // Create Minimizer Object
+    // ROOT::Math::Minimizer* min = ROOT::Math::Factory::CreateMinimizer("Minuit2", "Migrad");
+    // min->SetPrintLevel(-1);
+    // min->SetMaxIterations(int(1E15));
+    // min->SetMaxFunctionCalls(int(1E20));
+    // min->SetTolerance(0.001);
+    // min->SetStrategy(2);
+
+    // // Setup Functor for the fitter
+    // int npars = 7;
+    // BristolPoCAFitterFCN* fcn = new BristolPoCAFitterFCN(pocafit);
+    // ROOT::Math::Functor func(*fcn, npars);
+    // min->SetFunction(func);
+
+    // // Tell Minuit the variables
+    // // min->SetVariable(0, "rx",  pocafitparams[11],   10.0);
+    // // min->SetVariable(1, "ry",  pocafitparams[12],   10.0);
+    // // min->SetVariable(2, "rz",  pocafitparams[13],   10.0);
+    // // min->SetVariable(3, "px1", stf_below_px,        10.0);
+    // // min->SetVariable(4, "px2", stf_above_px,        10.0);
+    // // min->SetVariable(5, "py1", stf_below_py,        10.0);
+    // // min->SetVariable(6, "py2", stf_above_py,        10.0);
+
+    // // Tell Minuit the variables
+    // min->SetVariable(0, "rx",  0.0, 10.0);
+    // min->SetVariable(1, "ry",  0.0, 10.0);
+    // min->SetVariable(2, "rz",  0.0, 10.0);
+    // min->SetVariable(3, "px1", 0.0, 10.0);
+    // min->SetVariable(4, "px2", 0.0, 10.0);
+    // min->SetVariable(5, "py1", 0.0, 10.0);
+    // min->SetVariable(6, "py2", 0.0, 10.0);
+
+    // // Run the fit
+    // min->Minimize();
+
+    // // Get results
+    // const double* xx = min->X();
+    // for (int j = 0; j < npars; j++) {
+    //   fBestFitPars[j] = xx[j];
+    // }
+
+    // // Get Minuit Params
+    // Double_t istat = 0;
+    // if (min->CovMatrixStatus() > 0) istat = 3;
+    // fMinuitParams[0] = pocafit->DoEval(xx);
+    // fMinuitParams[1] = min->Edm();
+    // fMinuitParams[2] = min->ErrorDef();
+    // fMinuitParams[3] = 7;
+    // fMinuitParams[4] = 7;
+    // fMinuitParams[5] = istat;
+
+    // // Cut on Chi2
+
+    double CombinedChi2Cut = 2000;
+    // if (gInputMode != kUseAll) CombinedChi2Cut = 1000;
+
+    // if (fMinuitParams[0] > CombinedChi2Cut){
+    //   continue;
+    // }      
 
     // Get the covariance
-    min->GetCovMatrix(fCovarMatrix);
+    // min->GetCovMatrix(fCovarMatrix);
 
     // Read params for calculations
-    double fitVx  = xx[0];
-    double fitVy  = xx[1];
-    double fitVz  = xx[2];
-    double fitpx1 = -xx[3];
-    double fitpx2 = -xx[4];
-    double fitpy1 = -xx[5];
-    double fitpy2 = -xx[6];
+    double fitVx  = fBestFitPars[0];
+    double fitVy  = fBestFitPars[1];
+    double fitVz  = fBestFitPars[2];
+    double fitpx1 = fBestFitPars[3];
+    double fitpx2 = fBestFitPars[4];
+    double fitpy1 = fBestFitPars[5];
+    double fitpy2 = fBestFitPars[6];
 
-    // Get Scattering Angles
+
     TVector3 grad1X(fitpx1, 0., 1.);
     TVector3 grad2X(fitpx2, 0., 1.);
 
@@ -517,10 +649,18 @@ int main(int argc, char** argv) {
     fScattering[1] = grad1Y.Angle(grad2Y); // Scatter Angle Y
     fScattering[2] = grad1.Angle(grad2); // Scatter Angle 3d
 
-    double U_offsetX = fabs( pocafit->GetLowestXXAbove()  - (fitVx + fitpx2 * (pocafit->GetLowestXZAbove() - fitVz)) );
-    double U_offsetY = fabs( pocafit->GetLowestYYAbove()  - (fitVy + fitpy2 * (pocafit->GetLowestYZAbove() - fitVz)) );
-    double L_offsetX = fabs( pocafit->GetHighestXXBelow() - (fitVx + fitpx1 * (pocafit->GetHighestXZBelow() - fitVz)) );
-    double L_offsetY = fabs( pocafit->GetHighestYYBelow() - (fitVy + fitpy1 * (pocafit->GetHighestYZBelow() - fitVz)) );
+                // U_offsetX = fabs(hitPosition[2] - (fitVx + fitpx2*(zPosition[2] - fitVz)));
+                // U_offsetY = fabs(hitPosition[8] - (fitVy + fitpy2*(zPosition[8] - fitVz)));
+
+                // L_offsetX = fabs(hitPosition[3] - (fitVx + fitpx1*(zPosition[3] - fitVz)));
+                // L_offsetY = fabs(hitPosition[9] - (fitVy + fitpy1*(zPosition[9] - fitVz)));
+
+
+
+    double U_offsetX = fabs( pocafit->GetLowestXXAbove()  - (fitVx + fitpx2 * (pocafit->GetLowestXZAbove()))  - fitVz);
+    double U_offsetY = fabs( pocafit->GetLowestYYAbove()  - (fitVy + fitpy2 * (pocafit->GetLowestYZAbove()))  - fitVz);
+    double L_offsetX = fabs( pocafit->GetHighestXXBelow() - (fitVx + fitpx1 * (pocafit->GetHighestXZBelow())) - fitVz);
+    double L_offsetY = fabs( pocafit->GetHighestYYBelow() - (fitVy + fitpy1 * (pocafit->GetHighestYZBelow())) - fitVz);
     fScattering[3] = U_offsetX; // Find lowest Z point in X
     fScattering[4] = U_offsetY; // Find lowest Z point in Y
     fScattering[5] = L_offsetX; // Find highest Z point in X
@@ -556,10 +696,10 @@ int main(int argc, char** argv) {
     fScattering[11] = fitVx;
     fScattering[12] = fitVy;
     fScattering[13] = fitVz;
-    fScattering[14] = fitpx1;
-    fScattering[15] = fitpx2;
-    fScattering[16] = fitpy1;
-    fScattering[17] = fitpy2;
+    fScattering[14] = fitpx2;
+    fScattering[15] = fitpx1;
+    fScattering[16] = fitpy2;
+    fScattering[17] = fitpy1;
 
     // Calculate POCA Quantities
     double UPoCA_Vx = fabs(fitVx - (fitVz - stf_above_x) / stf_above_px);
@@ -578,7 +718,7 @@ int main(int argc, char** argv) {
     savecount++;
 
     // Clean up look sharp
-    delete min;
+    // delete min;
   }
 
   // Save outputs to TTree

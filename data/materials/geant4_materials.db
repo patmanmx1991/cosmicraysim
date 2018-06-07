@@ -1,5 +1,17 @@
 {
   name: "MATERIAL",
+  index: "G4_BONE_COMPACT_ICRU"
+  color: [1.0, 0.8039215686, 0.6, 0.5]
+  drawstyle: "solid"
+}
+
+{
+  name: "MATERIAL",
+  index: "G4_AIR",
+  color: [0.5,0.5,0.5,0.2],
+}
+{
+  name: "MATERIAL",
   index: "G4_C",
   color: [0.5,0.5,0.5,0.5],
   drawstyle: "solid"

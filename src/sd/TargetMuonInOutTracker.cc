@@ -168,9 +168,9 @@ bool TargetMuonInOutProcessor::ProcessEvent(const G4Event* /*event*/) {
   G4AnalysisManager* man = G4AnalysisManager::Instance();
 
   if (fTracker->GetMuonInTime() > 0.0) {
-    fInPos[0] = fTracker->GetMuonInPos().x() / m;
-    fInPos[1] = fTracker->GetMuonInPos().y() / m;
-    fInPos[2] = fTracker->GetMuonInPos().z() / m;
+    fInPos[0] = fTracker->GetMuonInPos().x() / mm;
+    fInPos[1] = fTracker->GetMuonInPos().y() / mm;
+    fInPos[2] = fTracker->GetMuonInPos().z() / mm;
     fInMom[0] = fTracker->GetMuonInMom().x() / MeV;
     fInMom[1] = fTracker->GetMuonInMom().y() / MeV;
     fInMom[2] = fTracker->GetMuonInMom().z() / MeV;
@@ -186,9 +186,9 @@ bool TargetMuonInOutProcessor::ProcessEvent(const G4Event* /*event*/) {
   }
 
   if (fTracker->GetMuonOutTime() > 0.0) {
-    fOutPos[0] = fTracker->GetMuonOutPos().x() / m;
-    fOutPos[1] = fTracker->GetMuonOutPos().y() / m;
-    fOutPos[2] = fTracker->GetMuonOutPos().z() / m;
+    fOutPos[0] = fTracker->GetMuonOutPos().x() / mm;
+    fOutPos[1] = fTracker->GetMuonOutPos().y() / mm;
+    fOutPos[2] = fTracker->GetMuonOutPos().z() / mm;
     fOutMom[0] = fTracker->GetMuonOutMom().x() / MeV;
     fOutMom[1] = fTracker->GetMuonOutMom().y() / MeV;
     fOutMom[2] = fTracker->GetMuonOutMom().z() / MeV;
@@ -214,11 +214,11 @@ bool TargetMuonInOutProcessor::ProcessEvent(const G4Event* /*event*/) {
                                  fTracker->GetMuonInPos(), fTracker->GetMuonInMom(),
                                  fTracker->GetMuonOutPos(), fTracker->GetMuonOutMom());
 
-    fPoCA[0] = poca[0] / m;
-    fPoCA[1] = poca[1] / m;
-    fPoCA[2] = poca[2] / m;
+    fPoCA[0] = poca[0] / mm;
+    fPoCA[1] = poca[1] / mm;
+    fPoCA[2] = poca[2] / mm;
     man->FillNtupleDColumn(fPoCAAngleIndex, angle);
-    man->FillNtupleDColumn(fPoCADistanceIndex, distance / m);
+    man->FillNtupleDColumn(fPoCADistanceIndex, distance / mm);
 
   } else {
     fPoCA[0] = -999.0;

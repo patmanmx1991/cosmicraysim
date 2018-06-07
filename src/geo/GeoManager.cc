@@ -37,6 +37,8 @@
 #include "chance/HybridMuonTomographyDetector.hh"
 #include "chance/AWEDriftChamber.hh"
 
+#include "cadmesh/GeoCADMesh.hh"
+
 #include "iso/ISOSpacingTest.hh"
 
 #include <map>
@@ -60,7 +62,8 @@ GeoObject* GeoObjectFactory::Construct(DBTable table){
   else if (type.compare("smallsteeldrum") == 0) return new SmallSteelDrum(table);
   else if (type.compare("largesteeldrum") == 0) return new LargeSteelDrum(table);
   else if (type.compare("isospacingtest") == 0) return new ISOSpacingTest(table);
-  
+  else if (type.compare("cadmesh") == 0) return new GeoCADMesh(table);
+
   //  else if (type.compare("bristol_rpc") == 0) return new BristolRPC(table);
 
   std::cout << "Failed to Construct Geometry" << std::endl;

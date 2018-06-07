@@ -44,12 +44,16 @@
 #include "sd/DetectorManager.hh"
 #include "trigger/TriggerManager.hh"
 #include "analysis/Analysis.hh"
+
+#include <math.h>
+#include <stdio.h>
+
 using namespace COSMIC;
 
 CosmicRun::CosmicRun()
   : G4Run()
 {
-  fPrintSize = Analysis::Get()->GetChunkSize() / 10.0;
+  Analysis::Get()->StartTheClock();
 }
 
 CosmicRun::~CosmicRun()
@@ -58,18 +62,36 @@ CosmicRun::~CosmicRun()
 
 void CosmicRun::RecordEvent(const G4Event* event)
 {
-  // Logging
-  int eventid = event->GetEventID();
-  if (eventid % fPrintSize == 0) {
-      std::cout << "RUN: --> Processing Event : " << eventid
-              << "/" << numberOfEventToBeProcessed << std::endl;
-      
-  }
+  // // Logging
+  // if (numberOfEventToBeProcessed > 100) {
+  //   fPrintSize = numberOfEventToBeProcessed / 100.0;
+  // }
 
+  // if (eventid % fPrintSize == 0 and eventid != 0) {
+
+  //   fCurTime = time(0);
+  //   double timetaken = (fCurTime - fStartTime);
+  //   double timeperevent  = timetaken / double(eventid);
+  //   double timetotal     = timeperevent * numberOfEventToBeProcessed;
+
+  //   std::cout << "RUN: --> Processing Event : " << eventid
+  //             << ". Approx~ " << round(1000.0 * timetaken / (60.0 * 1000.0)) << "/" << ceil(timetotal / 60.0) << " minutes done processing this run. " << std::endl;
+
+  // }
+
+  // Print progress
+  int eventid = event->GetEventID();
+  Analysis::Get()->PrintProgress(eventid, numberOfEventToBeProcessed);
+
+  // Do all processing loops
   Analysis::Get()->ProcessEvent(event);
 
   // Reset analysis state for next event.
   Analysis::Get()->BeginOfEventAction();
+
+  // Check Abort State
+  Analysis::Get()->CheckAbortState();
+
 }
 
 

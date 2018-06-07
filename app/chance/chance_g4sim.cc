@@ -90,7 +90,7 @@ int gNTriggers = -1; ///< Number of triggered events to generate
 // Mode : Generate t exposure
 int gExposureTime = -1; ///< Number of seconds exposure to generate
 
-int gProcessingChunks = 10000; ///< By default what the chunk size should be
+long int gProcessingChunks = 1E10; ///< By default what the chunk size should be
 
 // User Defined Geometry files
 std::vector<std::string> gGeomtryFiles;
@@ -162,9 +162,9 @@ int main(int argc, char** argv) {
       gSubRunID = std::stoi(argv[++i]);
 
       // Detector Input " --detector override"
-    } else if (std::strcmp(argv[i], "--detector") == 0){
+    } else if (std::strcmp(argv[i], "--detector") == 0) {
       gDefaultDetector = std::string(argv[++i]);
-      
+
       // Run Tag " -s outputtag"
     } else if (std::strcmp(argv[i], "-o") == 0) {
       gRunTag = std::string(argv[++i]);
@@ -224,7 +224,7 @@ int main(int argc, char** argv) {
   else rdb->Load(string("data"));
 
   std::cout << "APP: Default Detector GEO : " << gDefaultDetector << std::endl;
-  gGeomtryFiles.insert(gGeomtryFiles.begin(),gDefaultDetector);
+  gGeomtryFiles.insert(gGeomtryFiles.begin(), gDefaultDetector);
 
   if (gGeomtryFiles.size() > 0) {
     for (uint i = 0; i < gGeomtryFiles.size(); i++) {
@@ -236,14 +236,7 @@ int main(int argc, char** argv) {
   std::cout << "========================================= " << std::endl;
 
   std::cout << "APP: Setting up Geant4 Run Manager " << std::endl;
-// Construct the default run manager. Pick the proper run
-// manager depending if the multi-threading option is
-// active or not.
-//#ifdef G4MULTITHREADED
-//  G4MTRunManager* runManager = new G4MTRunManager;
-//#else
   G4RunManager* runManager = new G4RunManager;
-  //#endif
 
 
   std::cout << "========================================= " << std::endl;
@@ -333,7 +326,7 @@ int main(int argc, char** argv) {
       std::cout << "APP: --> NEvents : " << gNEvents << std::endl << std::endl;
 
 
-
+      Analysis::Get()->SetMode(Analysis::kEventMode);
       std::cout << "APP: Starting Run : " << gNEvents << std::endl;
       UImanager->ApplyCommand("/run/beamOn " + std::to_string(gNEvents));
 
@@ -346,36 +339,24 @@ int main(int argc, char** argv) {
       std::cout << "APP: Running NTriggers" << std::endl;
       std::cout << "APP: --> Desired Triggers : " << gNTriggers << std::endl;
       std::cout << "APP: --> Processing Chunk : " << gProcessingChunks << std::endl << std::endl;
+
+      // Set Run Details
+      Analysis::Get()->SetMode(Analysis::kTriggerMode);
+      Analysis::Get()->SetRequiredTriggers(gNTriggers);
       Analysis::Get()->SetChunkSize(gProcessingChunks);
 
-      // Run first loop for estimate
-      long int curtime = time(0);
-      UImanager->ApplyCommand("/run/beamOn " + std::to_string(gProcessingChunks));
-      int singletriggers = Analysis::Get()->GetNSavedEvents();
-      long int timetaken = time(0) - curtime;
+      // Start while loop
+      int exptriggers = 0;
+      while (exptriggers < gNTriggers){
 
-      // Print Estimated Loops
-      std::cout << "APP: " << gProcessingChunks << " events generated : "
-                << singletriggers << " s of exposure" << std::endl;
-
-      std::cout << "APP: Loops for full exposure : " << float(gNTriggers) / singletriggers << std::endl;
-
-      std::cout << "APP: CPU time for full exposure : "
-                << timetaken * float(gNTriggers) / singletriggers / 60. << " minutes" <<  std::endl;
-
-
-      // Infinite loop until total triggers reached
-      while (singletriggers < gNTriggers) {
-
-        // Run Loop Again
+        // Run a single chunk
         UImanager->ApplyCommand("/run/beamOn " + std::to_string(gProcessingChunks));
 
-        // Get new exposure time
-        singletriggers = Analysis::Get()->GetNSavedEvents();
-
+        // Update Triggers
+        exptriggers = Analysis::Get()->GetNSavedEvents();
       }
 
-      std::cout << "Acquired above desired triggers : " << singletriggers << std::endl;
+      std::cout << "Acquired above desired triggers : " << exptriggers << std::endl;
 
       // *********************************
       // Exposure Time Mode
@@ -386,36 +367,24 @@ int main(int argc, char** argv) {
       std::cout << "APP: Running Exposure" << std::endl;
       std::cout << "APP: --> Desired Exposure : " << gExposureTime << " s" << std::endl;
       std::cout << "APP: --> Processing Chunk : " << gProcessingChunks << std::endl << std::endl;
+
+      // Set run details
+      Analysis::Get()->SetMode(Analysis::kTimeExposureMode);
+      Analysis::Get()->SetRequiredExposure(gExposureTime);
       Analysis::Get()->SetChunkSize(gProcessingChunks);
 
-      // Run first loop for estimate
-      long int curtime = time(0);
-      UImanager->ApplyCommand("/run/beamOn " + std::to_string(gProcessingChunks));
-      double singleexp = Analysis::Get()->GetExposureTime();
-      long int timetaken = time(0) - curtime;
-
-      // Print Estimated Loops
-      std::cout << "APP: " << gProcessingChunks << " events generated : "
-                << singleexp << " s of exposure" << std::endl;
-
-      std::cout << "APP: Loops for full exposure : " << gExposureTime / singleexp << std::endl;
-
-      std::cout << "APP: CPU time for full exposure : "
-                << timetaken * gExposureTime / singleexp / 60. << " minutes" <<  std::endl;
-
-      // Infinite loop until total exposure reached
+      // Get the total rate
+      double singleexp = 0;
       while (singleexp < gExposureTime) {
 
-        // Run Loop Again
+        // Save beam
         UImanager->ApplyCommand("/run/beamOn " + std::to_string(gProcessingChunks));
 
         // Get new exposure time
         singleexp = Analysis::Get()->GetExposureTime();
-
       }
 
       std::cout << "Acquired above desired exposure : " << singleexp << std::endl;
-
 
       // *********************************
       // User Error

@@ -19,7 +19,7 @@
   name: "DETECTOR",
   index: "bristol_rpc_rec"
   type: "bristolrpc",
-  efficiency: "0.9",
+  efficiency: "1.0",
   resolution: "0.3*mm"
   processor: 0,
 }
@@ -64,7 +64,7 @@
   name: "DETECTOR",
   index: "scint_rec",
   type:  "scintillator"
-  effiency: 0.9,
+  effiency: 1.0,
   processor: 0,
 }
 
@@ -72,7 +72,7 @@
   name: "DETECTOR",
   index: "scint_rec_save",
   type:  "scintillator"
-  effiency: 0.9,
+  effiency: 1.0,
   processor: 1
 }
 

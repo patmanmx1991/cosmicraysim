@@ -74,6 +74,7 @@ public:
     inline G4ThreeVector GetMuonPos() { return fMuonPos;      };
     inline int GetMuonPDG()           { return fMuonPDG;      };
     inline G4double GetExposureTime() { return fExposureTime; };
+    inline void SetExposureTime(double d){ fMuonTime = d; };
 
 private:
 
@@ -119,7 +120,6 @@ private:
     int fNThrows; ///< Number of throws ran so far.
 
 
-
     G4double fMuonTime;     ///< MuonTime   Info for auto flux processor
     G4double fMuonEnergy;   ///< MuonEnergy Info for auto flux processor
     G4ThreeVector fMuonDir; ///< MuonDir    Info for auto flux processor
@@ -154,6 +154,9 @@ public:
     /// ending the run after so many seconds.
     G4double GetExposureTime();
 
+    /// Reset time counter back to 0
+    void ResetExposureTime(){ fGenerator->SetExposureTime(0.0); };
+double GetEventRate();
 protected:
 
     ShuklaPrimaryGenerator* fGenerator; ///< Pointer to associated generator

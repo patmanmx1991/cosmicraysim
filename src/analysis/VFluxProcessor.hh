@@ -58,6 +58,12 @@ public:
   /// ending the run after so many seconds.
   virtual G4double GetExposureTime() = 0;
 
+  /// Set exposure time back to 0
+  virtual void ResetExposureTime() = 0;
+
+  /// Get event rate
+  virtual double GetEventRate(){return 1.0;};
+
 protected:
 
   bool fHasInfo; ///< Whether the event had anything useful in it.

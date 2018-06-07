@@ -131,8 +131,11 @@ public:
 	double GetLowestZ();
 	double GetHighestX();
 	double GetHighestZ();
+void ApplyVectorOffset(std::vector<double>* vec);
+void ApplyOffsets();
 
-
+	void SetUseRPC(bool b = true){ fUseRPC = b;};
+	void SetUseDrift(bool b = true){ fUseDrift = b;};
 
 	double GetLowestXXAbove();
 	double GetLowestXZAbove();
@@ -197,6 +200,9 @@ public:
 	void SetAllYOnly();
 
 	void SetUseAll();
+
+	void ClearRPCVectors();
+	void ClearDriftVectors();
 
 	std::vector<double> values_x;
 	std::vector<double> values_e;

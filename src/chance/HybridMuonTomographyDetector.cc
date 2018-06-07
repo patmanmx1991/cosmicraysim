@@ -337,10 +337,12 @@ bool HybridMuonTomographyProcessor::ProcessEvent(const G4Event* event) {
     ResetVariables();
     return false;
   }
-
+  fHasInfo = true;
 
   // Saving
   // G4AnalysisManager* man = G4AnalysisManager::Instance();
+
+  
 
   // Loop over Scintillators and save info
   for (uint i = 0; i < fScintProcs.size(); i++) {
@@ -353,6 +355,7 @@ bool HybridMuonTomographyProcessor::ProcessEvent(const G4Event* event) {
   for (uint i = 0; i < fRPCProcs.size(); i++) {
 
     // Skip unhit RPCs
+    // std::cout << i << " : " << fRPCProcs[i]->HasInfo() << " " << fRPCHitInfo[i] << std::endl;
     if (!fRPCProcs[i]->HasInfo()) continue;
 
     // Save relevant info
@@ -393,6 +396,8 @@ bool HybridMuonTomographyProcessor::ProcessEvent(const G4Event* event) {
       fDriftHits_YE.push_back((fDriftChamberProcs[i]->GetErrY())/(mm));
     }
   }
+
+  // std::cout << "N RPC Hits : " << fRPCHits_XX.size() << " " << fRPCHits_YY.size() << std::endl;
 
   return true;
 }

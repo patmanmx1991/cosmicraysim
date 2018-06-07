@@ -59,10 +59,10 @@ void AWEDriftChamber::Construct(DBTable table) {
   G4double chambersize_x  = 180*cm;
   G4double chambersize_y  = 60*cm;
   G4double chambersize_z  = 6*cm;
-  G4double edge_thickness = 15*mm;
-  G4double top_thickness  = 2*mm;
-  G4String edge_material  = "G4_Cu";
-  G4String top_material   = "G4_Cu";
+  G4double edge_thickness = 0.015*mm;
+  G4double top_thickness  = 0.002*mm;
+  G4String edge_material  = "G4_AIR";
+  G4String top_material   = "G4_AIR";
   G4String gas_material   = "AWE_GASMIX1";
   G4String box_material   = "G4_AIR";
 

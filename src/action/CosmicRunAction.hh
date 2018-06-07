@@ -51,7 +51,7 @@ class CosmicRunAction : public G4UserRunAction
     virtual void BeginOfRunAction(const G4Run*);
   /// Called at the end of each run
     virtual void   EndOfRunAction(const G4Run*);
-  int fCurrentRun;
+    int fCurrentRun;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

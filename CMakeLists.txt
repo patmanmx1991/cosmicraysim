@@ -29,6 +29,9 @@ else()
   find_package(Geant4 REQUIRED)
 endif()
 
+# Find Cadmesh
+find_package(cadmesh)
+
 #----------------------------------------------------------------------------
 # Find ROOT variables if the variable G4ANALYSIS_USE_ROOT is set
 #
@@ -66,13 +69,13 @@ add_library (cresta ${sources} ${headers})
 #
 
 add_executable(cosmicraysim ${PROJECT_SOURCE_DIR}/app/standard/cosmicraysim.cc)
-target_link_libraries(cosmicraysim  ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} cresta)
+target_link_libraries(cosmicraysim  ${Geant4_LIBRARIES} ${ROOT_LIBRARIES}  ${cadmesh_LIBRARIES} cresta)
 
 add_executable(chance_g4sim ${PROJECT_SOURCE_DIR}/app/chance/chance_g4sim.cc)
-target_link_libraries(chance_g4sim  ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} cresta)
+target_link_libraries(chance_g4sim  ${Geant4_LIBRARIES} ${ROOT_LIBRARIES}  ${cadmesh_LIBRARIES} cresta)
 
 add_executable(chance_trackfit ${PROJECT_SOURCE_DIR}/app/chance/chance_trackfit.cc)
-target_link_libraries(chance_trackfit  ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} cresta)
+target_link_libraries(chance_trackfit  ${Geant4_LIBRARIES} ${ROOT_LIBRARIES}  ${cadmesh_LIBRARIES} cresta)
 
 
 #----------------------------------------------------------------------------

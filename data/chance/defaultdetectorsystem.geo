@@ -5,7 +5,7 @@
   name: "GEO",
   index: "world",
   material: "G4_AIR",
-  size: ["10.*m", "10.0*m", "10.*m"],
+  size: ["3.*m", "3.0*m", "7.*m"],
   type: "box",
 }
 
@@ -34,8 +34,8 @@
 {
   name: "FLUX",
   index: "source_box",
-  size: ["1.0*m", "1.*m", "0.5*m"],
-  position: ["0.0","0.0", "4.75*m"],
+  size: ["1.0*m", "1.*m", "0.05*m"],
+  position: ["0.0","0.0", "3.475*m"],
 }
 
 {

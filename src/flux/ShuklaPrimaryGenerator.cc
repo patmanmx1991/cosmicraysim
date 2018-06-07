@@ -485,6 +485,20 @@ bool ShuklaPrimaryFluxProcessor::ProcessEvent(const G4Event* /*event*/) {
 G4double ShuklaPrimaryFluxProcessor::GetExposureTime() {
     return fGenerator->GetMuonTime();
 }
+
+double ShuklaPrimaryFluxProcessor::GetEventRate(){
+  for (int i = 0; i < 1000; i++){
+    G4Event* g = new G4Event();
+    fGenerator->GeneratePrimaries(g);
+    delete g;
+  }
+  double rate = 1000.0 / GetExposureTime();
+  ResetExposureTime();
+  std::cout << "FLX: --> Total Shukla RATE : " << rate << std::endl;
+  return rate;
+}
+
+
 //---------------------------------------------------------------------------------
 
 } // - namespace COSMIC

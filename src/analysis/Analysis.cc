@@ -22,11 +22,13 @@ Analysis::Analysis() :
   fGeneratedEventsLimit(-1),
   fExposureTimeLimit(-1.0),
   fNTuplesSetup(0),
-  fChunkSize(10000)
+  fChunkSize(10000),
+  fRunMode(kEventMode),
+  fLastCount(0)
 {
 }
 
-Analysis::~Analysis() 
+Analysis::~Analysis()
 {
 }
 
@@ -35,7 +37,7 @@ Analysis *Analysis::fPrimary(0);
 
 void Analysis::BeginOfRunAction(const G4Run* run) {
 
-
+  // Setup Ntuples
   if (!fNTuplesSetup) {
     std::cout << "ANL: Setting up G4Manager" << std::endl;
     // Initialise G4 ROOT Manager
@@ -71,10 +73,10 @@ void Analysis::BeginOfRunAction(const G4Run* run) {
 }
 
 void Analysis::EndOfRunAction(const G4Run* /*run*/) {
+  // Skip Dummy Runs
   std::cout << "Writing" << std::endl;
   fG4Manager->Write();
   fG4Manager->CloseFile();
-  // delete  G4AnalysisManager::Instance();
 }
 
 void Analysis::BeginOfEventAction() {
@@ -226,6 +228,73 @@ VDetector* Analysis::GetDetector(std::string id, bool silentfail) {
 
 void Analysis::SetFluxProcessor(VFluxProcessor* p) {
   fFluxProcessor = p;
+}
+
+void Analysis::ResetCounters() {
+  fSavedEvents = 0;
+  fGeneratedEvents = 0;
+  fFluxProcessor->ResetExposureTime();
+}
+
+double Analysis::GetEventRate() {
+  return fFluxProcessor->GetEventRate();
+}
+
+void Analysis::CheckAbortState() {
+  if (fRunMode == kTimeExposureMode) {
+    if (GetExposureTime() > fRequiredExposure) {
+      G4RunManager::GetRunManager()->AbortRun(true);
+    }
+  }
+  if (fRunMode == kTriggerMode) {
+    if (fSavedEvents > fRequiredTriggers) {
+      G4RunManager::GetRunManager()->AbortRun(true);
+    }
+  }
+  return;
+}
+
+void Analysis::PrintProgress(int curcount, int totalcount) {
+
+  // Only print every 1000 events regardless
+  if (curcount % 1000 != 0 or curcount == 0) return;
+
+  // Get time taken so far
+  long int curtime = time(0);
+  long int prctime = curtime - fStartTime;
+
+  // Print N Events
+  if (fRunMode == kEventMode) {
+
+    double remtime = double(totalcount*prctime/double(curcount));
+
+    if (curcount - fLastCount > totalcount/20.0) {
+      std::cout << "RUN: --> Processing Event : " << curcount << " after " << prctime / 60 << " min. "
+                << "Approx. " << remtime / 60 << " min remaining." << std::endl;
+      fLastCount = curcount;
+    }
+
+  } else if (fRunMode == kTimeExposureMode){
+
+    double curexposure = GetExposureTime();
+    double remtime = double((fRequiredExposure-curexposure)*prctime/curexposure);
+
+    if (curexposure - fLastCount > (fRequiredExposure/20.0)) {
+      std::cout << "RUN: --> Processing Event : " << curcount << " after " << prctime/60.0  << " minutes. "
+                << "Approx. " << remtime/60.0  << " min remaining. Exposure : " << int(curexposure) << "/" << fRequiredExposure << std::endl;
+      fLastCount = curexposure;
+    }
+  } else if (fRunMode == kTriggerMode){
+
+    double remtime = double((fRequiredTriggers-fSavedEvents)*prctime/fSavedEvents);
+    if (fSavedEvents - fLastCount > (fRequiredTriggers/20.0)){
+      std::cout << "RUN: --> Processing Event : " << curcount << " after " << prctime/60.0  << " minutes. "
+                << "Approx. " << remtime/60.0  << " min remaining. Triggers : " << fSavedEvents << "/" << fRequiredTriggers << std::endl;
+      fLastCount = fSavedEvents;
+    }
+
+
+  }
 }
 
 } // - namespace COSMIC

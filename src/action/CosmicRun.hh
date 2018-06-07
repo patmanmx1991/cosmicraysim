@@ -33,6 +33,7 @@
 
 #include "G4Run.hh"
 #include "globals.hh"
+#include <ctime>
 
 class CosmicRun : public G4Run
 {
@@ -42,6 +43,9 @@ class CosmicRun : public G4Run
     virtual void RecordEvent(const G4Event*);
     virtual void Merge(const G4Run*);
     int fPrintSize;
+    long int fStartTime;
+    long int fCurTime;
+
 };
 
 #endif
