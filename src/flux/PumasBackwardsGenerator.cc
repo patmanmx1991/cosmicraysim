@@ -1,3 +1,4 @@
+#ifdef __USE_PUMAS__
 //******************************************************************************
 // PumasBackwardsGenerator.cc
 //
@@ -152,3 +153,4 @@ bool PumasBackwardsProcessor::ProcessEvent(const G4Event* /*event*/) {
 }
 
 } // - namespace COSMIC
+#endif // __USE_PUMAS__

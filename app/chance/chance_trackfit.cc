@@ -356,7 +356,7 @@ int main(int argc, char** argv) {
   std::cout << "========================================= " << std::endl;
   std::cout << "APP: Creating Minimizer" << std::endl;
 
-  ROOT::Minuit2::MnPrint::SetLevel(-1);
+  // ROOT::Minuit2::MnPrint::SetLevel(-1);
   gErrorIgnoreLevel = 1001;
 
   std::vector<bool> combobx;
@@ -508,111 +508,111 @@ int main(int argc, char** argv) {
     //   continue;
     // }
 
-    int npars = 7;
-    ROOT::Minuit2::MnUserParameters mn_param;
-
-    mn_param.Add("vx", 250.0, 10);
-    mn_param.Add("vy", 250.0, 10);
-    mn_param.Add("vz", 0.0, 10);
-    mn_param.Add("px1", 0.0, 10);
-    mn_param.Add("px2", 0.0, 10);
-    mn_param.Add("py1", 0.0, 10);
-    mn_param.Add("py2", 0.0, 10);
+    // int npars = 7;
+    // ROOT::Minuit2::MnUserParameters mn_param;
 
     // mn_param.Add("vx", 250.0, 10);
     // mn_param.Add("vy", 250.0, 10);
     // mn_param.Add("vz", 0.0, 10);
-    // mn_param.Add("px1", stf_below_x, 10);
-    // mn_param.Add("px2", stf_above_x, 10);
-    // mn_param.Add("py1", stf_below_y, 10);
-    // mn_param.Add("py2", stf_above_y, 10);
-    pocafit->SetUseAll();
+    // mn_param.Add("px1", 0.0, 10);
+    // mn_param.Add("px2", 0.0, 10);
+    // mn_param.Add("py1", 0.0, 10);
+    // mn_param.Add("py2", 0.0, 10);
 
-    // Minimisation
-    ROOT::Minuit2::MnMigrad migrad( *pocafit, mn_param, 2 ); //Strategy 2
-    ROOT::Minuit2::FunctionMinimum min = migrad();
+    // // mn_param.Add("vx", 250.0, 10);
+    // // mn_param.Add("vy", 250.0, 10);
+    // // mn_param.Add("vz", 0.0, 10);
+    // // mn_param.Add("px1", stf_below_x, 10);
+    // // mn_param.Add("px2", stf_above_x, 10);
+    // // mn_param.Add("py1", stf_below_y, 10);
+    // // mn_param.Add("py2", stf_above_y, 10);
+    // pocafit->SetUseAll();
 
-    ROOT::Minuit2::MnAlgebraicSymMatrix MinCovarMatrix = min.Error().Matrix();
-    ROOT::Minuit2::MnAlgebraicVector MinParams = min.Parameters().Vec();
+    // // Minimisation
+    // ROOT::Minuit2::MnMigrad migrad( *pocafit, mn_param, 2 ); //Strategy 2
+    // ROOT::Minuit2::FunctionMinimum min = migrad();
 
-    for (int j = 0; j < npars; j++){
-      fBestFitPars[j] = MinParams[j];
-    }
+    // ROOT::Minuit2::MnAlgebraicSymMatrix MinCovarMatrix = min.Error().Matrix();
+    // ROOT::Minuit2::MnAlgebraicVector MinParams = min.Parameters().Vec();
 
-    // end Minuit2
-    Double_t istat = 0;
-    if (min.HasPosDefCovar()) istat = 3;
-
-    fMinuitParams[0] = pocafit->DoEval(fBestFitPars);
-    fMinuitParams[1] = min.Edm();
-    fMinuitParams[2] = min.Up();
-    fMinuitParams[3] = 7;
-    fMinuitParams[4] = 7;
-    fMinuitParams[5] = istat;
-
-
-
-    for (Int_t i = 0; i < 7; ++i) {
-      for (Int_t j = 0; j < 7; ++j) {
-        Int_t pos = (i * 7) + j;
-        fCovarMatrix[pos] = MinCovarMatrix(i, j);
-      }
-    }
-
-    pocafit->SetUseAll();
-
-
-
-    // // Create Minimizer Object
-    // ROOT::Math::Minimizer* min = ROOT::Math::Factory::CreateMinimizer("Minuit2", "Migrad");
-    // min->SetPrintLevel(-1);
-    // min->SetMaxIterations(int(1E15));
-    // min->SetMaxFunctionCalls(int(1E20));
-    // min->SetTolerance(0.001);
-    // min->SetStrategy(2);
-
-    // // Setup Functor for the fitter
-    // int npars = 7;
-    // BristolPoCAFitterFCN* fcn = new BristolPoCAFitterFCN(pocafit);
-    // ROOT::Math::Functor func(*fcn, npars);
-    // min->SetFunction(func);
-
-    // // Tell Minuit the variables
-    // // min->SetVariable(0, "rx",  pocafitparams[11],   10.0);
-    // // min->SetVariable(1, "ry",  pocafitparams[12],   10.0);
-    // // min->SetVariable(2, "rz",  pocafitparams[13],   10.0);
-    // // min->SetVariable(3, "px1", stf_below_px,        10.0);
-    // // min->SetVariable(4, "px2", stf_above_px,        10.0);
-    // // min->SetVariable(5, "py1", stf_below_py,        10.0);
-    // // min->SetVariable(6, "py2", stf_above_py,        10.0);
-
-    // // Tell Minuit the variables
-    // min->SetVariable(0, "rx",  0.0, 10.0);
-    // min->SetVariable(1, "ry",  0.0, 10.0);
-    // min->SetVariable(2, "rz",  0.0, 10.0);
-    // min->SetVariable(3, "px1", 0.0, 10.0);
-    // min->SetVariable(4, "px2", 0.0, 10.0);
-    // min->SetVariable(5, "py1", 0.0, 10.0);
-    // min->SetVariable(6, "py2", 0.0, 10.0);
-
-    // // Run the fit
-    // min->Minimize();
-
-    // // Get results
-    // const double* xx = min->X();
-    // for (int j = 0; j < npars; j++) {
-    //   fBestFitPars[j] = xx[j];
+    // for (int j = 0; j < npars; j++){
+    //   fBestFitPars[j] = MinParams[j];
     // }
 
-    // // Get Minuit Params
+    // // end Minuit2
     // Double_t istat = 0;
-    // if (min->CovMatrixStatus() > 0) istat = 3;
-    // fMinuitParams[0] = pocafit->DoEval(xx);
-    // fMinuitParams[1] = min->Edm();
-    // fMinuitParams[2] = min->ErrorDef();
+    // if (min.HasPosDefCovar()) istat = 3;
+
+    // fMinuitParams[0] = pocafit->DoEval(fBestFitPars);
+    // fMinuitParams[1] = min.Edm();
+    // fMinuitParams[2] = min.Up();
     // fMinuitParams[3] = 7;
     // fMinuitParams[4] = 7;
     // fMinuitParams[5] = istat;
+
+
+
+    // for (Int_t i = 0; i < 7; ++i) {
+    //   for (Int_t j = 0; j < 7; ++j) {
+    //     Int_t pos = (i * 7) + j;
+    //     fCovarMatrix[pos] = MinCovarMatrix(i, j);
+    //   }
+    // }
+
+    // pocafit->SetUseAll();
+
+
+
+    // Create Minimizer Object
+    ROOT::Math::Minimizer* min = ROOT::Math::Factory::CreateMinimizer("Minuit2", "Migrad");
+    min->SetPrintLevel(-1);
+    min->SetMaxIterations(int(1E15));
+    min->SetMaxFunctionCalls(int(1E20));
+    min->SetTolerance(0.001);
+    min->SetStrategy(2);
+
+    // Setup Functor for the fitter
+    int npars = 7;
+    BristolPoCAFitterFCN* fcn = new BristolPoCAFitterFCN(pocafit);
+    ROOT::Math::Functor func(*fcn, npars);
+    min->SetFunction(func);
+
+    // Tell Minuit the variables
+    // min->SetVariable(0, "rx",  pocafitparams[11],   10.0);
+    // min->SetVariable(1, "ry",  pocafitparams[12],   10.0);
+    // min->SetVariable(2, "rz",  pocafitparams[13],   10.0);
+    // min->SetVariable(3, "px1", stf_below_px,        10.0);
+    // min->SetVariable(4, "px2", stf_above_px,        10.0);
+    // min->SetVariable(5, "py1", stf_below_py,        10.0);
+    // min->SetVariable(6, "py2", stf_above_py,        10.0);
+
+    // Tell Minuit the variables
+    min->SetVariable(0, "rx",  0.0, 10.0);
+    min->SetVariable(1, "ry",  0.0, 10.0);
+    min->SetVariable(2, "rz",  0.0, 10.0);
+    min->SetVariable(3, "px1", 0.0, 10.0);
+    min->SetVariable(4, "px2", 0.0, 10.0);
+    min->SetVariable(5, "py1", 0.0, 10.0);
+    min->SetVariable(6, "py2", 0.0, 10.0);
+
+    // Run the fit
+    min->Minimize();
+
+    // Get results
+    const double* xx = min->X();
+    for (int j = 0; j < npars; j++) {
+      fBestFitPars[j] = xx[j];
+    }
+
+    // Get Minuit Params
+    Double_t istat = 0;
+    if (min->CovMatrixStatus() > 0) istat = 3;
+    fMinuitParams[0] = pocafit->DoEval(xx);
+    fMinuitParams[1] = min->Edm();
+    fMinuitParams[2] = min->ErrorDef();
+    fMinuitParams[3] = 7;
+    fMinuitParams[4] = 7;
+    fMinuitParams[5] = istat;
 
     // // Cut on Chi2
 
@@ -624,7 +624,7 @@ int main(int argc, char** argv) {
     // }      
 
     // Get the covariance
-    // min->GetCovMatrix(fCovarMatrix);
+    min->GetCovMatrix(fCovarMatrix);
 
     // Read params for calculations
     double fitVx  = fBestFitPars[0];

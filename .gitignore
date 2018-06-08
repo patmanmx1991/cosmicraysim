@@ -1,0 +1,7 @@
+external/cadmesh/
+lib
+*.so
+bin
+*.o
+.tags
+build*

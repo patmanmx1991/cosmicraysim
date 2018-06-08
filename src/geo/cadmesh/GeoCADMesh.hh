@@ -1,3 +1,4 @@
+#ifdef __USE_CADMESH__
 #ifndef __GEO_CADMESH__HH__
 #define __GEO_CADMESH__HH__
 
@@ -20,4 +21,4 @@ public:
 
 } // namespace GEOBOX
 #endif
-
+#endif // __USE_CADMESH__

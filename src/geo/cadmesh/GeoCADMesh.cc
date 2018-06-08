@@ -1,3 +1,4 @@
+#ifdef __USE_CADMESH__
 #include "GeoCADMesh.hh"
 
 #include "CADMesh.hh"
@@ -39,3 +40,4 @@ G4VSolid* GeoCADMesh::ConstructSolidVolume(DBTable tbl) {
 }
 
 } // - namespace COSMIC
+#endif // __USE_CADMESH__

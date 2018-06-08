@@ -21,8 +21,11 @@ G4VUserPrimaryGeneratorAction* PrimaryGeneratorFactory::LoadGenerator(DBTable ta
   std::cout << "FLX: Loading Primary Generator : " << type << std::endl;
   if (type.compare("shukla")==0) return new ShuklaPrimaryGenerator();
   if (type.compare("cry")==0)    return new CRYPrimaryGenerator();
-  if (type.compare("pumasback") ==0) return new PumasBackwardsGenerator();
 
+  #ifdef __USE_PUMAS__
+  if (type.compare("pumasback") ==0) return new PumasBackwardsGenerator();
+  #endif
+  
   // Check if onle made
   std::cout << "Generator Creation Failed!" << std::endl;
   throw;
