@@ -74,14 +74,17 @@ if(USE_CADMESH)
     endif()
 
     # Add libraries and headers if so.
+    set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH} {CADMESH_DIR}/lib/")
     include_directories(${CADMESH_DIR}/include/)
-    set(cadmesh_LIBRARIES "-L${CADMESH_DIR}/lib/ -lassimp  -lcadmesh -ltet")
-
+    set(cadmesh_LIBRARIES "assimp;cadmesh;tet")
+#    find_library(cadmesh_LIBRARIES 
+#                 NAMES assimp cadmesh tet
+#                 HINTS "{CADMESH_DIR}/lib/}")
   endif()
 
   # Set the libraries and compiler flags
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D__USE_CADMESH__") 
-  SET(LINK_LIBRARIES "${LINK_LIBRARIES} ${cadmesh_LIBRARIES}")
+  SET(LINK_LIBRARIES "${LINK_LIBRARIES};${cadmesh_LIBRARIES}")
 
 endif()
 
@@ -122,7 +125,7 @@ add_library (cresta ${sources} ${headers})
 #
 
 add_executable(cosmicraysim ${PROJECT_SOURCE_DIR}/app/standard/cosmicraysim.cc)
-target_link_libraries(cosmicraysim  ${LINK_LIBRARIES} cresta)
+target_link_libraries(cosmicraysim ${LINK_LIBRARIES}  cresta)
 
 add_executable(chance_g4sim ${PROJECT_SOURCE_DIR}/app/chance/chance_g4sim.cc)
 target_link_libraries(chance_g4sim  ${LINK_LIBRARIES} cresta)
