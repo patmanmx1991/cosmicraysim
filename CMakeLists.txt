@@ -16,6 +16,7 @@ if (CMAKE_BUILD_TYPE MATCHES RELEASE)
 else()
   set(CURRENT_CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS_DEBUG})
 endif()
+set(LINK_DIRS "")
 
 #----------------------------------------------------------------------------
 # Find Geant4 package, activating all available UI and Vis drivers by default
@@ -77,6 +78,7 @@ if(USE_CADMESH)
     set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH} {CADMESH_DIR}/lib/")
     include_directories(${CADMESH_DIR}/include/)
     set(cadmesh_LIBRARIES "assimp;cadmesh;tet")
+    set(LINK_DIRS "${LINK_DIRS} -L{CADMESH_DIR}/lib/")
 #    find_library(cadmesh_LIBRARIES 
 #                 NAMES assimp cadmesh tet
 #                 HINTS "{CADMESH_DIR}/lib/}")
@@ -125,18 +127,18 @@ add_library (cresta ${sources} ${headers})
 #
 
 add_executable(cosmicraysim ${PROJECT_SOURCE_DIR}/app/standard/cosmicraysim.cc)
-target_link_libraries(cosmicraysim ${LINK_LIBRARIES}  cresta)
+target_link_libraries(cosmicraysim  ${LINK_DIRS} ${LINK_LIBRARIES} cresta)
 
 add_executable(chance_g4sim ${PROJECT_SOURCE_DIR}/app/chance/chance_g4sim.cc)
-target_link_libraries(chance_g4sim  ${LINK_LIBRARIES} cresta)
+target_link_libraries(chance_g4sim ${LINK_DIRS} ${LINK_LIBRARIES} cresta)
 
 add_executable(chance_trackfit ${PROJECT_SOURCE_DIR}/app/chance/chance_trackfit.cc)
-target_link_libraries(chance_trackfit  ${LINK_LIBRARIES} cresta)
+target_link_libraries(chance_trackfit ${LINK_DIRS} ${LINK_LIBRARIES} cresta)
 
 
 if(USE_PUMAS)
 add_executable(pumas_example ${PROJECT_SOURCE_DIR}/app/pumas/pumas_example.cc)
-target_link_libraries(pumas_example  ${LINK_LIBRARIES} cresta)
+target_link_libraries(pumas_example  cresta)
 endif()
 
 #----------------------------------------------------------------------------
