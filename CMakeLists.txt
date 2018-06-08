@@ -54,8 +54,8 @@ include_directories(${ROOT_INCLUDE_DIR} ${Geant4_INCLUDE_DIR} ${PROJECT_SOURCE_D
 # Locate sources and headers for this project
 # NB: headers are included so they will show up in IDEs
 #
-file(GLOB sources ${PROJECT_SOURCE_DIR}/src/*/*.cc ${PROJECT_SOURCE_DIR}/src/geo/*/*.cc)
-file(GLOB headers ${PROJECT_SOURCE_DIR}/src/*/*.hh ${PROJECT_SOURCE_DIR}/src/geo/*/*.cc)
+file(GLOB sources ${PROJECT_SOURCE_DIR}/src/*/*.cc ${PROJECT_SOURCE_DIR}/src/*/*.c ${PROJECT_SOURCE_DIR}/src/geo/*/*.cc)
+file(GLOB headers ${PROJECT_SOURCE_DIR}/src/*/*.hh ${PROJECT_SOURCE_DIR}/src/*/*.h ${PROJECT_SOURCE_DIR}/src/geo/*/*.hh)
 
 #----------------------------------------------------------------------------
 configure_file(cmake/setup.sh.in
@@ -77,6 +77,8 @@ target_link_libraries(chance_g4sim  ${Geant4_LIBRARIES} ${ROOT_LIBRARIES}  ${cad
 add_executable(chance_trackfit ${PROJECT_SOURCE_DIR}/app/chance/chance_trackfit.cc)
 target_link_libraries(chance_trackfit  ${Geant4_LIBRARIES} ${ROOT_LIBRARIES}  ${cadmesh_LIBRARIES} cresta)
 
+add_executable(pumas_example ${PROJECT_SOURCE_DIR}/app/pumas/pumas_example.cc)
+target_link_libraries(pumas_example  ${Geant4_LIBRARIES} ${ROOT_LIBRARIES}  ${cadmesh_LIBRARIES} cresta)
 
 #----------------------------------------------------------------------------
 # For internal Geant4 use - but has no effect if you build this

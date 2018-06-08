@@ -40,4 +40,7 @@
 #include "Math/Minimizer.h"
 #include "Math/Factory.h"
 #include "Math/Functor.h"
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
 #pragma GCC diagnostic pop

@@ -20,7 +20,21 @@
 {
   name: "MATERIAL",
   index: "G4_Pb",
-  color: [0.1,0.1,0.6,0.5],
+  color: [0.05,0.05,0.05,0.8],
+  drawstyle: "solid"
+}
+
+{
+  name: "MATERIAL",
+  index: "G4_W",
+  color: [0.0,0.6,0.9,0.8],
+  drawstyle: "solid"
+}
+
+{
+  name: "MATERIAL",
+  index: "G4_Al",
+  color: [0.0,0.2,0.8,0.8],
   drawstyle: "solid"
 }
 

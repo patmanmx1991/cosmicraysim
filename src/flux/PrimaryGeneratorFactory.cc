@@ -4,6 +4,7 @@
 #include "db/DBTable.hh"
 #include "flux/ShuklaPrimaryGenerator.hh"
 #include "flux/CRYPrimaryGenerator.hh"
+#include "flux/PumasBackwardsGenerator.hh"
 
 namespace COSMIC{
 
@@ -20,6 +21,7 @@ G4VUserPrimaryGeneratorAction* PrimaryGeneratorFactory::LoadGenerator(DBTable ta
   std::cout << "FLX: Loading Primary Generator : " << type << std::endl;
   if (type.compare("shukla")==0) return new ShuklaPrimaryGenerator();
   if (type.compare("cry")==0)    return new CRYPrimaryGenerator();
+  if (type.compare("pumasback") ==0) return new PumasBackwardsGenerator();
 
   // Check if onle made
   std::cout << "Generator Creation Failed!" << std::endl;

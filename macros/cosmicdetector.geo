@@ -29,7 +29,7 @@
   index: "detector",
   type: "box",
   mother: "world",
-  material: "G4_AIR",
+  material: "G4_Pb",
   size: ["2.0*m","2.0*m","2.0*m"],
   position: ["0.0*m","0.0","0.0"],
   sensitive: "truemuon",	   

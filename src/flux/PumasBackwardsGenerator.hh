@@ -1,14 +1,14 @@
 //******************************************************************************
-// CRYPrimaryGenerator.hh
+// PumasBackwardsGenerator.hh
 //
-// This class is a class derived from G4VUserCRYPrimaryGenerator for
+// This class is a class derived from G4VUserPumasBackwardsGenerator for
 // constructing the process used to generate incident particles.
 //
 // 1.00 JMV, LLNL, JAN-2007:  First version.
 //******************************************************************************
 //
-#ifndef __COSMIC_CRYPrimaryGenerator_HH__
-#define __COSMIC_CRYPrimaryGenerator_HH__ 1
+#ifndef __COSMIC_PumasBackwardsGenerator_HH__
+#define __COSMIC_PumasBackwardsGenerator_HH__ 1
 
 #include <iomanip>
 #include "vector"
@@ -36,125 +36,112 @@
 
 #include "db/DB.hh"
 
-#include "cry/RNGWrapper.hh"
-#include "cry/CRYSetup.h"
-#include "cry/CRYGenerator.h"
-#include "cry/CRYParticle.h"
-#include "cry/CRYUtils.h"
 
-#include "CRYPrimaryGenerator.hh"
+#include "PumasBackwardsGenerator.hh"
 
 // Forward Declarations
 class G4Event;
 
 namespace COSMIC {
 
+
 //---------------------------------------------------------------------------------
-/// CRY Flux Generator, derived from example given in CRY Library
-class CRYPrimaryGenerator : public G4VUserPrimaryGeneratorAction
+/// Shukla Flux Generator, derived from CRESTA code written by Chris Steer.
+class PumasBackwardsGenerator : public G4VUserPrimaryGeneratorAction
 {
 public:
 
-  /// Constructor
-  CRYPrimaryGenerator();
-  /// Destructor
-  ~CRYPrimaryGenerator();
+    /// Constructor
+    PumasBackwardsGenerator();
+    /// Destructor
+    ~PumasBackwardsGenerator();
 
-  /// Produce a new CRY generator given the current setup
-  void UpdateCRY();
+    void Setup();
 
-  /// Return the source box used
-  G4Box* GetSourceBox();
+    /// Generate the primary muon, and apply acceptance filter.
+    void GeneratePrimaries(G4Event* anEvent);
 
-  /// Return the target boxes list
-  std::vector<G4Box*> GetTargetBoxes();
+    bool fSetupState;
 
-  /// Return the Target Box Positions List
-  std::vector<G4ThreeVector> GetTargetBoxPositions();
-
-  /// Function to draw events from CRY library
-  void GeneratePrimaries(G4Event* anEvent);
-
-  // Getter Functions
-  G4double GetTime() {return fExposureTime;};
-  G4double GetEnergy() {return fParticleEnergy;};
-  G4ThreeVector GetDirection() {return fParticleDir;};
-  G4ThreeVector GetPosition() {return fParticlePos;};
-  G4double GetPDG() {return fParticlePDG;};
-  G4double GetMultiplicity() {return fParticleMult;};
-
-  void ResetExposureTime();
+    // Get Functions
+    inline G4double GetMuonTime()     { return fMuonTime;     };
+    inline G4double GetMuonEnergy()   { return fMuonEnergy;   };
+    inline G4ThreeVector GetMuonDir() { return fMuonDir;      };
+    inline G4ThreeVector GetMuonPos() { return fMuonPos;      };
+    inline int GetMuonPDG()           { return fMuonPDG;      };
+    inline G4double GetExposureTime() { return fExposureTime; };
+    inline void SetExposureTime(double d){ fMuonTime = d; };
 
 private:
 
-  CRYGenerator* gen; ///< Actual CRY Generator
+    G4double fMinEnergy; ///< Min Energy Range to integrate/throw
+    G4double fMaxEnergy; ///< Max Energy Range to integrate/throw
 
-  std::vector<CRYParticle*> *vect; ///< vector of generated particles
+    TF1 *fEnergyPDF; ///< Energy Function from Shukla Paper
+    TF1 *fZenithPDF; ///< Zenith Function from Shukla Paper
 
-  G4ParticleTable* particleTable; ///< Available of primaries table
-  G4ParticleGun* particleGun;     ///< Actual G4 Gun
+    G4double fFluxIntegrated; ///< Integral of flux for norm.
 
-  G4int InputState; ///< Flag to check CRY setup
+    G4double fPar_I0;  ///< IO  Par from Shukla Paper
+    G4double fPar_n;   ///< n   Par from Shukla Paper
+    G4double fPar_E0;  ///< E0  Par from Shukla Paper
+    G4double fPar_eps; ///< eps Par from Shukla Paper
 
-  // CRY Settings
-  bool fGenNeutrons  ; ///< Flag to generate neutrons : Def(true)
-  bool fGenProtons   ; ///< Flag to generate protons  : Def(true)
-  bool fGenGammas    ; ///< Flag to generate gammas   : Def(true)
-  bool fGenElectrons ; ///< Flag to generate electrons: Def(true)
-  bool fGenMuons     ; ///< Flag to generate muons    : Def(true)
-  bool fGenPions     ; ///< Flag to generate pions    : Def(true)
+    G4double fPar_rad; ///< radius Par from Shukla Paper
+    G4double fPar_dis; ///< distance Par from Shukla Paper
 
-  G4double fAltitude; ///< Altitude value for CRY
-  G4double fLatitude; ///< Latitude value for CRY [-90,90]
+    /// Definitions for particle gun to avoid string comparisons
+    std::vector<G4ParticleDefinition*> fParticleDefs;
+    G4ParticleGun* fParticleGun; ///< Main particle gun
 
-  std::string fDate; ///< CRY date ID : Def("1-1-2007")
+    // Source box setup originally used geometries from the main GEO
+    // volume list, but no longer does. That is why it is setup this
+    // way.
+    bool fSourceBox; ///< FLAG : Whether source box been created/checked
+    G4ThreeVector fSourceBoxWidth; ///< Length/Width of box.
+    G4ThreeVector fSourceBoxPosition; ///< Position of box in world volume
+    G4int fSourceBoxRequireN; ///< Requires at least this number of hits in different target boxes
 
-  G4int fNParticlesMin; ///< Particle multiplicity truncation
-  G4int fNParticlesMax; ///< Particle multiplicity truncation
+    G4double fArea; ///< Area of box. Used for normalisation.
 
-  G4double fMinEnergy; ///< Minimimum energy cut
-  G4double fMaxEnergy; ///< Maximum energy cut
+    // Target box also originally setup from GEO tables.
+    bool fCheckTargetBoxes; ///< FLAG : Whether target boxes okay.
+    std::vector<G4Box*> fTargetBoxes; ///< Geant4 Box Object for each target
+    std::vector<G4ThreeVector> fTargetBoxPositions; ///< Position in world volume for each target
+    // G4int fTargetBoxesRequireN; ///< Requires at least this number of hits in different target boxes
 
-  std::string fDataDirectory; ///< Default directory of CRY data files
-
-
-  // Source box setup originally used geometries from the main GEO
-  // volume list, but no longer does. That is why it is setup this
-  // way.
-  G4Box* fSourceBox; ///< Pointer to user setup Source Box
-  G4ThreeVector fSourceBoxPosition; ///< Position of source box in world
-  G4double fLateralBoxSize; ///< Side length of source box
-
-  // Target box also originally setup from GEO tables.
-  bool fCheckTargetBoxes; ///< Flag to check target boxes created
-  std::vector<G4Box*> fTargetBoxes; ///< List of user defined targets
-  std::vector<G4ThreeVector> fTargetBoxPositions; ///< Position of user defined targets in world
+    // Throws are tracked regardless of acceptance, so integrated time always correct.
+    /// Current Integrated Exposure time. Derivide from NThrows and Integrated flux.
+    G4double fExposureTime;
+    int fNThrows; ///< Number of throws ran so far.
 
 
-  G4double fExposureTime; ///< Current integrated exposure time
-  int fNthrows; ///< Total number of throws so far
+    G4double fMuonTime;     ///< MuonTime   Info for auto flux processor
+    G4double fMuonEnergy;   ///< MuonEnergy Info for auto flux processor
+    G4ThreeVector fMuonDir; ///< MuonDir    Info for auto flux processor
+    G4ThreeVector fMuonPos; ///< MuonPos    Info for auto flux processor
+    G4double fMuonPDG;      ///< MuonPDG    Info for auto flux processor
+    G4double fSpeedUp;      ///< MuonPDG    Info for auto flux processor
 
-  bool fAggressiveSelection; ///< Flag to keep only tracks that hit a target box
-  G4double fParticleMult;     ///< MuonTime   Info for auto flux processor
-  G4double fParticleEnergy;     ///< MuonTime   Info for auto flux processor
-  G4ThreeVector fParticleDir; ///< MuonDir    Info for auto flux processor
-  G4ThreeVector fParticlePos; ///< MuonPos    Info for auto flux processor
-  G4double fParticlePDG;      ///< MuonPDG    Info for auto flux processor
+    double fKineticThreshold;
 
 };
 //---------------------------------------------------------------------------------
+
+
+
 
 //---------------------------------------------------------------------------------
 /// CRYFluxProcessor class : Automatically saves the true muon information
 /// for each event into the TTree. Currently only saves the total exposure
 /// since CRY energy can save multiple primaries.
-class CRYPrimaryFluxProcessor : public VFluxProcessor {
+class PumasBackwardsProcessor : public VFluxProcessor {
 public:
   /// Processor can only be created with an associated
   /// tracker object.
-  CRYPrimaryFluxProcessor(CRYPrimaryGenerator* gen, bool autosave = true);
+  PumasBackwardsProcessor(PumasBackwardsGenerator* gen, bool autosave = true);
   /// Destructor
-  ~CRYPrimaryFluxProcessor() {};
+  ~PumasBackwardsProcessor() {};
 
   /// Setup Ntuple entries
   bool BeginOfRunAction(const G4Run* run);
@@ -164,27 +151,15 @@ public:
 
   /// Return an integrated exposure time in s. Used for
   /// ending the run after so many seconds.
-  G4double GetExposureTime();
+  G4double GetExposureTime() { return 1.0; };
 
-  void ResetExposureTime();
-  double GetEventRate();
+  void ResetExposureTime(){};
+  double GetEventRate(){ return 1.0; };
 
 protected:
 
-  CRYPrimaryGenerator* fGenerator; ///< Pointer to associated generator
-  bool fSave; ///< Flag to save event info automatically
-  int fTimeIndex; ///< Time Ntuple Index
-
-  int fParticleMultIndex;     ///< MuonTime   Info for auto flux processor
-  int fParticleEnergyIndex;     ///< MuonTime   Info for auto flux processor
-  int fParticlePDGIndex;      ///< MuonPDG    Info for auto flux processor
-  int fParticleDirXIndex; ///< MuonDir    Info for auto flux processor
-  int fParticleDirYIndex; ///< MuonDir    Info for auto flux processor
-  int fParticleDirZIndex; ///< MuonDir    Info for auto flux processor
-  int fParticlePosXIndex; ///< MuonPos    Info for auto flux processor
-  int fParticlePosYIndex; ///< MuonPos    Info for auto flux processor
-  int fParticlePosZIndex; ///< MuonPos    Info for auto flux processor
-
+  PumasBackwardsGenerator* fGenerator; ///< Pointer to associated generator
+  
 
 };
 //---------------------------------------------------------------------------------
