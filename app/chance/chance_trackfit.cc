@@ -449,7 +449,7 @@ int main(int argc, char** argv) {
     pocafit->SetUseAll();
 
     // Run an upper and lower single track fit here
-    double pocafitparams[14] = {0.};
+    double pocafitparams[16] = {0.};
     pocafit->PerformDoubleTrackPoCAFit(pocafitparams);
 
     double stf_above_x  = pocafitparams[0];
@@ -490,11 +490,11 @@ int main(int argc, char** argv) {
     fScattering[19] = chi2arpcy + chi2adrifty; // event.yUchi2;
     fScattering[20] = chi2brpcx + chi2bdriftx; // event.xLchi2;
     fScattering[21] = chi2brpcy + chi2bdrifty; // event.yLchi2;
-    fScattering[22] = chi2arpcx + chi2adriftx + chi2brpcx + chi2bdriftx; // event.xchi2;
-    fScattering[23] = chi2arpcy + chi2adrifty + chi2brpcy + chi2bdrifty; // event.ychi2;
-    fScattering[24] = fMinuitParams[0]; // chi2
 
-    // std::cout << "X Chi2 : " << fScattering[18] << " + " << fScattering[20] << " = " << fScattering[22] << std::endl;
+
+    fScattering[22] = pocafitparams[14]; //chi2arpcx + chi2adriftx + chi2brpcx + chi2bdriftx; // event.xchi2;
+    fScattering[23] = pocafitparams[15]; //chi2arpcy + chi2adrifty + chi2brpcy + chi2bdrifty; // event.ychi2;
+    fScattering[24] = fMinuitParams[0]; // chi2
 
     double ChiSquareCut3Points = 2000;
     if (gInputMode != kUseAll) ChiSquareCut3Points = 1000;
@@ -503,8 +503,6 @@ int main(int argc, char** argv) {
         fScattering[19] > ChiSquareCut3Points ||
         fScattering[20] > ChiSquareCut3Points ||
         fScattering[21] > ChiSquareCut3Points) {
-
-      // std::cout << "Bad Chi2 : " << fScattering[18] << " " << fScattering[19] << " " << fScattering[20] << " " << fScattering[21] << std::endl;
       continue;
     }
 
@@ -650,17 +648,6 @@ int main(int argc, char** argv) {
     fScattering[1] = grad1Y.Angle(grad2Y); // Scatter Angle Y
     fScattering[2] = grad1.Angle(grad2); // Scatter Angle 3d
 
-                // U_offsetX = fabs(hitPosition[2] - (fitVx + fitpx2*(zPosition[2] - fitVz)));
-                // U_offsetY = fabs(hitPosition[8] - (fitVy + fitpy2*(zPosition[8] - fitVz)));
-
-                // L_offsetX = fabs(hitPosition[3] - (fitVx + fitpx1*(zPosition[3] - fitVz)));
-                // L_offsetY = fabs(hitPosition[9] - (fitVy + fitpy1*(zPosition[9] - fitVz)));
-
-    // double UPoCA_Vx = fabs(fitVx - (stf_above_x + stf_above_px * (0.0 - fitVz)));
-    // double UPoCA_Vy = fabs(fitVy - (stf_above_y + stf_above_py * (0.0 - fitVz)));
-    // double LPoCA_Vx = fabs(fitVx - (stf_below_x + stf_below_px * (0.0 - fitVz)));
-    // double LPoCA_Vy = fabs(fitVy - (stf_below_y + stf_below_py * (0.0 - fitVz)));
-
     double projux = (fitVx + fitpx1 * (fitVz - pocafit->GetLowestXZAbove()));
     double projuy = (fitVy + fitpy1 * (fitVz - pocafit->GetLowestYZAbove()));
     double projlx = (fitVx + fitpx2 * (fitVz - pocafit->GetHighestXZBelow()));
@@ -670,10 +657,6 @@ int main(int argc, char** argv) {
     double U_offsetY = fabs( pocafit->GetLowestYYAbove()  - projuy);
     double L_offsetX = fabs( pocafit->GetHighestXXBelow() - projlx);
     double L_offsetY = fabs( pocafit->GetHighestYYBelow() - projly);
-
-    std::cout << "PROJ : " << projux << " " << projuy << " " << projlx << " " << projly << std::endl;
-    std::cout << "PLAN : " << pocafit->GetLowestXXAbove() << " " << pocafit->GetLowestYYAbove() << " " << pocafit->GetHighestXXBelow() << " " << pocafit->GetHighestYYBelow() << std::endl;
-    std::cout << "OFFS : " << U_offsetX << " " << U_offsetY << " " << L_offsetX << " " << L_offsetY << std::endl;
 
     fScattering[3] = U_offsetX; // Find lowest Z point in X
     fScattering[4] = U_offsetY; // Find lowest Z point in Y
@@ -715,34 +698,11 @@ int main(int argc, char** argv) {
     fScattering[16] = fitpy2;
     fScattering[17] = fitpy1;
 
-    // fitVx = fPOCAScattering[3];
-    // fitVy = fPOCAScattering[4];
-    // fitVz = fPOCAScattering[5];
-
-    // std::cout << "Dif X : " << fitVx << " " << fPOCAScattering[3] << std::endl;
-    // std::cout << "Dif Y : " << fitVy << " " << fPOCAScattering[4] << std::endl;
-    // std::cout << "Dif Z : " << fitVz << " " << fPOCAScattering[5] << std::endl;
-
-
     // Calculate POCA Quantities
     double UPoCA_Vx = fabs(fitVx - (stf_above_x + stf_above_px * (0.0 - fitVz)));
     double UPoCA_Vy = fabs(fitVy - (stf_above_y + stf_above_py * (0.0 - fitVz)));
     double LPoCA_Vx = fabs(fitVx - (stf_below_x + stf_below_px * (0.0 - fitVz)));
     double LPoCA_Vy = fabs(fitVy - (stf_below_y + stf_below_py * (0.0 - fitVz)));
-
-
-    // pocafit->TwoTrackFit();
-    // double TUPoCA_Vx = fabs(fitVx - (fitVz - pocafit->xUFitPrms[0]) / pocafit->xUFitPrms[1]);
-    // double TUPoCA_Vy = fabs(fitVy - (fitVz - pocafit->yUFitPrms[0]) / pocafit->yUFitPrms[1]);
-    // double TLPoCA_Vx = fabs(fitVx - (fitVz - pocafit->xLFitPrms[0]) / pocafit->xLFitPrms[1]);
-    // double TLPoCA_Vy = fabs(fitVy - (fitVz - pocafit->yLFitPrms[0]) / pocafit->yLFitPrms[1]);
-
-    // std::cout << "COMP POCA Z : " << fitVz << std::endl;
-    // std::cout << "Comp UXPOCA : " << fitVx << " " << UPoCA_Vx << " : " << TUPoCA_Vx << " : " << (fitVz - pocafit->xUFitPrms[0]) / pocafit->xUFitPrms[1] << std::endl;
-    // std::cout << "Comp UYPOCA : " << fitVy << " " << UPoCA_Vy << " : " << TUPoCA_Vy << std::endl;
-    // std::cout << "Comp LXPOCA : " << fitVx << " " << LPoCA_Vx << " : " << TLPoCA_Vx << std::endl;
-    // std::cout << "Comp LYPOCA : " << fitVy << " " << LPoCA_Vy << " : " << TLPoCA_Vy << std::endl;
-
 
     // // PoCA of upper/lower tracks to CF vertex.
     fScattering[25] = UPoCA_Vx;
@@ -753,7 +713,6 @@ int main(int argc, char** argv) {
     // Fill this event
     otree->Fill();
     savecount++;  
-    // if (savecount > 5) break;
 
     // Clean up look sharp
     // delete min;

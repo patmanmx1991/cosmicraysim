@@ -224,22 +224,16 @@ double BristolPoCAFitter::DoEval(const double* x) const {
 	double momy1  = x[5];
 	double momy2  = x[6];
 
-	// std::cout << "Getting RPC Hits" << std::endl;
 	chi2 += GetChi2AboveRPCX( pointx, momx2, pointz );
 	chi2 += GetChi2AboveRPCY( pointy, momy2, pointz );
 	chi2 += GetChi2BelowRPCX( pointx, momx1, pointz );
 	chi2 += GetChi2BelowRPCY( pointy, momy1, pointz );
 
-	// std::cout << " Total Chi2 After RPC = " << chi2 << " " << GetChi2AboveRPCX( pointx, momx2, pointz ) << " " << GetChi2AboveRPCY( pointy, momy2, pointz ) << " " << GetChi2BelowRPCX( pointx, momx1, pointz ) << " " << GetChi2BelowRPCY( pointy, momy1, pointz ) << std::endl;
+	chi2 += GetChi2AboveDriftX( pointx, momx2, pointz );
+	chi2 += GetChi2AboveDriftY( pointy, momy2, pointz );
+	chi2 += GetChi2BelowDriftX( pointx, momx1, pointz );
+	chi2 += GetChi2BelowDriftY( pointy, momy1, pointz );
 
-	// chi2 += GetChi2AboveDriftX( pointx, momx2, pointz );
-	// chi2 += GetChi2AboveDriftY( pointy, momy2, pointz );
-	// chi2 += GetChi2BelowDriftX( pointx, momx1, pointz );
-	// chi2 += GetChi2BelowDriftY( pointy, momy1, pointz );
-
-	// std::cout << "Print Level : " << ROOT::Minuit2::MnPrint::Level() << std::endl;
-
-	// std::cout << " Total Chi2 After Drift Too = " << chi2 << std::endl;
 	return chi2;
 
 }
@@ -251,10 +245,6 @@ double BristolPoCAFitter::GetChi2AboveRPCX( double pointx, double momx1, double 
 
 	double chi2 = 0.0;
 	for (uint i = 0; i < above_rpc_xx->size(); i++) {
-		// double t = pointz - above_rpc_xz->at(i);
-		// t*=-1;
-		// double d = pow(  above_rpc_xx->at(i) - (pointx + momx1*t), 2);
-		// chi2 += d / pow(above_rpc_xe->at(i), 2);
 		chi2 += pow( ( above_rpc_xx->at(i) - (pointx + momx1 * (pointz - above_rpc_xz->at(i))) ) / above_rpc_xe->at(i), 2 );
 	}
 
@@ -268,10 +258,6 @@ double BristolPoCAFitter::GetChi2AboveRPCY( double pointy, double momy1, double 
 
 	double chi2 = 0.0;
 	for (uint i = 0; i < above_rpc_yy->size(); i++) {
-		// double t = pointz - above_rpc_yz->at(i);
-		// t*=-1;
-		// double d = pow(  above_rpc_yy->at(i) - (pointy + momy1*t), 2);
-		// chi2 += d / pow(above_rpc_ye->at(i), 2);
 		chi2 += pow( ( above_rpc_yy->at(i) - (pointy + momy1 * (pointz - above_rpc_yz->at(i))) ) / above_rpc_ye->at(i), 2 );
 	}
 
@@ -323,10 +309,6 @@ double BristolPoCAFitter::GetChi2BelowRPCX( double pointx, double momx2, double 
 
 	double chi2 = 0.0;
 	for (uint i = 0; i < below_rpc_xx->size(); i++) {
-		// double t = pointz - below_rpc_xz->at(i);
-		// t*=-1;
-		// double d = pow(  below_rpc_xx->at(i) - (pointx + momx2*t), 2);
-		// chi2 += d / pow(below_rpc_xe->at(i), 2);
 		chi2 += pow( ( below_rpc_xx->at(i) - (pointx + momx2 * (pointz - below_rpc_xz->at(i))) ) / below_rpc_xe->at(i), 2 );
 	}
 
@@ -340,10 +322,6 @@ double BristolPoCAFitter::GetChi2BelowRPCY( double pointy, double momy2, double 
 
 	double chi2 = 0.0;
 	for (uint i = 0; i < below_rpc_yy->size(); i++) {
-		// double t = pointz - below_rpc_yz->at(i);
-		// t*=-1;
-		// double d = pow(  below_rpc_yy->at(i) - (pointy + momy2*t), 2);
-		// chi2 += d / pow(below_rpc_ye->at(i), 2);
 		chi2 += pow( ( below_rpc_yy->at(i) - (pointy + momy2 * (pointz - below_rpc_yz->at(i))) ) / below_rpc_ye->at(i), 2 );
 	}
 
@@ -1071,6 +1049,39 @@ void BristolPoCAFitter::PerformDoubleTrackPoCAFit(double* pocafitparams) {
 	SetVectorC( below_drift_yc );
 	DoSingleTrackFitWithX(&temp_below_y, &temp_below_py, &temp_below_yz);
 
+
+	// Perform a dodgy joint ABOVE+BELOW X Fit
+	FillSingleContainers(kFitAllX);
+	std::vector<bool> tempcombo;
+	if (above_drift_xc){
+	for (int i = 0; i < above_drift_xc->size(); i++){
+		tempcombo.push_back(above_drift_xc->at(i));
+	}
+	}
+	if (below_drift_xc){
+	for (int i = 0; i < below_drift_xc->size(); i++){
+		tempcombo.push_back(below_drift_xc->at(i));
+	}
+	}
+	SetVectorC( &tempcombo );
+	double xChi2 = DoSingleTrackFitWithX();
+
+	FillSingleContainers(kFitAllY);
+	tempcombo.clear();
+	if (above_drift_yc){
+	for (int i = 0; i < above_drift_yc->size(); i++){
+		tempcombo.push_back(above_drift_yc->at(i));
+	}
+	}
+	if (below_drift_yc){
+	for (int i = 0; i < below_drift_yc->size(); i++){
+		tempcombo.push_back(below_drift_yc->at(i));
+	}
+	}
+	SetVectorC( &tempcombo );
+	double yChi2 = DoSingleTrackFitWithX();
+
+
 	// Get vectors from the fits
 	TVector3 posA= TVector3(temp_above_x, temp_above_y, 0.0);
 	TVector3 momA= TVector3(temp_above_px, temp_above_py, 1.0);
@@ -1122,9 +1133,13 @@ void BristolPoCAFitter::PerformDoubleTrackPoCAFit(double* pocafitparams) {
 	pocafitparams[9]  = atan( abs((temp_above_py - temp_below_py)/(1 + temp_above_py*temp_below_py)) );
 	pocafitparams[10] = scatter_3d;
 
+	// std::cout << "Filling" << std::endl;
 	pocafitparams[11] = poca[0];
 	pocafitparams[12] = poca[1];
 	pocafitparams[13] = -poca[2];
+	pocafitparams[14] = xChi2;
+	pocafitparams[15] = yChi2;
+
 
 	return;
 }
@@ -1435,7 +1450,6 @@ void BristolPoCAFitter::TwoTrackFit()
 	delete yUTrack;
 	delete yLTrack;
 }
-
 
 }
 
