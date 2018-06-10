@@ -710,6 +710,16 @@ int main(int argc, char** argv) {
     fScattering[27] = UPoCA_Vy;
     fScattering[28] = LPoCA_Vy;
 
+    // Get Truth Information
+    fMCTruth[0] = pocafit->GetTrueEnergy();
+    fMCTruth[1] = pocafit->GetTrueP();
+    fMCTruth[2] = pocafit->GetTruePX();
+    fMCTruth[3] = pocafit->GetTruePY();
+    fMCTruth[4] = pocafit->GetTruePZ();
+    fMCTruth[5] = pocafit->GetTrueV();
+    fMCTruth[6] = pocafit->GetScatterAngle();
+    fMCTruth[7] = pocafit->GetPassFlag();
+
     // Fill this event
     otree->Fill();
     savecount++;  

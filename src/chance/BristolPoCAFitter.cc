@@ -108,7 +108,68 @@ void BristolPoCAFitter::ReadInputTTree(TTree* t, std::string prefixa, std::strin
 
 	ClearRPCVectors();
 	ClearDriftVectors();
+
+	// Set true information if available
+	t->SetBranchAddress( (prefixb + "_volume_px").c_str(), &fTruePX);
+	t->SetBranchAddress( (prefixb + "_volume_py").c_str(), &fTruePY);
+	t->SetBranchAddress( (prefixb + "_volume_pz").c_str(), &fTruePZ);
+	t->SetBranchAddress( (prefixa + "_volume_px").c_str(), &fTruePXIN);
+	t->SetBranchAddress( (prefixa + "_volume_py").c_str(), &fTruePYIN);
+	t->SetBranchAddress( (prefixa + "_volume_pz").c_str(), &fTruePZIN);
+
+
+	fTargetRegion_In_P  = new std::vector<double>(1, 0.0);
+	fTargetRegion_Out_P = new std::vector<double>(1, 0.0);
+	t->SetBranchAddress( "targetregion_in_p",  &fTargetRegion_In_P);
+	t->SetBranchAddress( "targetregion_out_p", &fTargetRegion_Out_P);
+
 }
+
+
+double BristolPoCAFitter::GetTrueEnergy() {
+	return GetTrueP() - 105.6583745;
+}
+
+double BristolPoCAFitter::GetTrueP() {
+	return sqrt(fTruePX * fTruePX + fTruePY * fTruePY + fTruePZ * fTruePZ);
+}
+
+double BristolPoCAFitter::GetTruePX() {
+	return fTruePX;
+}
+
+double BristolPoCAFitter::GetTruePY() {
+	return fTruePY;
+}
+
+double BristolPoCAFitter::GetTruePZ() {
+	return fTruePZ;
+}
+
+double BristolPoCAFitter::GetTrueV() {
+	return 0.0;
+}
+
+double BristolPoCAFitter::GetScatterAngle() {
+	TVector3 inv = TVector3(fTruePXIN, fTruePYIN, fTruePZIN);
+	TVector3 ouv = TVector3(fTruePX, fTruePY, fTruePZ);
+	return inv.Angle(ouv);
+}
+
+double BristolPoCAFitter::GetPassFlag() {
+	double TargetRegion_In_P = sqrt(fTargetRegion_In_P->at(0) * fTargetRegion_In_P->at(0) +
+	                                fTargetRegion_In_P->at(1) * fTargetRegion_In_P->at(1) +
+	                                fTargetRegion_In_P->at(2) * fTargetRegion_In_P->at(2));
+
+	double TargetRegion_Out_P = sqrt(fTargetRegion_Out_P->at(0) * fTargetRegion_Out_P->at(0) +
+	                                 fTargetRegion_Out_P->at(1) * fTargetRegion_Out_P->at(1) +
+	                                 fTargetRegion_Out_P->at(2) * fTargetRegion_Out_P->at(2));
+
+	if (TargetRegion_In_P > 0 && TargetRegion_Out_P > 0) return true;
+}
+
+
+
 
 void BristolPoCAFitter::DeleteContainers() {
 
@@ -158,10 +219,10 @@ void BristolPoCAFitter::DeleteContainers() {
 
 }
 
-void BristolPoCAFitter::ApplyVectorOffset(std::vector<double>* vec){
+void BristolPoCAFitter::ApplyVectorOffset(std::vector<double>* vec) {
 	if (!vec) return;
-	for (int i = 0; i < vec->size(); i++){
-		(*vec)[i] = (*vec)[i] - 250.0/1.5 + 250.0; 
+	for (int i = 0; i < vec->size(); i++) {
+		(*vec)[i] = (*vec)[i] - 250.0 / 1.5 + 250.0;
 	}
 }
 
@@ -555,10 +616,10 @@ double BristolPoCAFitter::GetLowestX() {
 		}
 		double z = values_z.at(i);
 
-		if ( minz == -999. || z < minz ){	
+		if ( minz == -999. || z < minz ) {
 			minx = x;
 			minz = z;
-		} 
+		}
 	}
 
 	for (uint i = 0; i < values_rx.size(); i++) {
@@ -589,10 +650,10 @@ double BristolPoCAFitter::GetLowestZ() {
 		}
 		double z = values_z.at(i);
 
-		if ( minz == -999. || z < minz ){	
+		if ( minz == -999. || z < minz ) {
 			minx = x;
 			minz = z;
-		} 
+		}
 	}
 
 	for (uint i = 0; i < values_rx.size(); i++) {
@@ -626,10 +687,10 @@ double BristolPoCAFitter::GetHighestX() {
 		}
 		double z = values_z.at(i);
 
-		if ( maxz == -999. || z > maxz ){	
+		if ( maxz == -999. || z > maxz ) {
 			maxx = x;
 			maxz = z;
-		} 
+		}
 	}
 
 	for (uint i = 0; i < values_rx.size(); i++) {
@@ -660,10 +721,10 @@ double BristolPoCAFitter::GetHighestZ() {
 		}
 		double z = values_z.at(i);
 
-		if ( maxz == -999. || z > maxz ){	
+		if ( maxz == -999. || z > maxz ) {
 			maxx = x;
 			maxz = z;
-		} 
+		}
 	}
 
 	for (uint i = 0; i < values_rx.size(); i++) {
@@ -1053,71 +1114,71 @@ void BristolPoCAFitter::PerformDoubleTrackPoCAFit(double* pocafitparams) {
 	// Perform a dodgy joint ABOVE+BELOW X Fit
 	FillSingleContainers(kFitAllX);
 	std::vector<bool> tempcombo;
-	if (above_drift_xc){
-	for (int i = 0; i < above_drift_xc->size(); i++){
-		tempcombo.push_back(above_drift_xc->at(i));
+	if (above_drift_xc) {
+		for (int i = 0; i < above_drift_xc->size(); i++) {
+			tempcombo.push_back(above_drift_xc->at(i));
+		}
 	}
-	}
-	if (below_drift_xc){
-	for (int i = 0; i < below_drift_xc->size(); i++){
-		tempcombo.push_back(below_drift_xc->at(i));
-	}
+	if (below_drift_xc) {
+		for (int i = 0; i < below_drift_xc->size(); i++) {
+			tempcombo.push_back(below_drift_xc->at(i));
+		}
 	}
 	SetVectorC( &tempcombo );
 	double xChi2 = DoSingleTrackFitWithX();
 
 	FillSingleContainers(kFitAllY);
 	tempcombo.clear();
-	if (above_drift_yc){
-	for (int i = 0; i < above_drift_yc->size(); i++){
-		tempcombo.push_back(above_drift_yc->at(i));
+	if (above_drift_yc) {
+		for (int i = 0; i < above_drift_yc->size(); i++) {
+			tempcombo.push_back(above_drift_yc->at(i));
+		}
 	}
-	}
-	if (below_drift_yc){
-	for (int i = 0; i < below_drift_yc->size(); i++){
-		tempcombo.push_back(below_drift_yc->at(i));
-	}
+	if (below_drift_yc) {
+		for (int i = 0; i < below_drift_yc->size(); i++) {
+			tempcombo.push_back(below_drift_yc->at(i));
+		}
 	}
 	SetVectorC( &tempcombo );
 	double yChi2 = DoSingleTrackFitWithX();
 
 
 	// Get vectors from the fits
-	TVector3 posA= TVector3(temp_above_x, temp_above_y, 0.0);
-	TVector3 momA= TVector3(temp_above_px, temp_above_py, 1.0);
+	TVector3 posA = TVector3(temp_above_x, temp_above_y, 0.0);
+	TVector3 momA = TVector3(temp_above_px, temp_above_py, 1.0);
 
-	TVector3 posB= TVector3(temp_below_x, temp_below_y, 0.0);
-	TVector3 momB= TVector3(temp_below_px, temp_below_py, 1.0);
+	TVector3 posB = TVector3(temp_below_x, temp_below_y, 0.0);
+	TVector3 momB = TVector3(temp_below_px, temp_below_py, 1.0);
 
-    // Get the PoCA
+	// Get the PoCA
 	TVector3 w0 = posA - posB;
-    double a = momA.Dot(momA);
-    double b = momA.Dot(momB);
-    double c = momB.Dot(momB);
-    double d = momA.Dot(w0);
-    double e = momB.Dot(w0);
+	double a = momA.Dot(momA);
+	double b = momA.Dot(momB);
+	double c = momB.Dot(momB);
+	double d = momA.Dot(w0);
+	double e = momB.Dot(w0);
 
-    double sc = ((b*e) - (c*d))/((a*c)-(b*b));
-    double tc = ((a*e) - (b*d))/((a*c)-(b*b));
+	double sc = ((b * e) - (c * d)) / ((a * c) - (b * b));
+	double tc = ((a * e) - (b * d)) / ((a * c) - (b * b));
 
-    TVector3 poca = 0.5 * (posA + sc*momA + posB + tc*momB);
+	TVector3 poca = 0.5 * (posA + sc * momA + posB + tc * momB);
 
-    // Get the distance between points of closest approach
-    // double distance = (posA + sc*momB - posB - tc*momB).Mag();
+	// Get the distance between points of closest approach
+	// double distance = (posA + sc*momB - posB - tc*momB).Mag();
 
-    // Get the scatter angles
-    TVector3 grad1X(temp_above_px, 0., 1.);
-    TVector3 grad2X(temp_below_px, 0., 1.);
+	// Get the scatter angles
+	TVector3 grad1X(temp_above_px, 0., 1.);
+	TVector3 grad2X(temp_below_px, 0., 1.);
 
-    TVector3 grad1Y(0., temp_above_py, 1.);
-    TVector3 grad2Y(0., temp_below_py, 1.);
+	TVector3 grad1Y(0., temp_above_py, 1.);
+	TVector3 grad2Y(0., temp_below_py, 1.);
 
-    TVector3 grad1(temp_above_px, temp_above_py, 1.);
-    TVector3 grad2(temp_below_px, temp_below_py, 1.);
+	TVector3 grad1(temp_above_px, temp_above_py, 1.);
+	TVector3 grad2(temp_below_px, temp_below_py, 1.);
 
 	// double scatter_x  = grad1X.Angle(grad2X);
-	// double scatter_y  = grad1Y.Angle(grad2Y); 
-    double scatter_3d = grad2.Angle(grad1);
+	// double scatter_y  = grad1Y.Angle(grad2Y);
+	double scatter_3d = grad2.Angle(grad1);
 
 	// Fill variables and return
 	pocafitparams[0] = temp_above_x;
@@ -1129,8 +1190,8 @@ void BristolPoCAFitter::PerformDoubleTrackPoCAFit(double* pocafitparams) {
 	pocafitparams[6] = temp_below_y;
 	pocafitparams[7] = temp_below_py;
 
-	pocafitparams[8]  = atan( abs((temp_above_px - temp_below_px)/(1 + temp_above_px*temp_below_px)) );
-	pocafitparams[9]  = atan( abs((temp_above_py - temp_below_py)/(1 + temp_above_py*temp_below_py)) );
+	pocafitparams[8]  = atan( abs((temp_above_px - temp_below_px) / (1 + temp_above_px * temp_below_px)) );
+	pocafitparams[9]  = atan( abs((temp_above_py - temp_below_py) / (1 + temp_above_py * temp_below_py)) );
 	pocafitparams[10] = scatter_3d;
 
 	// std::cout << "Filling" << std::endl;
@@ -1144,56 +1205,56 @@ void BristolPoCAFitter::PerformDoubleTrackPoCAFit(double* pocafitparams) {
 	return;
 }
 
-double BristolPoCAFitter::GetLowestXXAbove(){
+double BristolPoCAFitter::GetLowestXXAbove() {
 	FillSingleContainers(kFitAllAboveX);
 	SetVectorC( above_drift_xc );
 	return GetLowestX();
 }
 
-double BristolPoCAFitter::GetLowestXZAbove(){
+double BristolPoCAFitter::GetLowestXZAbove() {
 	FillSingleContainers(kFitAllAboveX);
 	SetVectorC( above_drift_xc );
 	return GetLowestZ();
 }
 
-double BristolPoCAFitter::GetLowestYYAbove(){
+double BristolPoCAFitter::GetLowestYYAbove() {
 	FillSingleContainers(kFitAllAboveY);
 	SetVectorC( above_drift_yc );
 	return GetLowestX();
 }
 
-double BristolPoCAFitter::GetLowestYZAbove(){
+double BristolPoCAFitter::GetLowestYZAbove() {
 	FillSingleContainers(kFitAllAboveY);
 	SetVectorC( above_drift_yc );
 	return GetLowestZ();
 }
 
-double BristolPoCAFitter::GetHighestXXBelow(){
+double BristolPoCAFitter::GetHighestXXBelow() {
 	FillSingleContainers(kFitAllBelowX);
 	SetVectorC( below_drift_xc );
 	return GetHighestX();
 }
 
-double BristolPoCAFitter::GetHighestXZBelow(){
+double BristolPoCAFitter::GetHighestXZBelow() {
 	FillSingleContainers(kFitAllBelowX);
 	SetVectorC( below_drift_xc );
 	return GetHighestZ();
 }
 
-double BristolPoCAFitter::GetHighestYYBelow(){
+double BristolPoCAFitter::GetHighestYYBelow() {
 	FillSingleContainers(kFitAllBelowY);
 	SetVectorC( below_drift_yc );
 	return GetHighestX();
 }
 
-double BristolPoCAFitter::GetHighestYZBelow(){
+double BristolPoCAFitter::GetHighestYZBelow() {
 	FillSingleContainers(kFitAllBelowY);
 	SetVectorC( below_drift_yc );
 	return GetHighestZ();
 }
 
 
-void BristolPoCAFitter::ClearRPCVectors(){
+void BristolPoCAFitter::ClearRPCVectors() {
 
 	if (above_rpc_xx) above_rpc_xx->clear();
 	if (above_rpc_xt) above_rpc_xt->clear();
@@ -1217,7 +1278,7 @@ void BristolPoCAFitter::ClearRPCVectors(){
 
 }
 
-void BristolPoCAFitter::ClearDriftVectors(){
+void BristolPoCAFitter::ClearDriftVectors() {
 
 	if (above_drift_xx) above_drift_xx->clear();
 	if (above_drift_xg) above_drift_xg->clear();
@@ -1258,33 +1319,33 @@ void BristolPoCAFitter::TwoTrackFit()
 
 	FillSingleContainers(kFitAllAboveX);
 	SetVectorC( above_drift_xc );
-	for (int i = 0; i < 3; i++){
+	for (int i = 0; i < 3; i++) {
 		xHits[i] = values_rx[i];
 		xErrors[i] = values_re[i];
 		xLayers[i] = values_rz[i];
 	}
 	FillSingleContainers(kFitAllBelowX);
 	SetVectorC( below_drift_xc );
-	for (int i = 0; i < 3; i++){
-		xHits[i+3] = values_rx[i];
-		xErrors[i+3] = values_re[i];
-		xLayers[i+3] = values_rz[i];
+	for (int i = 0; i < 3; i++) {
+		xHits[i + 3] = values_rx[i];
+		xErrors[i + 3] = values_re[i];
+		xLayers[i + 3] = values_rz[i];
 	}
 
-	
+
 	FillSingleContainers(kFitAllAboveY);
 	SetVectorC( above_drift_yc );
-	for (int i = 0; i < 3; i++){
+	for (int i = 0; i < 3; i++) {
 		yHits[i] = values_rx[i];
 		yErrors[i] = values_re[i];
 		yLayers[i] = values_rz[i];
 	}
 	FillSingleContainers(kFitAllBelowY);
 	SetVectorC( below_drift_yc );
-	for (int i = 0; i < 3; i++){
-		yHits[i+3] = values_rx[i];
-		yErrors[i+3] = values_re[i];
-		yLayers[i+3] = values_rz[i];
+	for (int i = 0; i < 3; i++) {
+		yHits[i + 3] = values_rx[i];
+		yErrors[i + 3] = values_re[i];
+		yLayers[i + 3] = values_rz[i];
 	}
 
 // std::cout << "Got track hits" << std::endl;
@@ -1304,43 +1365,43 @@ void BristolPoCAFitter::TwoTrackFit()
 
 
 	// std::cout << "UX LIM : " << (xLayers[3]+xLayers[2])/2.0 << " -> " << xLayers[0] << std::endl;
-	xLFitFunc = new TF1("xLFitFunc","pol1",xLayers[5],(xLayers[3]+xLayers[2])/2.0);
-	xUFitFunc = new TF1("xUFitFunc","pol1",(xLayers[3]+xLayers[2])/2.0,xLayers[0]);
-	yLFitFunc = new TF1("yLFitFunc","pol1",yLayers[5],(yLayers[3]+yLayers[2])/2.0);
-	yUFitFunc = new TF1("yUFitFunc","pol1",(yLayers[3]+yLayers[2])/2.0,yLayers[0]);
+	xLFitFunc = new TF1("xLFitFunc", "pol1", xLayers[5], (xLayers[3] + xLayers[2]) / 2.0);
+	xUFitFunc = new TF1("xUFitFunc", "pol1", (xLayers[3] + xLayers[2]) / 2.0, xLayers[0]);
+	yLFitFunc = new TF1("yLFitFunc", "pol1", yLayers[5], (yLayers[3] + yLayers[2]) / 2.0);
+	yUFitFunc = new TF1("yUFitFunc", "pol1", (yLayers[3] + yLayers[2]) / 2.0, yLayers[0]);
 
-	xLTrack = new TF1("xLTrack","pol1",xMin, xMax);
-	xUTrack = new TF1("xUTrack","pol1",xMin, xMax);
-	yLTrack = new TF1("yLTrack","pol1",yMin, yMax);
-	yUTrack = new TF1("yUTrack","pol1",yMin, yMax);
+	xLTrack = new TF1("xLTrack", "pol1", xMin, xMax);
+	xUTrack = new TF1("xUTrack", "pol1", xMin, xMax);
+	yLTrack = new TF1("yLTrack", "pol1", yMin, yMax);
+	yUTrack = new TF1("yUTrack", "pol1", yMin, yMax);
 
 	//fit ignoring error bars first, to set initial parameters
-	xFitGraph->Fit(xLFitFunc,"QEX0","",xLayers[5],(xLayers[3]+xLayers[2])/2.0);
-	xFitGraph->Fit(xUFitFunc,"+QEX0","",(xLayers[3]+xLayers[2])/2.0,xLayers[0]);
-	yFitGraph->Fit(yLFitFunc,"QEX0","",yLayers[5],(yLayers[3]+yLayers[2])/2.0);
-	yFitGraph->Fit(yUFitFunc,"+QEX0","",(yLayers[3]+yLayers[2])/2.0,yLayers[0]);
+	xFitGraph->Fit(xLFitFunc, "QEX0", "", xLayers[5], (xLayers[3] + xLayers[2]) / 2.0);
+	xFitGraph->Fit(xUFitFunc, "+QEX0", "", (xLayers[3] + xLayers[2]) / 2.0, xLayers[0]);
+	yFitGraph->Fit(yLFitFunc, "QEX0", "", yLayers[5], (yLayers[3] + yLayers[2]) / 2.0);
+	yFitGraph->Fit(yUFitFunc, "+QEX0", "", (yLayers[3] + yLayers[2]) / 2.0, yLayers[0]);
 
 	//fit considering error bars to get a better fit
-	xFitGraph->Fit(xLFitFunc,"QF","",xLayers[5],(xLayers[3]+xLayers[2])/2.0);
-	xFitGraph->Fit(xUFitFunc,"+QF","",(xLayers[3]+xLayers[2])/2.0,xLayers[0]);
-	yFitGraph->Fit(yLFitFunc,"QF","",yLayers[5],(yLayers[3]+yLayers[2])/2.0);
-	yFitGraph->Fit(yUFitFunc,"+QF","",(yLayers[3]+yLayers[2])/2.0,yLayers[0]);
+	xFitGraph->Fit(xLFitFunc, "QF", "", xLayers[5], (xLayers[3] + xLayers[2]) / 2.0);
+	xFitGraph->Fit(xUFitFunc, "+QF", "", (xLayers[3] + xLayers[2]) / 2.0, xLayers[0]);
+	yFitGraph->Fit(yLFitFunc, "QF", "", yLayers[5], (yLayers[3] + yLayers[2]) / 2.0);
+	yFitGraph->Fit(yUFitFunc, "+QF", "", (yLayers[3] + yLayers[2]) / 2.0, yLayers[0]);
 
 	//fix parameters for track line
-	xLTrack->FixParameter(0, (-xLFitFunc->GetParameter(0)/xLFitFunc->GetParameter(1)));
-	xLTrack->FixParameter(1, (1.0/xLFitFunc->GetParameter(1)));
-	xUTrack->FixParameter(0, (-xUFitFunc->GetParameter(0)/xUFitFunc->GetParameter(1)));
-	xUTrack->FixParameter(1, (1.0/xUFitFunc->GetParameter(1)));
-	yLTrack->FixParameter(0, (-yLFitFunc->GetParameter(0)/yLFitFunc->GetParameter(1)));
-	yLTrack->FixParameter(1, (1.0/yLFitFunc->GetParameter(1)));
-	yUTrack->FixParameter(0, (-yUFitFunc->GetParameter(0)/yUFitFunc->GetParameter(1)));
-	yUTrack->FixParameter(1, (1.0/yUFitFunc->GetParameter(1)));
+	xLTrack->FixParameter(0, (-xLFitFunc->GetParameter(0) / xLFitFunc->GetParameter(1)));
+	xLTrack->FixParameter(1, (1.0 / xLFitFunc->GetParameter(1)));
+	xUTrack->FixParameter(0, (-xUFitFunc->GetParameter(0) / xUFitFunc->GetParameter(1)));
+	xUTrack->FixParameter(1, (1.0 / xUFitFunc->GetParameter(1)));
+	yLTrack->FixParameter(0, (-yLFitFunc->GetParameter(0) / yLFitFunc->GetParameter(1)));
+	yLTrack->FixParameter(1, (1.0 / yLFitFunc->GetParameter(1)));
+	yUTrack->FixParameter(0, (-yUFitFunc->GetParameter(0) / yUFitFunc->GetParameter(1)));
+	yUTrack->FixParameter(1, (1.0 / yUFitFunc->GetParameter(1)));
 
 	//fit with fixed parameters, just to put the line on the graph
-	xGraph->Fit(xLTrack,"BQC","",xMin, xMax);
-	xGraph->Fit(xUTrack,"+BQC","",xMin, xMax);
-	yGraph->Fit(yLTrack,"BQC","",yMin, yMax);
-	yGraph->Fit(yUTrack,"+BQC","",yMin, yMax);
+	xGraph->Fit(xLTrack, "BQC", "", xMin, xMax);
+	xGraph->Fit(xUTrack, "+BQC", "", xMin, xMax);
+	yGraph->Fit(yLTrack, "BQC", "", yMin, yMax);
+	yGraph->Fit(yUTrack, "+BQC", "", yMin, yMax);
 
 	//format graphs
 	xGraph->GetXaxis()->SetLimits(xMin, xMax);
@@ -1368,8 +1429,8 @@ void BristolPoCAFitter::TwoTrackFit()
 	// std::cout << "U " << xUTrack->GetParameter(1) << " " << xUTrack->GetParameter(0) << std::endl;
 	// std::cout << "L " << xLTrack->GetParameter(1) << " " << xLTrack->GetParameter(0) << std::endl;
 
-	xScatterAngle = atan( abs((xUTrack->GetParameter(1) - xLTrack->GetParameter(1))/(1 + xUTrack->GetParameter(1)*xLTrack->GetParameter(1))) );
-	yScatterAngle = atan( abs((yUTrack->GetParameter(1) - yLTrack->GetParameter(1))/(1 + yUTrack->GetParameter(1)*yLTrack->GetParameter(1))) );
+	xScatterAngle = atan( abs((xUTrack->GetParameter(1) - xLTrack->GetParameter(1)) / (1 + xUTrack->GetParameter(1) * xLTrack->GetParameter(1))) );
+	yScatterAngle = atan( abs((yUTrack->GetParameter(1) - yLTrack->GetParameter(1)) / (1 + yUTrack->GetParameter(1) * yLTrack->GetParameter(1))) );
 
 	// std::cout << "xScatter Angle " << xScatterAngle << std::endl;
 
@@ -1378,36 +1439,36 @@ void BristolPoCAFitter::TwoTrackFit()
 	double temp_below_px = xLTrack->GetParameter(1);
 	double temp_below_py = yLTrack->GetParameter(1);
 
-    // Get the scatter angles
-    TVector3 grad1X(temp_above_px, 0., 1.);
-    TVector3 grad2X(temp_below_px, 0., 1.);
+	// Get the scatter angles
+	TVector3 grad1X(temp_above_px, 0., 1.);
+	TVector3 grad2X(temp_below_px, 0., 1.);
 
-    TVector3 grad1Y(0., temp_above_py, 1.);
-    TVector3 grad2Y(0., temp_below_py, 1.);
+	TVector3 grad1Y(0., temp_above_py, 1.);
+	TVector3 grad2Y(0., temp_below_py, 1.);
 
-    TVector3 grad1(temp_above_px, temp_above_py, 1.);
-    TVector3 grad2(temp_below_px, temp_below_py, 1.);
+	TVector3 grad1(temp_above_px, temp_above_py, 1.);
+	TVector3 grad2(temp_below_px, temp_below_py, 1.);
 
 	double scatter_x  = grad1X.Angle(grad2X);
-	double scatter_y  = grad1Y.Angle(grad2Y); 
-    double scatter_3d = grad1.Angle(grad2);
+	double scatter_y  = grad1Y.Angle(grad2Y);
+	double scatter_3d = grad1.Angle(grad2);
 
-    // std::cout << "New Scatter Angle X : " << scatter_x << std::endl;
+	// std::cout << "New Scatter Angle X : " << scatter_x << std::endl;
 
 
 	xUchi2 = xUFitFunc->GetChisquare();
 	xLchi2 = xLFitFunc->GetChisquare();
 	yUchi2 = yUFitFunc->GetChisquare();
 	yLchi2 = yLFitFunc->GetChisquare();
-	
-	trackParams[4] = xUTrack->GetParameter(0); 
-	trackParams[5] = xUTrack->GetParameter(1); 
-	trackParams[6] = xLTrack->GetParameter(0); 
-	trackParams[7] = xLTrack->GetParameter(1); 
-	trackParams[8] = yUTrack->GetParameter(0); 
-	trackParams[9] = yUTrack->GetParameter(1); 
-	trackParams[10] = yLTrack->GetParameter(0); 
-	trackParams[11] = yLTrack->GetParameter(1); 
+
+	trackParams[4] = xUTrack->GetParameter(0);
+	trackParams[5] = xUTrack->GetParameter(1);
+	trackParams[6] = xLTrack->GetParameter(0);
+	trackParams[7] = xLTrack->GetParameter(1);
+	trackParams[8] = yUTrack->GetParameter(0);
+	trackParams[9] = yUTrack->GetParameter(1);
+	trackParams[10] = yLTrack->GetParameter(0);
+	trackParams[11] = yLTrack->GetParameter(1);
 
 	//save fit parametes so they can be used by other functions
 	xUFitPrms[0] = xUTrack->GetParameter(0);
@@ -1420,15 +1481,15 @@ void BristolPoCAFitter::TwoTrackFit()
 	yLFitPrms[1] = yLTrack->GetParameter(1);
 
 	// Get z intersection point at layer 13 zpos.
-	
+
 	//x_intersect = (-400 - xUTrack->GetParameter(0)) / xUTrack->GetParameter(1);
 	//y_intersect = (-400 - yUTrack->GetParameter(0)) / yUTrack->GetParameter(1);
 
 	// if (config.perEventPlots == 1) {
-	if (false){
+	if (false) {
 		// if ((xUchi2 < 1) && (xLchi2 < 1) && (yUchi2 < 1) && (yLchi2 < 1)) {
-			xGraph->Write("x Two Track");
-			yGraph->Write("y Two Track");
+		xGraph->Write("x Two Track");
+		yGraph->Write("y Two Track");
 		// }
 	}
 	// //		xFitGraph->Write("x two-track fit");

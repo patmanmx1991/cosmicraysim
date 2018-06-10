@@ -205,6 +205,16 @@ void ApplyOffsets();
 	void ClearRPCVectors();
 	void ClearDriftVectors();
 
+	double GetTrueEnergy();
+    double GetTrueP();
+    double GetTruePX();
+    double GetTruePY();
+    double GetTruePZ();
+    double GetTrueV();
+    double GetScatterAngle();
+    double GetPassFlag();
+
+
 	std::vector<double> values_x;
 	std::vector<double> values_e;
 	std::vector<double> values_g;
@@ -302,6 +312,16 @@ protected:
 	std::vector<double>* below_drift_yz;
 	std::vector<double>* below_drift_ye;
 	std::vector<bool>*   below_drift_yc;
+
+	std::vector<double>* fTargetRegion_In_P;
+	std::vector<double>* fTargetRegion_Out_P;
+	double fTrueScatterAngle;
+    double fTruePX;
+    double fTruePY;
+    double fTruePZ;
+    double fTruePXIN;
+    double fTruePYIN;
+    double fTruePZIN;
 
 	bool fUseRPC;
 	bool fUseDrift;
