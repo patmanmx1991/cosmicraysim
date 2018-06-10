@@ -263,10 +263,10 @@ int main(int argc, char** argv) {
   std::cout << "APP: Reading Configuration" << std::endl;
   // bool fUseRPC = true;
   // bool fUseDrift = true;
-  int fMinARPCX = 2;
-  int fMinARPCY = 2;
-  int fMinBRPCX = 2;
-  int fMinBRPCY = 2;
+  int fMinARPCX = 3;
+  int fMinARPCY = 3;
+  int fMinBRPCX = 3;
+  int fMinBRPCY = 3;
   int fMinADriftX = 3;
   int fMinADriftY = 3;
   int fMinBDriftX = 3;
@@ -435,15 +435,15 @@ int main(int argc, char** argv) {
     // Get the starting track values for above and below
     pocafit->SetUseAll();
 
-    // double startpx1 = pocafit->PredictStartBelowPX();
-    // double startpy1 = pocafit->PredictStartBelowPY();
-    // double startpx2 = pocafit->PredictStartAbovePX();
-    // double startpy2 = pocafit->PredictStartAbovePY();
+    double startpx1 = pocafit->PredictStartBelowPX();
+    double startpy1 = pocafit->PredictStartBelowPY();
+    double startpx2 = pocafit->PredictStartAbovePX();
+    double startpy2 = pocafit->PredictStartAbovePY();
 
     // Set the starting PoCA as the mean
-    // double startx = pocafit->PredictStartPoCAX();
-    // double starty = pocafit->PredictStartPoCAY();
-    // double startz = pocafit->PredictStartPoCAZ();
+    double startx = pocafit->PredictStartPoCAX();
+    double starty = pocafit->PredictStartPoCAY();
+    double startz = pocafit->PredictStartPoCAZ();
 
     // Tell POCA to use all available information in subsequent fit
     pocafit->SetUseAll();
@@ -496,88 +496,88 @@ int main(int argc, char** argv) {
 
     // std::cout << "X Chi2 : " << fScattering[18] << " + " << fScattering[20] << " = " << fScattering[22] << std::endl;
 
-    // double ChiSquareCut3Points = 2000;
-    // if (gInputMode != kUseAll) ChiSquareCut3Points = 1000;
+    double ChiSquareCut3Points = 2000;
+    if (gInputMode != kUseAll) ChiSquareCut3Points = 1000;
 
-    // if (fScattering[18] > ChiSquareCut3Points || 
-    //     fScattering[19] > ChiSquareCut3Points ||
-    //     fScattering[20] > ChiSquareCut3Points ||
-    //     fScattering[21] > ChiSquareCut3Points) {
+    if (fScattering[18] > ChiSquareCut3Points || 
+        fScattering[19] > ChiSquareCut3Points ||
+        fScattering[20] > ChiSquareCut3Points ||
+        fScattering[21] > ChiSquareCut3Points) {
 
-    //   // std::cout << "Bad Chi2 : " << fScattering[18] << " " << fScattering[19] << " " << fScattering[20] << " " << fScattering[21] << std::endl;
-    //   continue;
-    // }
+      // std::cout << "Bad Chi2 : " << fScattering[18] << " " << fScattering[19] << " " << fScattering[20] << " " << fScattering[21] << std::endl;
+      continue;
+    }
 
-    // int npars = 7;
-    // ROOT::Minuit2::MnUserParameters mn_param;
+    int npars = 7;
+    ROOT::Minuit2::MnUserParameters mn_param;
+
+    mn_param.Add("vx", 225.0, 10);
+    mn_param.Add("vy", 225.0, 10);
+    mn_param.Add("vz", -250.0, 10);
+    mn_param.Add("px1", 0.0, 10);
+    mn_param.Add("px2", 0.0, 10);
+    mn_param.Add("py1", 0.0, 10);
+    mn_param.Add("py2", 0.0, 10);
 
     // mn_param.Add("vx", 250.0, 10);
     // mn_param.Add("vy", 250.0, 10);
     // mn_param.Add("vz", 0.0, 10);
-    // mn_param.Add("px1", 0.0, 10);
-    // mn_param.Add("px2", 0.0, 10);
-    // mn_param.Add("py1", 0.0, 10);
-    // mn_param.Add("py2", 0.0, 10);
+    // mn_param.Add("px1", stf_below_x, 10);
+    // mn_param.Add("px2", stf_above_x, 10);
+    // mn_param.Add("py1", stf_below_y, 10);
+    // mn_param.Add("py2", stf_above_y, 10);
+    pocafit->SetUseAll();
 
-    // // mn_param.Add("vx", 250.0, 10);
-    // // mn_param.Add("vy", 250.0, 10);
-    // // mn_param.Add("vz", 0.0, 10);
-    // // mn_param.Add("px1", stf_below_x, 10);
-    // // mn_param.Add("px2", stf_above_x, 10);
-    // // mn_param.Add("py1", stf_below_y, 10);
-    // // mn_param.Add("py2", stf_above_y, 10);
-    // pocafit->SetUseAll();
+    // Minimisation
+    ROOT::Minuit2::MnMigrad migrad( *pocafit, mn_param, 2 ); //Strategy 2
+    ROOT::Minuit2::FunctionMinimum min = migrad();
 
-    // // Minimisation
-    // ROOT::Minuit2::MnMigrad migrad( *pocafit, mn_param, 2 ); //Strategy 2
-    // ROOT::Minuit2::FunctionMinimum min = migrad();
+    ROOT::Minuit2::MnAlgebraicSymMatrix MinCovarMatrix = min.Error().Matrix();
+    ROOT::Minuit2::MnAlgebraicVector MinParams = min.Parameters().Vec();
 
-    // ROOT::Minuit2::MnAlgebraicSymMatrix MinCovarMatrix = min.Error().Matrix();
-    // ROOT::Minuit2::MnAlgebraicVector MinParams = min.Parameters().Vec();
+    for (int j = 0; j < npars; j++){
+      fBestFitPars[j] = MinParams[j];
+    }
 
-    // for (int j = 0; j < npars; j++){
-    //   fBestFitPars[j] = MinParams[j];
-    // }
+    // end Minuit2
+    Double_t istat = 0;
+    if (min.HasPosDefCovar()) istat = 3;
 
-    // // end Minuit2
-    // Double_t istat = 0;
-    // if (min.HasPosDefCovar()) istat = 3;
-
-    // fMinuitParams[0] = pocafit->DoEval(fBestFitPars);
-    // fMinuitParams[1] = min.Edm();
-    // fMinuitParams[2] = min.Up();
-    // fMinuitParams[3] = 7;
-    // fMinuitParams[4] = 7;
-    // fMinuitParams[5] = istat;
+    fMinuitParams[0] = pocafit->DoEval(fBestFitPars);
+    fMinuitParams[1] = min.Edm();
+    fMinuitParams[2] = min.Up();
+    fMinuitParams[3] = 7;
+    fMinuitParams[4] = 7;
+    fMinuitParams[5] = istat;
 
 
 
-    // for (Int_t i = 0; i < 7; ++i) {
-    //   for (Int_t j = 0; j < 7; ++j) {
-    //     Int_t pos = (i * 7) + j;
-    //     fCovarMatrix[pos] = MinCovarMatrix(i, j);
-    //   }
-    // }
+    for (Int_t i = 0; i < 7; ++i) {
+      for (Int_t j = 0; j < 7; ++j) {
+        Int_t pos = (i * 7) + j;
+        fCovarMatrix[pos] = MinCovarMatrix(i, j);
+      }
+    }
 
-    // pocafit->SetUseAll();
+    pocafit->SetUseAll();
 
 
 
-    // Create Minimizer Object
-    ROOT::Math::Minimizer* min = ROOT::Math::Factory::CreateMinimizer("Minuit2", "Migrad");
-    min->SetPrintLevel(-1);
-    min->SetMaxIterations(int(1E15));
-    min->SetMaxFunctionCalls(int(1E20));
-    min->SetTolerance(0.001);
-    min->SetStrategy(2);
+    // // Create Minimizer Object
+    // ROOT::Math::Minimizer* min = ROOT::Math::Factory::CreateMinimizer("Minuit2", "Migrad");
+    // min->SetPrintLevel(-1);
+    // min->SetMaxIterations(int(1E15));
+    // min->SetMaxFunctionCalls(int(1E20));
+    // min->SetTolerance(0.001);
+    // min->SetStrategy(2);
 
-    // Setup Functor for the fitter
-    int npars = 7;
-    BristolPoCAFitterFCN* fcn = new BristolPoCAFitterFCN(pocafit);
-    ROOT::Math::Functor func(*fcn, npars);
-    min->SetFunction(func);
+    // // Setup Functor for the fitter
+    // int npars = 7;
+    // BristolPoCAFitterFCN* fcn = new BristolPoCAFitterFCN(pocafit);
+    // ROOT::Math::Functor func(*fcn, npars);
+    // min->SetFunction(func);
 
-    // Tell Minuit the variables
+    // // Tell Minuit the variables
     // min->SetVariable(0, "rx",  pocafitparams[11],   10.0);
     // min->SetVariable(1, "ry",  pocafitparams[12],   10.0);
     // min->SetVariable(2, "rz",  pocafitparams[13],   10.0);
@@ -586,45 +586,46 @@ int main(int argc, char** argv) {
     // min->SetVariable(5, "py1", stf_below_py,        10.0);
     // min->SetVariable(6, "py2", stf_above_py,        10.0);
 
-    // Tell Minuit the variables
-    min->SetVariable(0, "rx",  0.0, 10.0);
-    min->SetVariable(1, "ry",  0.0, 10.0);
-    min->SetVariable(2, "rz",  0.0, 10.0);
-    min->SetVariable(3, "px1", 0.0, 10.0);
-    min->SetVariable(4, "px2", 0.0, 10.0);
-    min->SetVariable(5, "py1", 0.0, 10.0);
-    min->SetVariable(6, "py2", 0.0, 10.0);
+    // // Tell Minuit the variables
+    // // min->SetVariable(0, "rx",  0.0, 10.0);
+    // // min->SetVariable(1, "ry",  0.0, 10.0);
+    // // min->SetVariable(2, "rz",  0.0, 10.0);
+    // // min->SetVariable(3, "px1", 0.0, 10.0);
+    // // min->SetVariable(4, "px2", 0.0, 10.0);
+    // // min->SetVariable(5, "py1", 0.0, 10.0);
+    // // min->SetVariable(6, "py2", 0.0, 10.0);
 
-    // Run the fit
-    min->Minimize();
+    // // Run the fit
+    // min->Minimize();
 
-    // Get results
-    const double* xx = min->X();
-    for (int j = 0; j < npars; j++) {
-      fBestFitPars[j] = xx[j];
-    }
+    // // Get results
+    // const double* xx = min->X();
+    // for (int j = 0; j < npars; j++) {
+    //   fBestFitPars[j] = xx[j];
+    // }
 
-    // Get Minuit Params
-    Double_t istat = 0;
-    if (min->CovMatrixStatus() > 0) istat = 3;
-    fMinuitParams[0] = pocafit->DoEval(xx);
-    fMinuitParams[1] = min->Edm();
-    fMinuitParams[2] = min->ErrorDef();
-    fMinuitParams[3] = 7;
-    fMinuitParams[4] = 7;
-    fMinuitParams[5] = istat;
+    // // Get Minuit Params
+    // Double_t istat = 0;
+    // if (min->CovMatrixStatus() > 0) istat = 3;
+    // fMinuitParams[0] = pocafit->DoEval(xx);
+    // fMinuitParams[1] = min->Edm();
+    // fMinuitParams[2] = min->ErrorDef();
+    // fMinuitParams[3] = 7;
+    // fMinuitParams[4] = 7;
+    // fMinuitParams[5] = istat;
 
     // // Cut on Chi2
+    // min->GetCovMatrix(fCovarMatrix);
+
 
     double CombinedChi2Cut = 2000;
     // if (gInputMode != kUseAll) CombinedChi2Cut = 1000;
 
-    // if (fMinuitParams[0] > CombinedChi2Cut){
-    //   continue;
-    // }      
+    if (fMinuitParams[0] > CombinedChi2Cut){
+      continue;
+    }      
 
     // Get the covariance
-    min->GetCovMatrix(fCovarMatrix);
 
     // Read params for calculations
     double fitVx  = fBestFitPars[0];
@@ -636,11 +637,11 @@ int main(int argc, char** argv) {
     double fitpy2 = fBestFitPars[6];
 
 
-    TVector3 grad1X(fitpx1, 0., 1.);
-    TVector3 grad2X(fitpx2, 0., 1.);
+    TVector3 grad1X(fitpx1, 1., 1.);
+    TVector3 grad2X(fitpx2, 1., 1.);
 
-    TVector3 grad1Y(0., fitpy1, 1.);
-    TVector3 grad2Y(0., fitpy2, 1.);
+    TVector3 grad1Y(1., fitpy1, 1.);
+    TVector3 grad2Y(1., fitpy2, 1.);
 
     TVector3 grad1(fitpx1, fitpy1, 1.);
     TVector3 grad2(fitpx2, fitpy2, 1.);
@@ -655,12 +656,25 @@ int main(int argc, char** argv) {
                 // L_offsetX = fabs(hitPosition[3] - (fitVx + fitpx1*(zPosition[3] - fitVz)));
                 // L_offsetY = fabs(hitPosition[9] - (fitVy + fitpy1*(zPosition[9] - fitVz)));
 
+    // double UPoCA_Vx = fabs(fitVx - (stf_above_x + stf_above_px * (0.0 - fitVz)));
+    // double UPoCA_Vy = fabs(fitVy - (stf_above_y + stf_above_py * (0.0 - fitVz)));
+    // double LPoCA_Vx = fabs(fitVx - (stf_below_x + stf_below_px * (0.0 - fitVz)));
+    // double LPoCA_Vy = fabs(fitVy - (stf_below_y + stf_below_py * (0.0 - fitVz)));
 
+    double projux = (fitVx + fitpx1 * (fitVz - pocafit->GetLowestXZAbove()));
+    double projuy = (fitVy + fitpy1 * (fitVz - pocafit->GetLowestYZAbove()));
+    double projlx = (fitVx + fitpx2 * (fitVz - pocafit->GetHighestXZBelow()));
+    double projly = (fitVy + fitpy2 * (fitVz - pocafit->GetHighestYZBelow()));
 
-    double U_offsetX = fabs( pocafit->GetLowestXXAbove()  - (fitVx + fitpx2 * (pocafit->GetLowestXZAbove()))  - fitVz);
-    double U_offsetY = fabs( pocafit->GetLowestYYAbove()  - (fitVy + fitpy2 * (pocafit->GetLowestYZAbove()))  - fitVz);
-    double L_offsetX = fabs( pocafit->GetHighestXXBelow() - (fitVx + fitpx1 * (pocafit->GetHighestXZBelow())) - fitVz);
-    double L_offsetY = fabs( pocafit->GetHighestYYBelow() - (fitVy + fitpy1 * (pocafit->GetHighestYZBelow())) - fitVz);
+    double U_offsetX = fabs( pocafit->GetLowestXXAbove()  - projux);
+    double U_offsetY = fabs( pocafit->GetLowestYYAbove()  - projuy);
+    double L_offsetX = fabs( pocafit->GetHighestXXBelow() - projlx);
+    double L_offsetY = fabs( pocafit->GetHighestYYBelow() - projly);
+
+    std::cout << "PROJ : " << projux << " " << projuy << " " << projlx << " " << projly << std::endl;
+    std::cout << "PLAN : " << pocafit->GetLowestXXAbove() << " " << pocafit->GetLowestYYAbove() << " " << pocafit->GetHighestXXBelow() << " " << pocafit->GetHighestYYBelow() << std::endl;
+    std::cout << "OFFS : " << U_offsetX << " " << U_offsetY << " " << L_offsetX << " " << L_offsetY << std::endl;
+
     fScattering[3] = U_offsetX; // Find lowest Z point in X
     fScattering[4] = U_offsetY; // Find lowest Z point in Y
     fScattering[5] = L_offsetX; // Find highest Z point in X
@@ -701,11 +715,34 @@ int main(int argc, char** argv) {
     fScattering[16] = fitpy2;
     fScattering[17] = fitpy1;
 
+    // fitVx = fPOCAScattering[3];
+    // fitVy = fPOCAScattering[4];
+    // fitVz = fPOCAScattering[5];
+
+    // std::cout << "Dif X : " << fitVx << " " << fPOCAScattering[3] << std::endl;
+    // std::cout << "Dif Y : " << fitVy << " " << fPOCAScattering[4] << std::endl;
+    // std::cout << "Dif Z : " << fitVz << " " << fPOCAScattering[5] << std::endl;
+
+
     // Calculate POCA Quantities
-    double UPoCA_Vx = fabs(fitVx - (fitVz - stf_above_x) / stf_above_px);
-    double UPoCA_Vy = fabs(fitVy - (fitVz - stf_above_y) / stf_above_py);
-    double LPoCA_Vx = fabs(fitVx - (fitVz - stf_below_x) / stf_below_px);
-    double LPoCA_Vy = fabs(fitVy - (fitVz - stf_below_y) / stf_below_py);
+    double UPoCA_Vx = fabs(fitVx - (stf_above_x + stf_above_px * (0.0 - fitVz)));
+    double UPoCA_Vy = fabs(fitVy - (stf_above_y + stf_above_py * (0.0 - fitVz)));
+    double LPoCA_Vx = fabs(fitVx - (stf_below_x + stf_below_px * (0.0 - fitVz)));
+    double LPoCA_Vy = fabs(fitVy - (stf_below_y + stf_below_py * (0.0 - fitVz)));
+
+
+    // pocafit->TwoTrackFit();
+    // double TUPoCA_Vx = fabs(fitVx - (fitVz - pocafit->xUFitPrms[0]) / pocafit->xUFitPrms[1]);
+    // double TUPoCA_Vy = fabs(fitVy - (fitVz - pocafit->yUFitPrms[0]) / pocafit->yUFitPrms[1]);
+    // double TLPoCA_Vx = fabs(fitVx - (fitVz - pocafit->xLFitPrms[0]) / pocafit->xLFitPrms[1]);
+    // double TLPoCA_Vy = fabs(fitVy - (fitVz - pocafit->yLFitPrms[0]) / pocafit->yLFitPrms[1]);
+
+    // std::cout << "COMP POCA Z : " << fitVz << std::endl;
+    // std::cout << "Comp UXPOCA : " << fitVx << " " << UPoCA_Vx << " : " << TUPoCA_Vx << " : " << (fitVz - pocafit->xUFitPrms[0]) / pocafit->xUFitPrms[1] << std::endl;
+    // std::cout << "Comp UYPOCA : " << fitVy << " " << UPoCA_Vy << " : " << TUPoCA_Vy << std::endl;
+    // std::cout << "Comp LXPOCA : " << fitVx << " " << LPoCA_Vx << " : " << TLPoCA_Vx << std::endl;
+    // std::cout << "Comp LYPOCA : " << fitVy << " " << LPoCA_Vy << " : " << TLPoCA_Vy << std::endl;
+
 
     // // PoCA of upper/lower tracks to CF vertex.
     fScattering[25] = UPoCA_Vx;
@@ -715,7 +752,8 @@ int main(int argc, char** argv) {
 
     // Fill this event
     otree->Fill();
-    savecount++;
+    savecount++;  
+    // if (savecount > 5) break;
 
     // Clean up look sharp
     // delete min;

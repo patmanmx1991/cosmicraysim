@@ -38,14 +38,14 @@ void BristolPoCAFitter::ReadInputTTree(TTree* t, std::string prefixa, std::strin
 	above_rpc_yt = new std::vector<double>(1, 0.0);
 	above_rpc_yz = new std::vector<double>(1, 0.0);
 	above_rpc_ye = new std::vector<double>(1, 0.0);
-	t->SetBranchAddress( (prefixa + "_rpc_xx").c_str(), &above_rpc_xx);
-	t->SetBranchAddress( (prefixa + "_rpc_xt").c_str(), &above_rpc_xt);
-	t->SetBranchAddress( (prefixa + "_rpc_xz").c_str(), &above_rpc_xz);
-	t->SetBranchAddress( (prefixa + "_rpc_xe").c_str(), &above_rpc_xe);
-	t->SetBranchAddress( (prefixa + "_rpc_yy").c_str(), &above_rpc_yy);
-	t->SetBranchAddress( (prefixa + "_rpc_yt").c_str(), &above_rpc_yt);
-	t->SetBranchAddress( (prefixa + "_rpc_yz").c_str(), &above_rpc_yz);
-	t->SetBranchAddress( (prefixa + "_rpc_ye").c_str(), &above_rpc_ye);
+	t->SetBranchAddress( (prefixa + "_rpc_yy").c_str(), &above_rpc_xx);
+	t->SetBranchAddress( (prefixa + "_rpc_yt").c_str(), &above_rpc_xt);
+	t->SetBranchAddress( (prefixa + "_rpc_yz").c_str(), &above_rpc_xz);
+	t->SetBranchAddress( (prefixa + "_rpc_ye").c_str(), &above_rpc_xe);
+	t->SetBranchAddress( (prefixa + "_rpc_xx").c_str(), &above_rpc_yy);
+	t->SetBranchAddress( (prefixa + "_rpc_xt").c_str(), &above_rpc_yt);
+	t->SetBranchAddress( (prefixa + "_rpc_xz").c_str(), &above_rpc_yz);
+	t->SetBranchAddress( (prefixa + "_rpc_xe").c_str(), &above_rpc_ye);
 
 	above_drift_xx = new std::vector<double>(1, 0.0);
 	above_drift_xg = new std::vector<double>(1, 0.0);
@@ -57,16 +57,16 @@ void BristolPoCAFitter::ReadInputTTree(TTree* t, std::string prefixa, std::strin
 	above_drift_yt = new std::vector<double>(1, 0.0);
 	above_drift_yz = new std::vector<double>(1, 0.0);
 	above_drift_ye = new std::vector<double>(1, 0.0);
-	t->SetBranchAddress( (prefixa + "_drift_xx").c_str(), &above_drift_xx);
-	t->SetBranchAddress( (prefixa + "_drift_xg").c_str(), &above_drift_xg);
-	t->SetBranchAddress( (prefixa + "_drift_xt").c_str(), &above_drift_xt);
-	t->SetBranchAddress( (prefixa + "_drift_xz").c_str(), &above_drift_xz);
-	t->SetBranchAddress( (prefixa + "_drift_xe").c_str(), &above_drift_xe);
-	t->SetBranchAddress( (prefixa + "_drift_yy").c_str(), &above_drift_yy);
-	t->SetBranchAddress( (prefixa + "_drift_yg").c_str(), &above_drift_yg);
-	t->SetBranchAddress( (prefixa + "_drift_yt").c_str(), &above_drift_yt);
-	t->SetBranchAddress( (prefixa + "_drift_yz").c_str(), &above_drift_yz);
-	t->SetBranchAddress( (prefixa + "_drift_ye").c_str(), &above_drift_ye);
+	t->SetBranchAddress( (prefixa + "_drift_yy").c_str(), &above_drift_xx);
+	t->SetBranchAddress( (prefixa + "_drift_yg").c_str(), &above_drift_xg);
+	t->SetBranchAddress( (prefixa + "_drift_yt").c_str(), &above_drift_xt);
+	t->SetBranchAddress( (prefixa + "_drift_yz").c_str(), &above_drift_xz);
+	t->SetBranchAddress( (prefixa + "_drift_ye").c_str(), &above_drift_xe);
+	t->SetBranchAddress( (prefixa + "_drift_xx").c_str(), &above_drift_yy);
+	t->SetBranchAddress( (prefixa + "_drift_xg").c_str(), &above_drift_yg);
+	t->SetBranchAddress( (prefixa + "_drift_xt").c_str(), &above_drift_yt);
+	t->SetBranchAddress( (prefixa + "_drift_xz").c_str(), &above_drift_yz);
+	t->SetBranchAddress( (prefixa + "_drift_xe").c_str(), &above_drift_ye);
 
 	below_rpc_xx = new std::vector<double>(1, 0.0);
 	below_rpc_xt = new std::vector<double>(1, 0.0);
@@ -76,14 +76,14 @@ void BristolPoCAFitter::ReadInputTTree(TTree* t, std::string prefixa, std::strin
 	below_rpc_yt = new std::vector<double>(1, 0.0);
 	below_rpc_yz = new std::vector<double>(1, 0.0);
 	below_rpc_ye = new std::vector<double>(1, 0.0);
-	t->SetBranchAddress( (prefixb + "_rpc_xx").c_str(), &below_rpc_xx);
-	t->SetBranchAddress( (prefixb + "_rpc_xt").c_str(), &below_rpc_xt);
-	t->SetBranchAddress( (prefixb + "_rpc_xz").c_str(), &below_rpc_xz);
-	t->SetBranchAddress( (prefixb + "_rpc_xe").c_str(), &below_rpc_xe);
-	t->SetBranchAddress( (prefixb + "_rpc_yy").c_str(), &below_rpc_yy);
-	t->SetBranchAddress( (prefixb + "_rpc_yt").c_str(), &below_rpc_yt);
-	t->SetBranchAddress( (prefixb + "_rpc_yz").c_str(), &below_rpc_yz);
-	t->SetBranchAddress( (prefixb + "_rpc_ye").c_str(), &below_rpc_ye);
+	t->SetBranchAddress( (prefixb + "_rpc_yy").c_str(), &below_rpc_xx);
+	t->SetBranchAddress( (prefixb + "_rpc_yt").c_str(), &below_rpc_xt);
+	t->SetBranchAddress( (prefixb + "_rpc_yz").c_str(), &below_rpc_xz);
+	t->SetBranchAddress( (prefixb + "_rpc_ye").c_str(), &below_rpc_xe);
+	t->SetBranchAddress( (prefixb + "_rpc_xx").c_str(), &below_rpc_yy);
+	t->SetBranchAddress( (prefixb + "_rpc_xt").c_str(), &below_rpc_yt);
+	t->SetBranchAddress( (prefixb + "_rpc_xz").c_str(), &below_rpc_yz);
+	t->SetBranchAddress( (prefixb + "_rpc_xe").c_str(), &below_rpc_ye);
 
 	below_drift_xx = new std::vector<double>(1, 0.0);
 	below_drift_xg = new std::vector<double>(1, 0.0);
@@ -95,16 +95,16 @@ void BristolPoCAFitter::ReadInputTTree(TTree* t, std::string prefixa, std::strin
 	below_drift_yt = new std::vector<double>(1, 0.0);
 	below_drift_yz = new std::vector<double>(1, 0.0);
 	below_drift_ye = new std::vector<double>(1, 0.0);
-	t->SetBranchAddress( (prefixb + "_drift_xx").c_str(), &below_drift_xx);
-	t->SetBranchAddress( (prefixb + "_drift_xg").c_str(), &below_drift_xg);
-	t->SetBranchAddress( (prefixb + "_drift_xt").c_str(), &below_drift_xt);
-	t->SetBranchAddress( (prefixb + "_drift_xz").c_str(), &below_drift_xz);
-	t->SetBranchAddress( (prefixb + "_drift_xe").c_str(), &below_drift_xe);
-	t->SetBranchAddress( (prefixb + "_drift_yy").c_str(), &below_drift_yy);
-	t->SetBranchAddress( (prefixb + "_drift_yg").c_str(), &below_drift_yg);
-	t->SetBranchAddress( (prefixb + "_drift_yt").c_str(), &below_drift_yt);
-	t->SetBranchAddress( (prefixb + "_drift_yz").c_str(), &below_drift_yz);
-	t->SetBranchAddress( (prefixb + "_drift_ye").c_str(), &below_drift_ye);
+	t->SetBranchAddress( (prefixb + "_drift_yy").c_str(), &below_drift_xx);
+	t->SetBranchAddress( (prefixb + "_drift_yg").c_str(), &below_drift_xg);
+	t->SetBranchAddress( (prefixb + "_drift_yt").c_str(), &below_drift_xt);
+	t->SetBranchAddress( (prefixb + "_drift_yz").c_str(), &below_drift_xz);
+	t->SetBranchAddress( (prefixb + "_drift_ye").c_str(), &below_drift_xe);
+	t->SetBranchAddress( (prefixb + "_drift_xx").c_str(), &below_drift_yy);
+	t->SetBranchAddress( (prefixb + "_drift_xg").c_str(), &below_drift_yg);
+	t->SetBranchAddress( (prefixb + "_drift_xt").c_str(), &below_drift_yt);
+	t->SetBranchAddress( (prefixb + "_drift_xz").c_str(), &below_drift_yz);
+	t->SetBranchAddress( (prefixb + "_drift_xe").c_str(), &below_drift_ye);
 
 	ClearRPCVectors();
 	ClearDriftVectors();
@@ -232,10 +232,10 @@ double BristolPoCAFitter::DoEval(const double* x) const {
 
 	// std::cout << " Total Chi2 After RPC = " << chi2 << " " << GetChi2AboveRPCX( pointx, momx2, pointz ) << " " << GetChi2AboveRPCY( pointy, momy2, pointz ) << " " << GetChi2BelowRPCX( pointx, momx1, pointz ) << " " << GetChi2BelowRPCY( pointy, momy1, pointz ) << std::endl;
 
-	chi2 += GetChi2AboveDriftX( pointx, momx2, pointz );
-	chi2 += GetChi2AboveDriftY( pointy, momy2, pointz );
-	chi2 += GetChi2BelowDriftX( pointx, momx1, pointz );
-	chi2 += GetChi2BelowDriftY( pointy, momy1, pointz );
+	// chi2 += GetChi2AboveDriftX( pointx, momx2, pointz );
+	// chi2 += GetChi2AboveDriftY( pointy, momy2, pointz );
+	// chi2 += GetChi2BelowDriftX( pointx, momx1, pointz );
+	// chi2 += GetChi2BelowDriftY( pointy, momy1, pointz );
 
 	// std::cout << "Print Level : " << ROOT::Minuit2::MnPrint::Level() << std::endl;
 
@@ -976,14 +976,10 @@ double BristolPoCAFitter::DoSingleTrackFitWithX(double* fitx, double* fitpx, dou
 
 	// Get start pos and grad from hits
 	double startx  = PredictStartX();
-	// double startz  = values_rz.at(0);
-	// double startpx = PredictStartPX();
 
 	// Run the fit
 	min->SetVariable(0, "x",   startx,  0.1);
 	min->SetVariable(1, "px1", 0.0, 10);
-	// min->SetVariable(2, "z",   startz,  0.1);
-	// min->FixVariable(2);
 	min->Minimize();
 
 	// Get the results
@@ -1233,6 +1229,213 @@ void BristolPoCAFitter::ClearDriftVectors(){
 	if (below_drift_ye) below_drift_ye->clear();
 
 }
+
+
+
+//fit two straight lines through the first and last sets of three data points
+void BristolPoCAFitter::TwoTrackFit()
+{
+	// std::cout << "Running Two Track Fit" << std::endl;
+
+	double zErrors[6] = {0.0};
+	double xHits[6], xErrors[6], yHits[6], yErrors[6];
+	double xLayers[6], yLayers[6];
+
+	FillSingleContainers(kFitAllAboveX);
+	SetVectorC( above_drift_xc );
+	for (int i = 0; i < 3; i++){
+		xHits[i] = values_rx[i];
+		xErrors[i] = values_re[i];
+		xLayers[i] = values_rz[i];
+	}
+	FillSingleContainers(kFitAllBelowX);
+	SetVectorC( below_drift_xc );
+	for (int i = 0; i < 3; i++){
+		xHits[i+3] = values_rx[i];
+		xErrors[i+3] = values_re[i];
+		xLayers[i+3] = values_rz[i];
+	}
+
+	
+	FillSingleContainers(kFitAllAboveY);
+	SetVectorC( above_drift_yc );
+	for (int i = 0; i < 3; i++){
+		yHits[i] = values_rx[i];
+		yErrors[i] = values_re[i];
+		yLayers[i] = values_rz[i];
+	}
+	FillSingleContainers(kFitAllBelowY);
+	SetVectorC( below_drift_yc );
+	for (int i = 0; i < 3; i++){
+		yHits[i+3] = values_rx[i];
+		yErrors[i+3] = values_re[i];
+		yLayers[i+3] = values_rz[i];
+	}
+
+// std::cout << "Got track hits" << std::endl;
+	double xMin = -300;
+	double xMax = 750;
+	double yMin = -300;
+	double yMax = 750;
+
+	TGraphErrors *xGraph, *yGraph, *xFitGraph, *yFitGraph;
+	TF1 *xLFitFunc, *xUFitFunc, *xLTrack, *xUTrack;
+	TF1 *yLFitFunc, *yUFitFunc, *yLTrack, *yUTrack;
+
+	xFitGraph = new TGraphErrors(6, xLayers, xHits, zErrors, xErrors);
+	yFitGraph = new TGraphErrors(6, yLayers, yHits, zErrors, yErrors);
+	xGraph = new TGraphErrors(6, xHits, xLayers, xErrors, zErrors);
+	yGraph = new TGraphErrors(6, yHits, yLayers, yErrors, zErrors);
+
+
+	// std::cout << "UX LIM : " << (xLayers[3]+xLayers[2])/2.0 << " -> " << xLayers[0] << std::endl;
+	xLFitFunc = new TF1("xLFitFunc","pol1",xLayers[5],(xLayers[3]+xLayers[2])/2.0);
+	xUFitFunc = new TF1("xUFitFunc","pol1",(xLayers[3]+xLayers[2])/2.0,xLayers[0]);
+	yLFitFunc = new TF1("yLFitFunc","pol1",yLayers[5],(yLayers[3]+yLayers[2])/2.0);
+	yUFitFunc = new TF1("yUFitFunc","pol1",(yLayers[3]+yLayers[2])/2.0,yLayers[0]);
+
+	xLTrack = new TF1("xLTrack","pol1",xMin, xMax);
+	xUTrack = new TF1("xUTrack","pol1",xMin, xMax);
+	yLTrack = new TF1("yLTrack","pol1",yMin, yMax);
+	yUTrack = new TF1("yUTrack","pol1",yMin, yMax);
+
+	//fit ignoring error bars first, to set initial parameters
+	xFitGraph->Fit(xLFitFunc,"QEX0","",xLayers[5],(xLayers[3]+xLayers[2])/2.0);
+	xFitGraph->Fit(xUFitFunc,"+QEX0","",(xLayers[3]+xLayers[2])/2.0,xLayers[0]);
+	yFitGraph->Fit(yLFitFunc,"QEX0","",yLayers[5],(yLayers[3]+yLayers[2])/2.0);
+	yFitGraph->Fit(yUFitFunc,"+QEX0","",(yLayers[3]+yLayers[2])/2.0,yLayers[0]);
+
+	//fit considering error bars to get a better fit
+	xFitGraph->Fit(xLFitFunc,"QF","",xLayers[5],(xLayers[3]+xLayers[2])/2.0);
+	xFitGraph->Fit(xUFitFunc,"+QF","",(xLayers[3]+xLayers[2])/2.0,xLayers[0]);
+	yFitGraph->Fit(yLFitFunc,"QF","",yLayers[5],(yLayers[3]+yLayers[2])/2.0);
+	yFitGraph->Fit(yUFitFunc,"+QF","",(yLayers[3]+yLayers[2])/2.0,yLayers[0]);
+
+	//fix parameters for track line
+	xLTrack->FixParameter(0, (-xLFitFunc->GetParameter(0)/xLFitFunc->GetParameter(1)));
+	xLTrack->FixParameter(1, (1.0/xLFitFunc->GetParameter(1)));
+	xUTrack->FixParameter(0, (-xUFitFunc->GetParameter(0)/xUFitFunc->GetParameter(1)));
+	xUTrack->FixParameter(1, (1.0/xUFitFunc->GetParameter(1)));
+	yLTrack->FixParameter(0, (-yLFitFunc->GetParameter(0)/yLFitFunc->GetParameter(1)));
+	yLTrack->FixParameter(1, (1.0/yLFitFunc->GetParameter(1)));
+	yUTrack->FixParameter(0, (-yUFitFunc->GetParameter(0)/yUFitFunc->GetParameter(1)));
+	yUTrack->FixParameter(1, (1.0/yUFitFunc->GetParameter(1)));
+
+	//fit with fixed parameters, just to put the line on the graph
+	xGraph->Fit(xLTrack,"BQC","",xMin, xMax);
+	xGraph->Fit(xUTrack,"+BQC","",xMin, xMax);
+	yGraph->Fit(yLTrack,"BQC","",yMin, yMax);
+	yGraph->Fit(yUTrack,"+BQC","",yMin, yMax);
+
+	//format graphs
+	xGraph->GetXaxis()->SetLimits(xMin, xMax);
+	xGraph->GetXaxis()->SetTitle("x position (strip number)");
+	xGraph->GetYaxis()->SetTitle("z position (mm)");
+	xGraph->SetTitle("Track (x strips)");
+	xGraph->SetMarkerColor(4);
+	xGraph->SetMarkerStyle(20);
+	xGraph->SetMarkerSize(0.7);
+	yGraph->GetXaxis()->SetLimits(yMin, yMax);
+	yGraph->GetXaxis()->SetTitle("x position (strip number)");
+	yGraph->GetYaxis()->SetTitle("z position (mm)");
+	yGraph->SetTitle("Track (y strips)");
+	yGraph->SetMarkerColor(4);
+	yGraph->SetMarkerStyle(20);
+	yGraph->SetMarkerSize(0.7);
+
+	xFitGraph->SetMarkerColor(4);
+	xFitGraph->SetMarkerStyle(20);
+	xFitGraph->SetMarkerSize(0.7);
+	yFitGraph->SetMarkerColor(4);
+	yFitGraph->SetMarkerStyle(20);
+	yFitGraph->SetMarkerSize(0.7);
+
+	// std::cout << "U " << xUTrack->GetParameter(1) << " " << xUTrack->GetParameter(0) << std::endl;
+	// std::cout << "L " << xLTrack->GetParameter(1) << " " << xLTrack->GetParameter(0) << std::endl;
+
+	xScatterAngle = atan( abs((xUTrack->GetParameter(1) - xLTrack->GetParameter(1))/(1 + xUTrack->GetParameter(1)*xLTrack->GetParameter(1))) );
+	yScatterAngle = atan( abs((yUTrack->GetParameter(1) - yLTrack->GetParameter(1))/(1 + yUTrack->GetParameter(1)*yLTrack->GetParameter(1))) );
+
+	// std::cout << "xScatter Angle " << xScatterAngle << std::endl;
+
+	double temp_above_px = xUTrack->GetParameter(1);
+	double temp_above_py = yUTrack->GetParameter(1);
+	double temp_below_px = xLTrack->GetParameter(1);
+	double temp_below_py = yLTrack->GetParameter(1);
+
+    // Get the scatter angles
+    TVector3 grad1X(temp_above_px, 0., 1.);
+    TVector3 grad2X(temp_below_px, 0., 1.);
+
+    TVector3 grad1Y(0., temp_above_py, 1.);
+    TVector3 grad2Y(0., temp_below_py, 1.);
+
+    TVector3 grad1(temp_above_px, temp_above_py, 1.);
+    TVector3 grad2(temp_below_px, temp_below_py, 1.);
+
+	double scatter_x  = grad1X.Angle(grad2X);
+	double scatter_y  = grad1Y.Angle(grad2Y); 
+    double scatter_3d = grad1.Angle(grad2);
+
+    // std::cout << "New Scatter Angle X : " << scatter_x << std::endl;
+
+
+	xUchi2 = xUFitFunc->GetChisquare();
+	xLchi2 = xLFitFunc->GetChisquare();
+	yUchi2 = yUFitFunc->GetChisquare();
+	yLchi2 = yLFitFunc->GetChisquare();
+	
+	trackParams[4] = xUTrack->GetParameter(0); 
+	trackParams[5] = xUTrack->GetParameter(1); 
+	trackParams[6] = xLTrack->GetParameter(0); 
+	trackParams[7] = xLTrack->GetParameter(1); 
+	trackParams[8] = yUTrack->GetParameter(0); 
+	trackParams[9] = yUTrack->GetParameter(1); 
+	trackParams[10] = yLTrack->GetParameter(0); 
+	trackParams[11] = yLTrack->GetParameter(1); 
+
+	//save fit parametes so they can be used by other functions
+	xUFitPrms[0] = xUTrack->GetParameter(0);
+	xUFitPrms[1] = xUTrack->GetParameter(1);
+	xLFitPrms[0] = xLTrack->GetParameter(0);
+	xLFitPrms[1] = xLTrack->GetParameter(1);
+	yUFitPrms[0] = yUTrack->GetParameter(0);
+	yUFitPrms[1] = yUTrack->GetParameter(1);
+	yLFitPrms[0] = yLTrack->GetParameter(0);
+	yLFitPrms[1] = yLTrack->GetParameter(1);
+
+	// Get z intersection point at layer 13 zpos.
+	
+	//x_intersect = (-400 - xUTrack->GetParameter(0)) / xUTrack->GetParameter(1);
+	//y_intersect = (-400 - yUTrack->GetParameter(0)) / yUTrack->GetParameter(1);
+
+	// if (config.perEventPlots == 1) {
+	if (false){
+		// if ((xUchi2 < 1) && (xLchi2 < 1) && (yUchi2 < 1) && (yLchi2 < 1)) {
+			xGraph->Write("x Two Track");
+			yGraph->Write("y Two Track");
+		// }
+	}
+	// //		xFitGraph->Write("x two-track fit");
+	// //		yFitGraph->Write("y two-track fit");
+	// 	}
+	// }
+
+	//clean up allocated objects
+	delete xFitGraph;
+	delete yFitGraph;
+	delete xGraph;
+	delete yGraph;
+	delete xUFitFunc;
+	delete xLFitFunc;
+	delete yUFitFunc;
+	delete yLFitFunc;
+	delete xUTrack;
+	delete xLTrack;
+	delete yUTrack;
+	delete yLTrack;
+}
+
 
 }
 

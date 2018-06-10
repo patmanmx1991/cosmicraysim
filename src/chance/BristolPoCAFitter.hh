@@ -146,6 +146,7 @@ void ApplyOffsets();
 	double GetHighestXZBelow();
 	double GetHighestYYBelow();
 	double GetHighestYZBelow();
+	void TwoTrackFit();
 
 	std::vector<bool> GetBestComboForDriftHits(int combo);
 
@@ -213,6 +214,45 @@ void ApplyOffsets();
 	std::vector<double> values_rx;
 	std::vector<double> values_re;
 	std::vector<double> values_rz;
+
+
+
+	double xFitPrms[2];
+		double yFitPrms[2];
+		double xUFitPrms[2];
+		double xLFitPrms[2];
+		double yUFitPrms[2];
+		double yLFitPrms[2];
+
+		double trackUGradient[3], trackLGradient[3];
+		double trackGradient[3];
+
+		double distance;
+		double vertex[3];
+
+		// double *hitPosition;			//array contains reconstructed hit positions
+		// double *hitErrors;				//array contains estimated errors in hit position
+
+		// double *zPosition;				//array contains z positions of channels read from file header
+		// double *residuals;				//array stores hit residuals after linear fit
+		// double *residualsTwo;
+		// double *pulls;
+		double trackParams[40];
+		
+		double xScatterAngle;
+		double yScatterAngle;
+		double scatterAngle3d;
+
+		double xchi2;
+		double ychi2;
+		double xUchi2;
+		double xLchi2;
+		double yUchi2;
+		double yLchi2;
+		
+		double x_intersect;
+		double y_intersect;
+
 
 
 protected:
@@ -290,6 +330,10 @@ protected:
 	uint fMinBDriftY;
 
 	int fStatus;
+
+
+
+
 };
 
 class BristolPoCAFitterFCN {
