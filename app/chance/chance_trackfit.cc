@@ -517,13 +517,6 @@ int main(int argc, char** argv) {
     mn_param.Add("py1", 0.0, 10);
     mn_param.Add("py2", 0.0, 10);
 
-    // mn_param.Add("vx", 250.0, 10);
-    // mn_param.Add("vy", 250.0, 10);
-    // mn_param.Add("vz", 0.0, 10);
-    // mn_param.Add("px1", stf_below_x, 10);
-    // mn_param.Add("px2", stf_above_x, 10);
-    // mn_param.Add("py1", stf_below_y, 10);
-    // mn_param.Add("py2", stf_above_y, 10);
     pocafit->SetUseAll();
 
     // Minimisation
@@ -576,22 +569,22 @@ int main(int argc, char** argv) {
     // min->SetFunction(func);
 
     // // Tell Minuit the variables
-    // min->SetVariable(0, "rx",  pocafitparams[11],   10.0);
-    // min->SetVariable(1, "ry",  pocafitparams[12],   10.0);
-    // min->SetVariable(2, "rz",  pocafitparams[13],   10.0);
-    // min->SetVariable(3, "px1", stf_below_px,        10.0);
-    // min->SetVariable(4, "px2", stf_above_px,        10.0);
-    // min->SetVariable(5, "py1", stf_below_py,        10.0);
-    // min->SetVariable(6, "py2", stf_above_py,        10.0);
+    // // min->SetVariable(0, "rx",  pocafitparams[11],   10.0);
+    // // min->SetVariable(1, "ry",  pocafitparams[12],   10.0);
+    // // min->SetVariable(2, "rz",  pocafitparams[13],   10.0);
+    // // min->SetVariable(3, "px1", stf_above_px,        10.0);
+    // // min->SetVariable(4, "px2", stf_below_px,        10.0);
+    // // min->SetVariable(5, "py1", stf_above_py,        10.0);
+    // // min->SetVariable(6, "py2", stf_below_py,        10.0);
 
     // // Tell Minuit the variables
-    // // min->SetVariable(0, "rx",  0.0, 10.0);
-    // // min->SetVariable(1, "ry",  0.0, 10.0);
-    // // min->SetVariable(2, "rz",  0.0, 10.0);
-    // // min->SetVariable(3, "px1", 0.0, 10.0);
-    // // min->SetVariable(4, "px2", 0.0, 10.0);
-    // // min->SetVariable(5, "py1", 0.0, 10.0);
-    // // min->SetVariable(6, "py2", 0.0, 10.0);
+    // min->SetVariable(0, "rx",  225.0, 10.0);
+    // min->SetVariable(1, "ry",  225.0, 10.0);
+    // min->SetVariable(2, "rz",  -250.0, 10.0);
+    // min->SetVariable(3, "px1", 0.0, 10.0);
+    // min->SetVariable(4, "px2", 0.0, 10.0);
+    // min->SetVariable(5, "py1", 0.0, 10.0);
+    // min->SetVariable(6, "py2", 0.0, 10.0);
 
     // // Run the fit
     // min->Minimize();
@@ -635,11 +628,11 @@ int main(int argc, char** argv) {
     double fitpy2 = fBestFitPars[6];
 
 
-    TVector3 grad1X(fitpx1, 1., 1.);
-    TVector3 grad2X(fitpx2, 1., 1.);
+    TVector3 grad1X(fitpx1, 0., 1.);
+    TVector3 grad2X(fitpx2, 0., 1.);
 
-    TVector3 grad1Y(1., fitpy1, 1.);
-    TVector3 grad2Y(1., fitpy2, 1.);
+    TVector3 grad1Y(0., fitpy1, 1.);
+    TVector3 grad2Y(0., fitpy2, 1.);
 
     TVector3 grad1(fitpx1, fitpy1, 1.);
     TVector3 grad2(fitpx2, fitpy2, 1.);
